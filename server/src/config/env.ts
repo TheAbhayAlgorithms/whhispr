@@ -27,7 +27,7 @@ export const env = {
   CLIENT_URL: optional('CLIENT_URL', 'http://localhost:3000'),
 
   // Database
-  DATABASE_URL: required('DATABASE_URL'),
+  DATABASE_URL: optional('DATABASE_URL', ''),
   DB_HOST: optional('DB_HOST', 'localhost'),
   DB_PORT: parseInt(optional('DB_PORT', '5432'), 10),
   DB_NAME: optional('DB_NAME', 'beacon'),
@@ -38,8 +38,14 @@ export const env = {
   REDIS_URL: optional('REDIS_URL', 'redis://localhost:6379'),
 
   // JWT
-  JWT_ACCESS_SECRET: required('JWT_ACCESS_SECRET'),
-  JWT_REFRESH_SECRET: required('JWT_REFRESH_SECRET'),
+  JWT_ACCESS_SECRET: optional(
+    'JWT_ACCESS_SECRET',
+    'whispr_default_access_secret_key_minimum_32_characters_long_jwt',
+  ),
+  JWT_REFRESH_SECRET: optional(
+    'JWT_REFRESH_SECRET',
+    'whispr_default_refresh_secret_key_minimum_32_characters_long_jwt',
+  ),
   JWT_ACCESS_EXPIRES_IN: optional('JWT_ACCESS_EXPIRES_IN', '15m'),
   JWT_REFRESH_EXPIRES_IN: optional('JWT_REFRESH_EXPIRES_IN', '7d'),
 

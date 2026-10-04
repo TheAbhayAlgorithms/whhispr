@@ -5,18 +5,34 @@
 import { Pool, PoolClient, QueryResultRow } from 'pg';
 import { env } from './env';
 
+const isCloudDb = Boolean(
+  env.DATABASE_URL &&
+    (env.DATABASE_URL.includes('supabase') ||
+      env.DATABASE_URL.includes('sslmode=require') ||
+      env.DATABASE_URL.includes('neon.tech') ||
+      env.DATABASE_URL.includes('render.com')),
+);
+
 const pool = new Pool({
-  connectionString: env.DATABASE_URL,
+  connectionString: env.DATABASE_URL || undefined,
   max: 20, // maximum pool size
   idleTimeoutMillis: 30_000,
   connectionTimeoutMillis: 5_000,
-  ssl: env.isProduction ? { rejectUnauthorized: false } : false,
+  ssl: env.isProduction || isCloudDb ? { rejectUnauthorized: false } : false,
 });
 
 // Surface pool-level errors (e.g. DB going away) without crashing
 pool.on('error', (err) => {
   console.error('[DB] Unexpected pool error:', err.message);
 });
+
+function assertDatabaseConfigured(): void {
+  if (!env.DATABASE_URL) {
+    throw new Error(
+      'DATABASE_URL is not set. Please add your Supabase connection string to your Vercel Environment Variables.',
+    );
+  }
+}
 
 /**
  * Run a single parameterised query.
@@ -26,6 +42,7 @@ export async function query<T extends QueryResultRow = QueryResultRow>(
   text: string,
   params?: unknown[],
 ): Promise<{ rows: T[]; rowCount: number | null }> {
+  assertDatabaseConfigured();
   const start = Date.now();
   const result = await pool.query<T>(text, params);
   const duration = Date.now() - start;
@@ -45,6 +62,7 @@ export async function query<T extends QueryResultRow = QueryResultRow>(
  * Always call client.release() in a finally block.
  */
 export async function getClient(): Promise<PoolClient> {
+  assertDatabaseConfigured();
   return pool.connect();
 }
 
