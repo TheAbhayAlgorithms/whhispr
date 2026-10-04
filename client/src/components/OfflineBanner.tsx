@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { WifiOff, RefreshCw } from 'lucide-react';
+import { WifiOff, RefreshCw, X } from 'lucide-react';
 import { useSocketStore } from '../store/useSocketStore';
 
 export function OfflineBanner() {
@@ -9,6 +9,7 @@ export function OfflineBanner() {
     typeof navigator !== 'undefined' ? navigator.onLine : true,
   );
   const [reconnecting, setReconnecting] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -17,6 +18,7 @@ export function OfflineBanner() {
     };
     const handleOffline = () => {
       setIsBrowserOnline(false);
+      setDismissed(false);
     };
 
     window.addEventListener('online', handleOnline);
@@ -28,8 +30,8 @@ export function OfflineBanner() {
     };
   }, [connect]);
 
-  // If both browser is online and socket is connected, do not display banner
-  if (isBrowserOnline && isConnected) {
+  // If dismissed or connected, do not display banner
+  if (dismissed || (isBrowserOnline && isConnected)) {
     return null;
   }
 
@@ -50,18 +52,28 @@ export function OfflineBanner() {
         <span>
           {!isBrowserOnline
             ? 'You are currently offline. Check your internet connection.'
-            : 'Disconnected from real-time gateway. Attempting automatic reconnection...'}
+            : 'Disconnected from real-time gateway. Messages will sync via REST.'}
         </span>
       </div>
 
-      <button
-        onClick={handleManualReconnect}
-        disabled={reconnecting}
-        className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-lg bg-white/20 hover:bg-white/30 text-white font-bold transition disabled:opacity-50"
-      >
-        <RefreshCw className={`w-3.5 h-3.5 ${reconnecting ? 'animate-spin' : ''}`} />
-        <span>{reconnecting ? 'Retrying...' : 'Reconnect'}</span>
-      </button>
+      <div className="flex items-center space-x-2">
+        <button
+          onClick={handleManualReconnect}
+          disabled={reconnecting}
+          className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-lg bg-white/20 hover:bg-white/30 text-white font-bold transition disabled:opacity-50"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${reconnecting ? 'animate-spin' : ''}`} />
+          <span>{reconnecting ? 'Retrying...' : 'Reconnect'}</span>
+        </button>
+
+        <button
+          onClick={() => setDismissed(true)}
+          className="p-1 rounded-lg bg-white/10 hover:bg-white/20 text-white transition"
+          title="Dismiss notice"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
     </div>
   );
 }
