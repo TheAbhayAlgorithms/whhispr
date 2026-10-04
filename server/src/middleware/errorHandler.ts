@@ -56,12 +56,28 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
 
   // ── Unknown / programming errors ─────────────────────────────────────────
   logger.error('Unhandled error', { message: err.message, stack: err.stack });
+
+  let clientMessage = err.message || 'An unexpected error occurred';
+  if (clientMessage.includes('password authentication failed')) {
+    clientMessage =
+      'Database connection failed: Invalid password in DATABASE_URL. Please verify your Supabase database password.';
+  } else if (
+    clientMessage.includes('does not exist') ||
+    clientMessage.includes('relation "users"') ||
+    clientMessage.includes('relation "profiles"')
+  ) {
+    clientMessage =
+      'Database tables not found. Please paste and run supabase/schema.sql in your Supabase SQL Editor.';
+  } else if (clientMessage.includes('DATABASE_URL is not set')) {
+    clientMessage =
+      'DATABASE_URL is not set in Vercel. Please add your Supabase connection string in Vercel Settings -> Environment Variables and redeploy.';
+  }
+
   const body: ErrorResponse = {
     success: false,
     error: {
       code: 'INTERNAL_ERROR',
-      message: 'An unexpected error occurred',
-      // Only expose stack in development
+      message: clientMessage,
       ...(process.env.NODE_ENV === 'development' ? { stack: err.stack } : {}),
     },
   };
