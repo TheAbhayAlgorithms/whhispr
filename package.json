@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace=server\" \"npm run dev --workspace=client\"",
+    "build": "npm run build --workspace=client",
     "lint": "npm run lint --workspace=server && npm run lint --workspace=client",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
     "test": "npm run test --workspace=server && npm run test --workspace=client",

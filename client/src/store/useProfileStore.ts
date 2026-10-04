@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { FullProfile, PublicProfile, UpdateProfileInput } from '../types/profile';
-import { apiRequest, getClientAccessToken } from '../lib/api';
+import { apiRequest, getClientAccessToken, resolveApiUrl } from '../lib/api';
 import { useAuthStore } from './useAuthStore';
 
 interface ProfileState {
@@ -81,7 +81,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
       formData.append('avatar', file);
 
       const token = getClientAccessToken();
-      const res = await fetch('/api/v1/users/profile/avatar', {
+      const res = await fetch(resolveApiUrl('/api/v1/users/profile/avatar'), {
         method: 'POST',
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),

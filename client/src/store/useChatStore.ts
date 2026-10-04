@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { apiRequest, getClientAccessToken } from '../lib/api';
+import { apiRequest, getClientAccessToken, resolveApiUrl } from '../lib/api';
 import { getSocket } from '../lib/socket';
 import { Chat, ChatMessage, GroupDetails, PublicChannel, MessageAttachment, MessageReaction } from '../types/chat';
 import { useAuthStore } from './useAuthStore';
@@ -368,7 +368,7 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
     formData.append('file', file);
 
     const token = getClientAccessToken();
-    const res = await fetch('/api/v1/media/upload', {
+    const res = await fetch(resolveApiUrl('/api/v1/media/upload'), {
       method: 'POST',
       headers: {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),

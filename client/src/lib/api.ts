@@ -30,6 +30,14 @@ export function setClientAccessToken(token: string | null): void {
   }
 }
 
+export function resolveApiUrl(endpoint: string): string {
+  if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
+    return endpoint;
+  }
+  const base = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/+$/, '') : '';
+  return `${base}${endpoint}`;
+}
+
 export function getClientAccessToken(): string | null {
   return currentAccessToken;
 }
@@ -53,7 +61,8 @@ export async function apiRequest<T = unknown>(
     reqHeaders['Authorization'] = `Bearer ${currentAccessToken}`;
   }
 
-  let response = await fetch(endpoint, {
+  const url = resolveApiUrl(endpoint);
+  let response = await fetch(url, {
     ...rest,
     headers: reqHeaders,
     credentials: 'include', // send cookies for refresh token
@@ -69,7 +78,7 @@ export async function apiRequest<T = unknown>(
     const refreshSuccess = await attemptRefreshToken();
     if (refreshSuccess && currentAccessToken) {
       reqHeaders['Authorization'] = `Bearer ${currentAccessToken}`;
-      response = await fetch(endpoint, {
+      response = await fetch(url, {
         ...rest,
         headers: reqHeaders,
         credentials: 'include',
@@ -107,7 +116,7 @@ async function attemptRefreshToken(): Promise<boolean> {
   isRefreshing = true;
   refreshPromise = (async () => {
     try {
-      const res = await fetch('/api/v1/auth/refresh', {
+      const res = await fetch(resolveApiUrl('/api/v1/auth/refresh'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

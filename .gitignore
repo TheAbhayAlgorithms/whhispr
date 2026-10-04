@@ -45,3 +45,9 @@ server/uploads/
 
 # Redis dump
 dump.rdb
+
+# Vercel
+.vercel/
+
+# Workflows (untracked due to token permissions)
+.github/
