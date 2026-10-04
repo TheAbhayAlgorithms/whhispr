@@ -394,7 +394,7 @@ export default function DashboardPage() {
         activeChat?.type === 'direct' &&
         activeChat.otherUser &&
         content &&
-        e2eeChatEnabled[activeChat.id] !== false
+        e2eeChatEnabled[activeChat.id] === true
       ) {
         try {
           contentToSend = await encryptMessage(activeChat.otherUser.id, content);

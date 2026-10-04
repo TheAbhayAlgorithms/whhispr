@@ -20,7 +20,11 @@ export function DecryptedText({ content, senderId, isMe }: DecryptedTextProps) {
       setIsEncrypted(true);
       void decryptMessage(content, senderId).then((decrypted) => {
         if (!isCancelled) {
-          setDisplayText(decrypted);
+          if (decrypted && decrypted.startsWith('{') && decrypted.includes('"e2ee":true')) {
+            setDisplayText('🔒 Encrypted message');
+          } else {
+            setDisplayText(decrypted);
+          }
         }
       });
     } else {

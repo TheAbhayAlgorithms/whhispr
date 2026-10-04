@@ -191,7 +191,10 @@ export const useE2eeStore = create<E2eeState>((set, get) => ({
 
       return await decryptAesGcm(key, envelope.ciphertext, envelope.iv);
     } catch {
-      // If decryption fails (e.g. key mismatch or plain string), return raw string or safe indicator
+      // If decryption fails (e.g. key mismatch or refreshed session), return safe indicator instead of raw JSON
+      if (envelopeJson && envelopeJson.startsWith('{') && envelopeJson.includes('"e2ee":true')) {
+        return '🔒 Encrypted message';
+      }
       return envelopeJson;
     }
   },
