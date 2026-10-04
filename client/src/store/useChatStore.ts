@@ -157,10 +157,8 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
       }));
       void get().markChatAsRead(chatId);
 
-      // Fetch initial messages if not already loaded
-      if (!get().messages[chatId]) {
-        void get().fetchMessages(chatId);
-      }
+      // Always fetch messages for selected chat
+      void get().fetchMessages(chatId);
 
       // If group or channel, fetch details
       const selected = get().chats.find((c) => c.id === chatId);
@@ -388,7 +386,10 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
   },
 
   fetchMessages: async (chatId: string, loadMore = false) => {
-    set({ isLoadingMessages: true, error: null });
+    const hasExisting = Boolean(get().messages[chatId] && get().messages[chatId].length > 0);
+    if (!loadMore && !hasExisting) {
+      set({ isLoadingMessages: true, error: null });
+    }
     try {
       const cursor = loadMore ? get().cursors[chatId] : undefined;
       const queryParam = cursor ? `?cursor=${encodeURIComponent(cursor)}&limit=50` : '?limit=50';
@@ -401,7 +402,10 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
 
       set((state) => {
         const existing = state.messages[chatId] || [];
-        const combined = loadMore ? [...newMsgs, ...existing] : newMsgs;
+        const sendingOptimistic = existing.filter((m) => m.id.startsWith('optimistic-'));
+        const combined = loadMore
+          ? [...newMsgs, ...existing]
+          : [...newMsgs, ...sendingOptimistic];
         const seen = new Set<string>();
         const deduplicated = combined.filter((m: ChatMessage) => {
           if (seen.has(m.id)) return false;

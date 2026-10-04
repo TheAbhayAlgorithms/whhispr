@@ -124,6 +124,7 @@ export default function DashboardPage() {
     isSending,
     typingUsers,
     fetchChats,
+    fetchMessages,
     selectChat,
     sendMessage,
     uploadMedia,
@@ -196,6 +197,20 @@ export default function DashboardPage() {
   useEffect(() => {
     void fetchNotifications();
   }, [fetchNotifications]);
+
+  // Real-time synchronization polling (syncs Supabase messages & chats automatically even when WebSockets are disconnected/serverless)
+  useEffect(() => {
+    if (!activeChatId) return;
+
+    void fetchMessages(activeChatId);
+
+    const interval = setInterval(() => {
+      void fetchMessages(activeChatId);
+      void fetchChats();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [activeChatId, fetchMessages, fetchChats]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messageInputRef = useRef<HTMLInputElement>(null);
