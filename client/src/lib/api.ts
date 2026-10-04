@@ -89,8 +89,12 @@ export async function apiRequest<T = unknown>(
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    const errorMsg =
+    let errorMsg =
       data?.error?.message || data?.message || `Request failed with status ${response.status}`;
+    if (response.status === 405) {
+      errorMsg =
+        'Backend server not reached (405). Please configure VITE_API_URL in your Vercel environment variables to point to your deployed backend.';
+    }
     const err = new Error(errorMsg) as Error & {
       code?: string;
       status: number;
