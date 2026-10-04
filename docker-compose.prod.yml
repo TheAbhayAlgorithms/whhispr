@@ -1,0 +1,99 @@
+# ============================================================
+# Whispr — Production Docker Compose Orchestration
+# ============================================================
+version: '3.9'
+
+services:
+  # ── PostgreSQL Database ─────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: beacon_prod_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME:-beacon}
+      POSTGRES_USER: ${DB_USER:-beacon_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-beacon_secret}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - beacon_internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-beacon_user} -d ${DB_NAME:-beacon}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis Cache & PubSub ───────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: beacon_prod_redis
+    restart: always
+    command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD:-}"
+    volumes:
+      - redis_prod_data:/data
+    networks:
+      - beacon_internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Backend Node API & WebSockets ──────────────────────────
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: beacon_prod_api
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      CLIENT_URL: ${CLIENT_URL:-http://localhost}
+      DATABASE_URL: postgres://${DB_USER:-beacon_user}:${DB_PASSWORD:-beacon_secret}@postgres:5432/${DB_NAME:-beacon}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-}@redis:6379
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_ACCESS_EXPIRES_IN: 15m
+      JWT_REFRESH_EXPIRES_IN: 7d
+      STORAGE_DRIVER: ${STORAGE_DRIVER:-local}
+      LOCAL_UPLOAD_DIR: uploads
+    volumes:
+      - uploads_prod_data:/app/uploads
+    networks:
+      - beacon_internal
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:4000/api/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ── Frontend Web & Reverse Proxy (Nginx) ────────────────────
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: beacon_prod_client
+    restart: always
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "80:80"
+    networks:
+      - beacon_internal
+
+volumes:
+  postgres_prod_data:
+  redis_prod_data:
+  uploads_prod_data:
+
+networks:
+  beacon_internal:
+    driver: bridge

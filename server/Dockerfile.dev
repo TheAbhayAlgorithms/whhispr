@@ -1,0 +1,16 @@
+# Development Dockerfile for the server
+# Uses ts-node-dev for hot reload
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies first (layer caching)
+COPY package*.json ./
+RUN npm install
+
+# Copy source (volume-mounted in dev so this is just for the image)
+COPY . .
+
+EXPOSE 4000
+
+CMD ["npm", "run", "dev"]

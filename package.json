@@ -1,0 +1,21 @@
+{
+  "name": "whispr",
+  "version": "1.0.0",
+  "description": "Whispr — Real-time chat platform monorepo",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=server\" \"npm run dev --workspace=client\"",
+    "lint": "npm run lint --workspace=server && npm run lint --workspace=client",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
+    "test": "npm run test --workspace=server && npm run test --workspace=client",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "prettier": "^3.2.5"
+  }
+}

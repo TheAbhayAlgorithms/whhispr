@@ -1,0 +1,81 @@
+# ============================================================
+# Whispr — Docker Compose (Development)
+# Starts: PostgreSQL, Redis, and the API server
+# Usage: docker-compose up -d
+# ============================================================
+version: '3.9'
+
+services:
+  # ── PostgreSQL ──────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: beacon_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: beacon
+      POSTGRES_USER: beacon_user
+      POSTGRES_PASSWORD: beacon_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Run init scripts on first boot
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U beacon_user -d beacon"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis ──────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: beacon_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ""
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── API Server ─────────────────────────────────────────────
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    container_name: beacon_api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      DATABASE_URL: postgres://beacon_user:beacon_secret@postgres:5432/beacon
+      REDIS_URL: redis://redis:6379
+      CLIENT_URL: http://localhost:3000
+      JWT_ACCESS_SECRET: dev_access_secret_change_in_production_1234
+      JWT_REFRESH_SECRET: dev_refresh_secret_change_in_production_5678
+      JWT_ACCESS_EXPIRES_IN: 15m
+      JWT_REFRESH_EXPIRES_IN: 7d
+      STORAGE_DRIVER: local
+      LOCAL_UPLOAD_DIR: uploads
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules          # anonymous volume prevents host override
+      - uploads_data:/app/uploads
+    working_dir: /app
+
+volumes:
+  postgres_data:
+  redis_data:
+  uploads_data:

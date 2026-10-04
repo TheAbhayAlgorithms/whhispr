@@ -1,0 +1,1664 @@
+openapi: '3.0.3'
+info:
+  title: Whispr Chat API
+  description: |
+    Real-time chat platform API.
+    All endpoints (except `/api/health`) require a Bearer JWT token in the `Authorization` header.
+  version: '1.0.0'
+  contact:
+    name: Whispr Team
+    email: dev@whispr.chat
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:4000/api
+    description: Local development
+  - url: https://api.whispr.chat/api
+    description: Production
+
+tags:
+  - name: Infrastructure
+    description: Health and meta endpoints
+  - name: Auth
+    description: Authentication and token management (Module 2)
+  - name: Users
+    description: User profiles (Module 3)
+  - name: Contacts
+    description: Contact / friend management (Module 4)
+  - name: Chats
+    description: Chat rooms and direct messages (Module 6)
+  - name: Messages
+    description: Messages within chats (Modules 6–13)
+  - name: Presence
+    description: Online/offline and typing indicators (Module 9)
+  - name: Notifications
+    description: In-app and push notifications (Module 15)
+  - name: Search
+    description: Global and in-chat search (Module 14)
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded]
+        timestamp:
+          type: string
+          format: date-time
+        uptime:
+          type: number
+          description: Server uptime in seconds
+        version:
+          type: string
+        services:
+          type: object
+          properties:
+            database:
+              type: string
+              enum: [ok, error]
+            redis:
+              type: string
+              enum: [ok, error]
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: VALIDATION_ERROR
+            message:
+              type: string
+              example: Validation failed
+            fields:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+
+    AuthUser:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+        displayName:
+          type: string
+        role:
+          type: string
+          enum: [user, admin]
+        isEmailVerified:
+          type: boolean
+
+    AuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/AuthUser'
+            accessToken:
+              type: string
+            refreshToken:
+              type: string
+
+paths:
+  /health:
+    get:
+      tags: [Infrastructure]
+      summary: Health check
+      description: Returns the operational status of the API and its backing services.
+      operationId: getHealth
+      responses:
+        '200':
+          description: All services healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: One or more services degraded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /v1/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, username, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                username:
+                  type: string
+                password:
+                  type: string
+                displayName:
+                  type: string
+      responses:
+        '201':
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '409':
+          description: Email or username already taken
+
+  /v1/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login with credentials
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [identifier, password]
+              properties:
+                identifier:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Authenticated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid credentials
+
+  /v1/auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Rotate refresh token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: Tokens rotated successfully
+
+  /v1/auth/logout:
+    post:
+      tags: [Auth]
+      summary: Logout and revoke refresh token
+      responses:
+        '200':
+          description: Logged out successfully
+
+  /v1/auth/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Request password reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Reset email sent if account exists
+
+  /v1/auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Complete password reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, password]
+              properties:
+                token:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Password updated successfully
+
+  /v1/auth/verify-email/{token}:
+    get:
+      tags: [Auth]
+      summary: Verify email address
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Email verified successfully
+
+  /v1/auth/me:
+    get:
+      tags: [Auth]
+      summary: Get current authenticated user
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Current user profile
+        '401':
+          description: Unauthorized
+
+  /v1/users/profile/me:
+    get:
+      tags: [Users]
+      summary: Get authenticated user's full personal profile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Full profile with privacy settings
+        '401':
+          description: Unauthorized
+    patch:
+      tags: [Users]
+      summary: Update authenticated user's profile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                displayName:
+                  type: string
+                bio:
+                  type: string
+                statusMessage:
+                  type: string
+                lastSeenVisibility:
+                  type: string
+                  enum: [everyone, contacts, nobody]
+                avatarVisibility:
+                  type: string
+                  enum: [everyone, contacts, nobody]
+                addMePolicy:
+                  type: string
+                  enum: [everyone, contacts, nobody]
+      responses:
+        '200':
+          description: Profile updated successfully
+
+  /v1/users/profile/avatar:
+    post:
+      tags: [Users]
+      summary: Upload user profile avatar
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Avatar uploaded successfully
+    delete:
+      tags: [Users]
+      summary: Remove avatar
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Avatar removed successfully
+
+  /v1/users/search:
+    get:
+      tags: [Users]
+      summary: Search users by username or display name
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Matching users
+
+  /v1/users/{id}/profile:
+    get:
+      tags: [Users]
+      summary: View another user's public profile
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Public profile respecting privacy settings
+        '404':
+          description: User not found
+
+  /v1/contacts:
+    get:
+      tags: [Contacts]
+      summary: List all accepted contacts
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of contacts with profile details
+
+  /v1/contacts/requests:
+    get:
+      tags: [Contacts]
+      summary: List pending incoming and outgoing contact requests
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Incoming and outgoing pending requests
+    post:
+      tags: [Contacts]
+      summary: Send a contact request
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                targetUserId:
+                  type: string
+                  format: uuid
+                username:
+                  type: string
+      responses:
+        '201':
+          description: Request sent or auto-accepted upon mutual request
+        '400':
+          description: Validation error or cannot add self
+        '409':
+          description: Request already sent or already a contact
+
+  /v1/contacts/requests/{requestId}/respond:
+    post:
+      tags: [Contacts]
+      summary: Respond to a pending contact request (accept or reject)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action:
+                  type: string
+                  enum: [accept, reject]
+      responses:
+        '200':
+          description: Request responded to successfully
+        '404':
+          description: Request not found
+
+  /v1/contacts/{targetUserId}:
+    delete:
+      tags: [Contacts]
+      summary: Remove an accepted contact
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: targetUserId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Contact removed successfully
+        '404':
+          description: Contact relationship not found
+
+  /v1/chats:
+    get:
+      tags: [Chats]
+      summary: List chats for current authenticated user
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of user chats with participant and last message info
+
+  /v1/chats/direct:
+    post:
+      tags: [Chats]
+      summary: Create or retrieve an existing 1-on-1 direct chat
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [targetUserId]
+              properties:
+                targetUserId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Direct chat retrieved or created
+        '400':
+          description: Cannot start a direct chat with yourself
+        '404':
+          description: Target user not found
+
+  /v1/chats/{chatId}/messages:
+    get:
+      tags: [Messages]
+      summary: Get paginated messages for a chat
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: cursor
+          in: query
+          description: ISO timestamp or message ID for cursor pagination
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Messages array with nextCursor
+        '403':
+          description: Not a member of this chat
+        '404':
+          description: Chat not found
+    post:
+      tags: [Messages]
+      summary: Send a message in a chat
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content:
+                  type: string
+                type:
+                  type: string
+                  enum: [text, image, file, audio, video]
+                  default: text
+                replyToId:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Message created and broadcasted
+        '403':
+          description: Not a member of this chat
+        '422':
+          description: Validation error
+
+  /v1/chats/{chatId}/read:
+    post:
+      tags: [Chats]
+      summary: Mark chat messages as read
+      description: Marks all unread messages in the specified chat as read for the authenticated user and emits real-time status updates.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Chat messages marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      chatId:
+                        type: string
+                        format: uuid
+                      affectedCount:
+                        type: integer
+                      readMessageIds:
+                        type: array
+                        items:
+                          type: string
+                          format: uuid
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not a member of this chat
+
+  /v1/messages/{messageId}:
+    patch:
+      tags: [Messages]
+      summary: Edit message content
+      description: Edits an existing message sent by the caller within 15 minutes of sending. Broadcasts message:updated event to chat.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content:
+                  type: string
+                  example: "Updated message text"
+      responses:
+        '200':
+          description: Message updated successfully
+        '400':
+          description: Edit window expired or empty content
+        '403':
+          description: Caller is not the message author
+        '404':
+          description: Message not found
+
+    delete:
+      tags: [Messages]
+      summary: Delete a message
+      description: Deletes a message either locally for caller ('me') or globally for everyone ('everyone').
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: mode
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [me, everyone]
+            default: everyone
+      responses:
+        '200':
+          description: Message deleted successfully
+        '403':
+          description: Not authorized to delete message for everyone
+        '404':
+          description: Message not found
+
+  /v1/messages/{messageId}/reactions:
+    post:
+      tags: [Messages]
+      summary: Toggle emoji reaction on a message
+      description: Adds an emoji reaction if not present, or removes it if already present. Emits real-time socket update to chat participants.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [emoji]
+              properties:
+                emoji:
+                  type: string
+                  example: "❤️"
+      responses:
+        '200':
+          description: Reaction toggled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      action:
+                        type: string
+                        enum: [added, removed]
+                      messageId:
+                        type: string
+                        format: uuid
+                      chatId:
+                        type: string
+                        format: uuid
+                      emoji:
+                        type: string
+                      reactions:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            emoji:
+                              type: string
+                            count:
+                              type: integer
+                            hasReacted:
+                              type: boolean
+        '400':
+          description: Invalid emoji
+        '401':
+          description: Unauthorized
+        '403':
+          description: Not a member of the chat
+        '404':
+          description: Message not found
+
+  /v1/search:
+    get:
+      tags: [Search]
+      summary: Unified search across messages, users, and channels
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Unified search results
+
+  /v1/search/messages:
+    get:
+      tags: [Search]
+      summary: Search messages with optional in-chat scoping
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: chatId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Message search results
+
+  /v1/search/users:
+    get:
+      tags: [Search]
+      summary: Search users by username or display name
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User search results
+
+  /v1/search/chats:
+    get:
+      tags: [Search]
+      summary: Search groups, direct chats, and public channels
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Chat search results
+
+  /v1/groups:
+    post:
+      tags: [Chats]
+      summary: Create a new group chat
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                avatarUrl:
+                  type: string
+                memberIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        '201':
+          description: Group chat created with creator as owner
+
+  /v1/groups/channels:
+    post:
+      tags: [Chats]
+      summary: Create a new public or private channel
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                avatarUrl:
+                  type: string
+                isPublic:
+                  type: boolean
+                memberIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        '201':
+          description: Channel created
+
+  /v1/groups/channels/public:
+    get:
+      tags: [Chats]
+      summary: Search and browse public channels
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of public channels with member count and join status
+
+  /v1/groups/channels/{chatId}/join:
+    post:
+      tags: [Chats]
+      summary: Join an open public channel
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully joined the channel
+
+  /v1/groups/{chatId}/details:
+    get:
+      tags: [Chats]
+      summary: Get group/channel metadata and member roster
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Chat details and member list
+        '403':
+          description: Forbidden for non-members of private groups
+
+  /v1/groups/{chatId}:
+    patch:
+      tags: [Chats]
+      summary: Update group/channel metadata
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                avatarUrl:
+                  type: string
+                isPublic:
+                  type: boolean
+      responses:
+        '200':
+          description: Group updated
+
+  /v1/groups/{chatId}/members:
+    post:
+      tags: [Chats]
+      summary: Add members to group or channel
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [memberIds]
+              properties:
+                memberIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        '200':
+          description: Members added
+
+  /v1/groups/{chatId}/members/{targetUserId}:
+    delete:
+      tags: [Chats]
+      summary: Remove / kick a member from group
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: targetUserId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Member removed
+
+  /v1/groups/{chatId}/members/{targetUserId}/role:
+    patch:
+      tags: [Chats]
+      summary: Update a member's role (admin, moderator, member)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: targetUserId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role:
+                  type: string
+                  enum: [admin, moderator, member]
+      responses:
+        '200':
+          description: Role updated
+
+  /v1/groups/{chatId}/leave:
+    post:
+      tags: [Chats]
+      summary: Voluntarily leave group or channel
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Left group successfully
+
+  /v1/media/upload:
+    post:
+      tags: [Messages]
+      summary: Upload a media file or document attachment
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Media uploaded successfully with storage key and publicUrl
+        '400':
+          description: Unsupported file format or file size exceeded
+        '401':
+          description: Unauthorized
+
+  /v1/media/file/{filename}:
+    get:
+      tags: [Messages]
+      summary: Stream media file with HTTP Range support for audio, video, and images
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Media stream
+        '206':
+          description: Partial content range stream
+        '404':
+          description: File not found
+
+  /v1/media/download/{filename}:
+    get:
+      tags: [Messages]
+      summary: Download file attachment with Content-Disposition
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: File download stream
+        '404':
+          description: File not found
+
+  /v1/calls/ice-servers:
+    get:
+      tags: [Calls]
+      summary: Retrieve WebRTC ICE servers (STUN/TURN) configuration
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of ICE servers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      iceServers:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            urls:
+                              oneOf:
+                                - type: string
+                                - type: array
+                                  items:
+                                    type: string
+                            username:
+                              type: string
+                            credential:
+                              type: string
+        '401':
+          description: Unauthorized
+
+  /v1/calls/log:
+    post:
+      tags: [Calls]
+      summary: Log a voice or video call event
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [recipientId, type, status]
+              properties:
+                chatId:
+                  type: string
+                  format: uuid
+                recipientId:
+                  type: string
+                  format: uuid
+                type:
+                  type: string
+                  enum: [audio, video]
+                status:
+                  type: string
+                  enum: [missed, completed, rejected, busy, cancelled]
+                duration:
+                  type: integer
+                  minimum: 0
+                  default: 0
+                startedAt:
+                  type: string
+                  format: date-time
+                endedAt:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Call logged successfully
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+
+  /v1/calls/history:
+    get:
+      tags: [Calls]
+      summary: Fetch call history for authenticated user
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: User call logs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      calls:
+                        type: array
+                        items:
+                          type: object
+                      total:
+                        type: integer
+                      limit:
+                        type: integer
+                      offset:
+                        type: integer
+        '401':
+          description: Unauthorized
+
+  /v1/e2ee/keys:
+    post:
+      tags: [E2EE]
+      summary: Register or update user's Signal Protocol cryptographic key bundle
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [registrationId, identityKey, signedPrekey]
+              properties:
+                registrationId:
+                  type: integer
+                identityKey:
+                  type: string
+                signedPrekey:
+                  type: object
+                  required: [keyId, publicKey, signature]
+                  properties:
+                    keyId:
+                      type: integer
+                    publicKey:
+                      type: string
+                    signature:
+                      type: string
+                oneTimePrekeys:
+                  type: array
+                  items:
+                    type: object
+                    required: [keyId, publicKey]
+                    properties:
+                      keyId:
+                        type: integer
+                      publicKey:
+                        type: string
+      responses:
+        '201':
+          description: E2EE keys registered successfully
+        '400':
+          description: Invalid key parameters
+        '401':
+          description: Unauthorized
+
+  /v1/e2ee/bundle/{userId}:
+    get:
+      tags: [E2EE]
+      summary: Fetch a Prekey Bundle to initiate an X3DH E2EE session with target user
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User's prekey bundle (consumes one OTPK atomically)
+        '401':
+          description: Unauthorized
+        '404':
+          description: Target user has not registered E2EE keys
+
+  /v1/e2ee/keys/count:
+    get:
+      tags: [E2EE]
+      summary: Get count of remaining unused one-time prekeys
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Unused one-time prekeys count
+        '401':
+          description: Unauthorized
+
+  /v1/e2ee/keys/replenish:
+    post:
+      tags: [E2EE]
+      summary: Replenish one-time prekeys pool
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [keys]
+              properties:
+                keys:
+                  type: array
+                  items:
+                    type: object
+                    required: [keyId, publicKey]
+                    properties:
+                      keyId:
+                        type: integer
+                      publicKey:
+                        type: string
+      responses:
+        '200':
+          description: Prekeys added successfully
+        '401':
+          description: Unauthorized
+
+  /v1/notifications:
+    get:
+      tags: [Notifications]
+      summary: Retrieve in-app notifications and unread badge count
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: unreadOnly
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: List of notifications and unread counter
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      notifications:
+                        type: array
+                        items:
+                          type: object
+                      total:
+                        type: integer
+                      unreadCount:
+                        type: integer
+        '401':
+          description: Unauthorized
+
+  /v1/notifications/read-all:
+    patch:
+      tags: [Notifications]
+      summary: Mark all notifications as read
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: All notifications marked as read
+        '401':
+          description: Unauthorized
+
+  /v1/notifications/{id}/read:
+    patch:
+      tags: [Notifications]
+      summary: Mark single notification as read
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Notification marked as read
+        '401':
+          description: Unauthorized
+        '404':
+          description: Notification not found
+
+  /v1/notifications/{id}:
+    delete:
+      tags: [Notifications]
+      summary: Delete a notification
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Notification deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Notification not found
+
+  /v1/notifications/push/vapid-key:
+    get:
+      tags: [Notifications]
+      summary: Get VAPID public key for Web Push subscription
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: VAPID public key
+        '401':
+          description: Unauthorized
+
+  /v1/notifications/push/subscribe:
+    post:
+      tags: [Notifications]
+      summary: Register a Web Push subscription
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [endpoint, p256dh, auth]
+              properties:
+                endpoint:
+                  type: string
+                p256dh:
+                  type: string
+                auth:
+                  type: string
+                userAgent:
+                  type: string
+      responses:
+        '201':
+          description: Subscribed to Web Push
+        '401':
+          description: Unauthorized
+
+  /v1/notifications/push/unsubscribe:
+    delete:
+      tags: [Notifications]
+      summary: Remove a Web Push subscription
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [endpoint]
+              properties:
+                endpoint:
+                  type: string
+      responses:
+        '200':
+          description: Unsubscribed from Web Push
+        '401':
+          description: Unauthorized
+
+  /v1/settings/password:
+    patch:
+      tags: [Settings]
+      summary: Change user password
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPassword, newPassword]
+              properties:
+                currentPassword:
+                  type: string
+                newPassword:
+                  type: string
+                  minLength: 8
+      responses:
+        '200':
+          description: Password updated successfully
+        '400':
+          description: Validation error or same password
+        '401':
+          description: Invalid current password
+
+  /v1/settings/account:
+    delete:
+      tags: [Settings]
+      summary: Permanently delete account (soft-delete)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password, confirmText]
+              properties:
+                password:
+                  type: string
+                confirmText:
+                  type: string
+                  enum: [DELETE]
+      responses:
+        '200':
+          description: Account deleted successfully
+        '400':
+          description: Confirmation text mismatch
+        '401':
+          description: Incorrect password
+
+  /v1/settings/sessions:
+    get:
+      tags: [Settings]
+      summary: List all active login sessions
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of active sessions
+    delete:
+      tags: [Settings]
+      summary: Revoke all other active sessions except current
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Other sessions revoked
+
+  /v1/settings/sessions/{sessionId}:
+    delete:
+      tags: [Settings]
+      summary: Revoke a specific session
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Session revoked
+        '404':
+          description: Session not found
+

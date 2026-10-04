@@ -1,0 +1,55 @@
+config:
+  target: "http://localhost:4000"
+  phases:
+    - duration: 20
+      arrivalRate: 10
+      rampTo: 50
+      name: "Warm-up phase"
+    - duration: 30
+      arrivalRate: 50
+      name: "Sustained high load"
+    - duration: 15
+      arrivalRate: 100
+      name: "Peak burst"
+  defaults:
+    headers:
+      Content-Type: "application/json"
+
+scenarios:
+  - name: "Health Check Probe"
+    weight: 30
+    flow:
+      - get:
+          url: "/api/health"
+
+  - name: "Public Channels Discovery"
+    weight: 40
+    flow:
+      - post:
+          url: "/api/v1/auth/login"
+          json:
+            identifier: "alice"
+            password: "Password123!"
+          capture:
+            - json: "$.data.accessToken"
+              as: "token"
+      - get:
+          url: "/api/v1/groups/channels/public"
+          headers:
+            Authorization: "Bearer {{ token }}"
+
+  - name: "Authenticated Profile & Cache Test"
+    weight: 30
+    flow:
+      - post:
+          url: "/api/v1/auth/login"
+          json:
+            identifier: "alice"
+            password: "Password123!"
+          capture:
+            - json: "$.data.accessToken"
+              as: "token"
+      - get:
+          url: "/api/v1/users/profile/me"
+          headers:
+            Authorization: "Bearer {{ token }}"
