@@ -241,7 +241,14 @@ export default function DashboardPage() {
     }
   }, [replyingTo]);
 
-  const chatsList = Array.isArray(chats) ? chats : [];
+  const rawChatsList = Array.isArray(chats) ? chats : [];
+  const seenDirectUsers = new Set<string>();
+  const chatsList = rawChatsList.filter((c) => {
+    if (c.type !== 'direct' || !c.otherUser?.id) return true;
+    if (seenDirectUsers.has(c.otherUser.id)) return false;
+    seenDirectUsers.add(c.otherUser.id);
+    return true;
+  });
   const activeChat = chatsList.find((c) => c.id === activeChatId);
   const currentMessages = activeChatId ? messages[activeChatId] || [] : [];
   const activeTyping = activeChatId ? typingUsers[activeChatId] || [] : [];

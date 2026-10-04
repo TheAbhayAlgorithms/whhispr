@@ -124,11 +124,23 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
     set({ isLoadingChats: true, error: null });
     try {
       const res = await apiRequest<{ success: boolean; data: { chats: Chat[] } | Chat[] }>('/api/v1/chats');
-      const chatsList = Array.isArray(res.data)
+      const rawChats = Array.isArray(res.data)
         ? res.data
         : (res.data && Array.isArray((res.data as any).chats))
         ? (res.data as any).chats
         : [];
+
+      // Deduplicate direct chats so only ONE conversation per contact is kept
+      const seenDirectUsers = new Set<string>();
+      const chatsList: Chat[] = [];
+      for (const chat of rawChats) {
+        if (chat.type === 'direct' && chat.otherUser?.id) {
+          if (seenDirectUsers.has(chat.otherUser.id)) continue;
+          seenDirectUsers.add(chat.otherUser.id);
+        }
+        chatsList.push(chat);
+      }
+
       set({ chats: chatsList, isLoadingChats: false });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to fetch chats';
@@ -169,6 +181,15 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
   },
 
   getOrCreateDirectChat: async (targetUserId: string): Promise<Chat> => {
+    // 1. If a direct chat with this user already exists locally, select and return it immediately
+    const existing = get().chats.find(
+      (c) => c.type === 'direct' && c.otherUser?.id === targetUserId,
+    );
+    if (existing) {
+      await get().selectChat(existing.id);
+      return existing;
+    }
+
     set({ error: null });
     try {
       const res = await apiRequest<{ success: boolean; data: { chat: Chat } | Chat }>('/api/v1/chats/direct', {
@@ -178,14 +199,11 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
       const chat = (res.data && 'chat' in res.data) ? (res.data as any).chat : (res.data as Chat);
 
       set((state) => {
-        const existingIdx = state.chats.findIndex((c) => c.id === chat.id);
-        let updatedChats: Chat[];
-        if (existingIdx >= 0) {
-          updatedChats = [chat, ...state.chats.filter((c) => c.id !== chat.id)];
-        } else {
-          updatedChats = [chat, ...state.chats];
-        }
-        return { chats: updatedChats };
+        // Filter out any chats with the same ID or same otherUser
+        const filtered = state.chats.filter(
+          (c) => c.id !== chat.id && !(c.type === 'direct' && c.otherUser?.id === chat.otherUser?.id),
+        );
+        return { chats: [chat, ...filtered] };
       });
 
       await get().selectChat(chat.id);

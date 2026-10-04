@@ -71,9 +71,12 @@ export class ChatService {
     const { rows: existingChats } = await query<{ id: string; created_at: Date; updated_at: Date }>(
       `SELECT c.id, c.created_at, c.updated_at
        FROM chats c
-       JOIN chat_members m1 ON m1.chat_id = c.id AND m1.user_id = $1 AND m1.left_at IS NULL
-       JOIN chat_members m2 ON m2.chat_id = c.id AND m2.user_id = $2 AND m2.left_at IS NULL
+       JOIN chat_members m1 ON m1.chat_id = c.id AND m1.user_id = $1::uuid AND m1.left_at IS NULL
+       JOIN chat_members m2 ON m2.chat_id = c.id AND m2.user_id = $2::uuid AND m2.left_at IS NULL
        WHERE c.type = 'direct'
+       ORDER BY (
+         SELECT COUNT(*) FROM messages msg WHERE msg.chat_id = c.id
+       ) DESC, c.created_at ASC
        LIMIT 1`,
       [currentUserId, targetUserId],
     );
@@ -206,7 +209,21 @@ export class ChatService {
       [userId],
     );
 
-    return rows.map((r) => {
+    // Clean up redundant empty direct chats in the background
+    void this.cleanupDuplicateDirectChats(userId);
+
+    // Deduplicate direct chats so only ONE conversation per contact is returned
+    const seenOtherUserIds = new Set<string>();
+    const deduplicatedRows = rows.filter((r) => {
+      if (r.chat_type !== 'direct' || !r.other_user_id) return true;
+      if (seenOtherUserIds.has(r.other_user_id)) {
+        return false;
+      }
+      seenOtherUserIds.add(r.other_user_id);
+      return true;
+    });
+
+    return deduplicatedRows.map((r) => {
       let otherUser: ChatParticipant | undefined;
       if (r.other_user_id && r.other_username && r.other_display_name) {
         otherUser = {
@@ -243,6 +260,38 @@ export class ChatService {
         unreadCount: 0,
       };
     });
+  }
+
+  /**
+   * Safely deletes empty duplicate direct chats between users when an active chat exists.
+   */
+  static async cleanupDuplicateDirectChats(userId: string): Promise<void> {
+    try {
+      await query(
+        `DELETE FROM chats
+         WHERE id IN (
+           SELECT c_empty.id
+           FROM chats c_empty
+           JOIN chat_members m1_empty ON m1_empty.chat_id = c_empty.id AND m1_empty.user_id = $1::uuid
+           JOIN chat_members m2_empty ON m2_empty.chat_id = c_empty.id AND m2_empty.user_id != $1::uuid
+           WHERE c_empty.type = 'direct'
+             AND NOT EXISTS (
+               SELECT 1 FROM messages msg WHERE msg.chat_id = c_empty.id
+             )
+             AND EXISTS (
+               SELECT 1
+               FROM chats c_other
+               JOIN chat_members m1_other ON m1_other.chat_id = c_other.id AND m1_other.user_id = m1_empty.user_id
+               JOIN chat_members m2_other ON m2_other.chat_id = c_other.id AND m2_other.user_id = m2_empty.user_id
+               WHERE c_other.id != c_empty.id
+                 AND c_other.type = 'direct'
+             )
+         )`,
+        [userId],
+      );
+    } catch {
+      // Non-blocking cleanup
+    }
   }
 
   /**
