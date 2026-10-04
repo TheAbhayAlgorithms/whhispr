@@ -53,6 +53,12 @@ export class AuthService {
     const name = displayName?.trim() || username;
 
     const user = await withTransaction(async (client) => {
+      // If this is the very first user registering on the platform, grant admin role and auto-verify
+      const countRes = await client.query<{ count: string }>('SELECT COUNT(*) as count FROM users');
+      const isFirstUser = parseInt(countRes.rows[0]?.count || '0', 10) === 0;
+      const initialRole = isFirstUser ? 'admin' : 'user';
+      const isAutoVerified = isFirstUser;
+
       const userRes = await client.query<{
         id: string;
         email: string;
@@ -61,10 +67,18 @@ export class AuthService {
         is_email_verified: boolean;
       }>(
         `INSERT INTO users (
-          email, username, password_hash, email_verify_token, email_verify_expires
-        ) VALUES ($1, $2, $3, $4, $5)
+          email, username, password_hash, email_verify_token, email_verify_expires, role, is_email_verified
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING id, email, username, role, is_email_verified`,
-        [email.toLowerCase(), username.toLowerCase(), passwordHash, verifyToken, verifyExpires],
+        [
+          email.toLowerCase(),
+          username.toLowerCase(),
+          passwordHash,
+          verifyToken,
+          verifyExpires,
+          initialRole,
+          isAutoVerified,
+        ],
       );
 
       const newUser = userRes.rows[0];

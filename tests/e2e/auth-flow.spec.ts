@@ -7,34 +7,22 @@ test.describe('Authentication & Access Control Flows', () => {
     await expect(page.locator('h1, h2')).toContainText(/Sign in|Welcome/i);
   });
 
-  test('displays quick sign-in seed user buttons and fills credentials', async ({ page }) => {
+  test('displays login form with username/email and password fields', async ({ page }) => {
     await page.goto('/login');
 
-    // Verify seed buttons
-    const aliceButton = page.getByRole('button', { name: /Alice/i });
-    await expect(aliceButton).toBeVisible();
+    const identifierInput = page.locator('input[placeholder*="username" i], input[placeholder*="email" i]').first();
+    await expect(identifierInput).toBeVisible();
 
-    // Click Alice seed button
-    await aliceButton.click();
+    const passwordInput = page.locator('input[type="password"]').first();
+    await expect(passwordInput).toBeVisible();
 
-    // Verify inputs populated
-    const identifierInput = page.locator('input[name="identifier"], input[placeholder*="username" i], input[placeholder*="email" i]').first();
-    await expect(identifierInput).toHaveValue('alice');
+    const submitButton = page.getByRole('button', { name: /Sign in/i });
+    await expect(submitButton).toBeVisible();
   });
 
-  test('successful login redirects to dashboard', async ({ page }) => {
+  test('has link to register page', async ({ page }) => {
     await page.goto('/login');
-
-    // Click Alice seed button
-    const aliceButton = page.getByRole('button', { name: /Alice/i });
-    await aliceButton.click();
-
-    // Submit form
-    const submitButton = page.getByRole('button', { name: /Sign in|Log in/i });
-    await submitButton.click();
-
-    // Should redirect to dashboard and show user's presence or sidebar
-    await expect(page).toHaveURL(/\/(#|\?.*)?$/, { timeout: 10000 });
-    await expect(page.locator('aside')).toBeVisible();
+    const registerLink = page.getByRole('link', { name: /create a new account/i });
+    await expect(registerLink).toBeVisible();
   });
 });

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
-import { MessageSquare, Lock, User, AlertCircle, ArrowRight, Check } from 'lucide-react';
+import { MessageSquare, Lock, User, AlertCircle, ArrowRight } from 'lucide-react';
 import { ThemeToggle } from '../components/ThemeToggle';
 
 export default function LoginPage() {
@@ -36,12 +36,6 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const fillDemoAccount = (username: string) => {
-    setIdentifier(username);
-    setPassword('Password123!');
-    setFormError(null);
   };
 
   return (
@@ -97,7 +91,7 @@ export default function LoginPage() {
                   required
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder="alice or alice@whispr.chat"
+                  placeholder="Enter username or email"
                   className="block w-full pl-10 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-300 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm transition"
                 />
               </div>
@@ -149,30 +143,6 @@ export default function LoginPage() {
               )}
             </button>
           </form>
-
-          {/* Quick Demo Switcher */}
-          <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
-            <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold mb-3 text-center">
-              Quick Sign In (Seed Users)
-            </p>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { name: 'Alice', user: 'alice' },
-                { name: 'Bob', user: 'bob' },
-                { name: 'Carol', user: 'carol' },
-              ].map((demo) => (
-                <button
-                  key={demo.user}
-                  type="button"
-                  onClick={() => fillDemoAccount(demo.user)}
-                  className="flex items-center justify-center space-x-1.5 py-1.5 px-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700 border border-slate-300/70 dark:border-slate-700/60 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 transition"
-                >
-                  <Check className="w-3 h-3 text-indigo-500 dark:text-indigo-400" />
-                  <span>{demo.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>

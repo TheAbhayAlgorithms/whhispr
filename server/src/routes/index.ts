@@ -16,6 +16,7 @@ import callRouter from './call.routes';
 import e2eeRouter from './e2ee.routes';
 import notificationRouter from './notification.routes';
 import settingsRouter from './settings.routes';
+import adminRouter from './admin.routes';
 import docsRouter from './docs.routes';
 
 const router = Router();
@@ -36,6 +37,7 @@ router.use('/v1/calls', callRouter);
 router.use('/v1/e2ee', e2eeRouter);
 router.use('/v1/notifications', notificationRouter);
 router.use('/v1/settings', settingsRouter);
+router.use('/v1/admin', adminRouter);
 
 // API Documentation (Swagger UI & OpenAPI)
 router.use('/docs', docsRouter);

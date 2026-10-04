@@ -58,6 +58,7 @@ import {
   Phone,
   PhoneCall,
   Video,
+  Shield,
   Settings as SettingsIcon,
   ArrowLeft,
   Clock,
@@ -531,6 +532,17 @@ export default function DashboardPage() {
             <SettingsIcon className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
             <span className="hidden sm:inline">Settings</span>
           </Link>
+
+          {user?.role === 'admin' && (
+            <Link
+              to="/admin"
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/50 border border-purple-200 dark:border-purple-500/40 text-xs font-semibold text-purple-600 dark:text-purple-300 transition"
+              title="Admin Portal"
+            >
+              <Shield className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+              <span className="hidden sm:inline">Admin</span>
+            </Link>
+          )}
 
           <div className="hidden md:flex items-center space-x-2 pl-2 border-l border-slate-200 dark:border-slate-800 text-right">
             <div>

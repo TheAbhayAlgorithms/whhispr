@@ -28,7 +28,19 @@ export function createApp(): Application {
   // ── CORS ───────────────────────────────────────────────────────────────
   app.use(
     cors({
-      origin: env.CLIENT_URL,
+      origin: (origin, callback) => {
+        // Allow requests with no origin (e.g. mobile apps, curl, health checks)
+        if (!origin) return callback(null, true);
+        if (
+          !env.isProduction ||
+          origin === env.CLIENT_URL ||
+          origin.endsWith('.vercel.app') ||
+          origin.includes('localhost')
+        ) {
+          return callback(null, true);
+        }
+        return callback(null, true);
+      },
       credentials: true, // allow cookies/auth headers
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],

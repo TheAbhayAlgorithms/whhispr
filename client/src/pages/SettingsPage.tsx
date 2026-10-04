@@ -352,6 +352,28 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </button>
+
+              {user?.role === 'admin' && (
+                <div className="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800">
+                  <Link
+                    to="/admin"
+                    className="flex items-center space-x-3 w-full px-4 py-3 rounded-2xl font-medium text-sm transition text-left bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20 dark:hover:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/40 shadow-sm"
+                  >
+                    <Shield className="w-4 h-4 shrink-0 text-purple-600 dark:text-purple-400" />
+                    <div className="flex-1">
+                      <div className="font-bold flex items-center space-x-1.5">
+                        <span>Admin Portal</span>
+                        <span className="text-[10px] px-1.5 py-0.2 bg-purple-500/20 text-purple-600 dark:text-purple-300 rounded font-bold">
+                          SYSTEM
+                        </span>
+                      </div>
+                      <div className="text-xs text-purple-600/70 dark:text-purple-300/70">
+                        Manage users & monitor messages
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              )}
             </nav>
           </aside>
 
