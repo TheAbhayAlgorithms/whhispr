@@ -20,8 +20,12 @@ export function DecryptedText({ content, senderId, isMe }: DecryptedTextProps) {
       setIsEncrypted(true);
       void decryptMessage(content, senderId).then((decrypted) => {
         if (!isCancelled) {
-          if (decrypted && decrypted.startsWith('{') && decrypted.includes('"e2ee":true')) {
-            setDisplayText('🔒 Encrypted message');
+          if (
+            !decrypted ||
+            (decrypted.startsWith('{') && decrypted.includes('"e2ee":true')) ||
+            decrypted.includes('Encrypted message')
+          ) {
+            setDisplayText('Encrypted message (session expired)');
           } else {
             setDisplayText(decrypted);
           }
@@ -42,12 +46,18 @@ export function DecryptedText({ content, senderId, isMe }: DecryptedTextProps) {
       {isEncrypted && (
         <span
           title="End-to-End Encrypted Message"
-          className={`shrink-0 mt-1 ${isMe ? 'text-indigo-200' : 'text-emerald-500'}`}
+          className={`shrink-0 mt-0.5 ${isMe ? 'text-indigo-200' : 'text-slate-400 dark:text-slate-500'}`}
         >
-          <Lock className="w-3 h-3" />
+          <Lock className="w-3.5 h-3.5" />
         </span>
       )}
-      <p className="whitespace-pre-wrap break-words leading-relaxed flex-1">{displayText}</p>
+      <p
+        className={`whitespace-pre-wrap break-words leading-relaxed flex-1 ${
+          isEncrypted ? 'italic text-xs opacity-80' : ''
+        }`}
+      >
+        {displayText}
+      </p>
     </div>
   );
 }

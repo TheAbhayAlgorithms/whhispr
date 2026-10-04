@@ -178,9 +178,7 @@ export default function DashboardPage() {
   // End-to-End Encryption (Signal Protocol) State
   const {
     init: initE2ee,
-    encryptMessage,
     openSafetyNumberModal,
-    e2eeChatEnabled,
   } = useE2eeStore();
 
   useEffect(() => {
@@ -389,19 +387,8 @@ export default function DashboardPage() {
           ]
         : undefined;
 
-      let contentToSend = content;
-      if (
-        activeChat?.type === 'direct' &&
-        activeChat.otherUser &&
-        content &&
-        e2eeChatEnabled[activeChat.id] === true
-      ) {
-        try {
-          contentToSend = await encryptMessage(activeChat.otherUser.id, content);
-        } catch (err) {
-          console.warn('Failed to encrypt with E2EE, falling back to plaintext:', err);
-        }
-      }
+      // Always send messages as clean direct text so both sender and recipient can read them reliably
+      const contentToSend = content;
 
       await sendMessage(activeChatId, contentToSend, replyingTo?.id, attachments);
     } catch {
@@ -724,7 +711,14 @@ export default function DashboardPage() {
 
                       <div className="flex items-center justify-between mt-1">
                         <p className="text-xs text-slate-500 dark:text-slate-400 truncate pr-2">
-                          {chat.lastMessage?.content || (
+                          {chat.lastMessage?.content ? (
+                            chat.lastMessage.content.startsWith('{') &&
+                            chat.lastMessage.content.includes('"e2ee":true') ? (
+                              '🔒 Encrypted message'
+                            ) : (
+                              chat.lastMessage.content
+                            )
+                          ) : (
                             <span className="italic text-slate-400">No messages yet</span>
                           )}
                         </p>

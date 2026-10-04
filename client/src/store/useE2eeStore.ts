@@ -193,7 +193,7 @@ export const useE2eeStore = create<E2eeState>((set, get) => ({
     } catch {
       // If decryption fails (e.g. key mismatch or refreshed session), return safe indicator instead of raw JSON
       if (envelopeJson && envelopeJson.startsWith('{') && envelopeJson.includes('"e2ee":true')) {
-        return '🔒 Encrypted message';
+        return 'Encrypted message (session expired)';
       }
       return envelopeJson;
     }
