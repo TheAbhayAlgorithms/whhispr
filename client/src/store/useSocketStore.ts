@@ -21,6 +21,7 @@ interface SocketState {
   connect: () => void;
   disconnect: () => void;
   queryPresence: (userId: string) => Promise<PresenceInfo | null>;
+  queryBatchPresence: (userIds: string[]) => Promise<void>;
   setPresence: (info: PresenceInfo) => void;
 }
 
@@ -51,6 +52,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     socket.off('connect');
     socket.off('disconnect');
     socket.off('connect_error');
+    socket.off('presence:init');
     socket.off('presence:update');
     socket.off('call:incoming');
     socket.off('call:answered');
@@ -76,6 +78,23 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       set({ status: 'disconnected', error: err.message });
     });
 
+    // Initial list of all currently online users received on connection
+    socket.on('presence:init', (data: { onlineUserIds: string[] }) => {
+      if (Array.isArray(data?.onlineUserIds)) {
+        const presenceMap: Record<string, PresenceInfo> = {};
+        for (const uid of data.onlineUserIds) {
+          presenceMap[uid] = { userId: uid, status: 'online' };
+        }
+        set((state) => ({
+          onlineUsers: {
+            ...state.onlineUsers,
+            ...presenceMap,
+          },
+        }));
+      }
+    });
+
+    // Real-time presence updates (user goes online or offline)
     socket.on('presence:update', (data: PresenceInfo) => {
       get().setPresence(data);
     });
@@ -133,6 +152,28 @@ export const useSocketStore = create<SocketState>((set, get) => ({
           resolve(null);
         }
       });
+    });
+  },
+
+  queryBatchPresence: async (userIds: string[]): Promise<void> => {
+    const socket = getSocket();
+    if (!socket.connected || !userIds || userIds.length === 0) return;
+
+    socket.emit('presence:query_batch', userIds, (presences: PresenceInfo[]) => {
+      if (Array.isArray(presences)) {
+        const presenceMap: Record<string, PresenceInfo> = {};
+        for (const p of presences) {
+          if (p?.userId) {
+            presenceMap[p.userId] = p;
+          }
+        }
+        set((state) => ({
+          onlineUsers: {
+            ...state.onlineUsers,
+            ...presenceMap,
+          },
+        }));
+      }
     });
   },
 }));

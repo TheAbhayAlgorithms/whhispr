@@ -41,7 +41,7 @@ export function InChatSearchBar({ chatId, onSelectMessage }: InChatSearchBarProp
             if (e.key === 'Escape') toggleInChatSearch(false);
           }}
           placeholder="Search within this conversation..."
-          className="flex-1 text-xs bg-transparent border-none text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none"
+          className="flex-1 text-base sm:text-xs bg-transparent border-none text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none"
         />
         {isInChatSearching ? (
           <Loader2 className="w-4 h-4 animate-spin text-slate-400 shrink-0" />

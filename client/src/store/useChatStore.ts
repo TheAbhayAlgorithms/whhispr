@@ -3,6 +3,9 @@ import { apiRequest, getClientAccessToken, resolveApiUrl } from '../lib/api';
 import { getSocket } from '../lib/socket';
 import { Chat, ChatMessage, GroupDetails, PublicChannel, MessageAttachment, MessageReaction } from '../types/chat';
 import { useAuthStore } from './useAuthStore';
+import { useSocketStore } from './useSocketStore';
+
+const typingAutoExpireTimers: Record<string, NodeJS.Timeout> = {};
 
 export interface AttachmentInput {
   fileName: string;
@@ -142,6 +145,14 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
       }
 
       set({ chats: chatsList, isLoadingChats: false });
+
+      // Automatically query presence for all direct chat contacts
+      const userIdsToQuery = chatsList
+        .filter((c) => c.type === 'direct' && c.otherUser?.id)
+        .map((c) => c.otherUser!.id);
+      if (userIdsToQuery.length > 0) {
+        void useSocketStore.getState().queryBatchPresence(userIdsToQuery);
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to fetch chats';
       set({ error: msg, isLoadingChats: false });
@@ -176,6 +187,8 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
       const selected = get().chats.find((c) => c.id === chatId);
       if (selected && (selected.type === 'group' || selected.type === 'channel')) {
         void get().fetchGroupDetails(chatId);
+      } else if (selected?.otherUser?.id) {
+        void useSocketStore.getState().queryPresence(selected.otherUser.id);
       }
     }
   },
@@ -599,6 +612,18 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
   },
 
   setTyping: (chatId: string, username: string, isTyping: boolean) => {
+    const key = `${chatId}:${username}`;
+    if (typingAutoExpireTimers[key]) {
+      clearTimeout(typingAutoExpireTimers[key]);
+      delete typingAutoExpireTimers[key];
+    }
+
+    if (isTyping) {
+      typingAutoExpireTimers[key] = setTimeout(() => {
+        get().setTyping(chatId, username, false);
+      }, 4000);
+    }
+
     set((state) => {
       const existing = state.typingUsers[chatId] || [];
       const updated = isTyping
@@ -901,9 +926,15 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
     socket.on('group:removed', onGroupRemoved);
 
     const onConnect = () => {
-      const { activeChatId } = get();
+      const { activeChatId, chats } = get();
       if (activeChatId) {
         socket.emit('chat:join', activeChatId);
+      }
+      const userIdsToQuery = chats
+        .filter((c) => c.type === 'direct' && c.otherUser?.id)
+        .map((c) => c.otherUser!.id);
+      if (userIdsToQuery.length > 0) {
+        void useSocketStore.getState().queryBatchPresence(userIdsToQuery);
       }
     };
     socket.on('connect', onConnect);

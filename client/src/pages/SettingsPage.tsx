@@ -195,8 +195,8 @@ export default function SettingsPage() {
             </div>
           </div>
           <div className="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400">
-            <span>Signed in as</span>
-            <span className="font-semibold text-slate-800 dark:text-slate-200">
+            <span className="hidden sm:inline">Signed in as</span>
+            <span className="font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[120px] sm:max-w-none">
               @{user?.username}
             </span>
           </div>
@@ -204,7 +204,7 @@ export default function SettingsPage() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-8">
+      <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8">
         {/* Toast / Global Action Message */}
         {actionMessage && (
           <div
@@ -223,13 +223,13 @@ export default function SettingsPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-          {/* Navigation Sidebar */}
-          <aside className="md:col-span-4 bg-white dark:bg-slate-900/60 rounded-3xl border border-slate-200 dark:border-slate-800/80 p-2 shadow-sm">
-            <nav className="flex flex-col space-y-1">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-start">
+          {/* Navigation Sidebar: Horizontal scrollable on mobile, vertical card on desktop */}
+          <aside className="md:col-span-4 bg-white dark:bg-slate-900/60 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800/80 p-2 shadow-sm overflow-hidden">
+            <nav className="flex md:flex-col overflow-x-auto no-scrollbar gap-1.5 md:space-y-1">
               <button
                 onClick={() => setActiveTab('appearance')}
-                className={`flex items-center space-x-3 w-full px-4 py-3 rounded-2xl font-medium text-sm transition text-left ${
+                className={`flex items-center space-x-2.5 md:space-x-3 px-3.5 py-2.5 md:px-4 md:py-3 rounded-xl md:rounded-2xl font-medium text-xs md:text-sm transition text-left shrink-0 md:w-full ${
                   activeTab === 'appearance'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
@@ -239,7 +239,7 @@ export default function SettingsPage() {
                 <div className="flex-1">
                   <div>Appearance</div>
                   <div
-                    className={`text-xs ${
+                    className={`hidden md:block text-xs ${
                       activeTab === 'appearance'
                         ? 'text-indigo-100'
                         : 'text-slate-400 dark:text-slate-500'
@@ -252,7 +252,7 @@ export default function SettingsPage() {
 
               <button
                 onClick={() => setActiveTab('account')}
-                className={`flex items-center space-x-3 w-full px-4 py-3 rounded-2xl font-medium text-sm transition text-left ${
+                className={`flex items-center space-x-2.5 md:space-x-3 px-3.5 py-2.5 md:px-4 md:py-3 rounded-xl md:rounded-2xl font-medium text-xs md:text-sm transition text-left shrink-0 md:w-full ${
                   activeTab === 'account'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
@@ -262,7 +262,7 @@ export default function SettingsPage() {
                 <div className="flex-1">
                   <div>Account & Security</div>
                   <div
-                    className={`text-xs ${
+                    className={`hidden md:block text-xs ${
                       activeTab === 'account'
                         ? 'text-indigo-100'
                         : 'text-slate-400 dark:text-slate-500'
@@ -275,7 +275,7 @@ export default function SettingsPage() {
 
               <button
                 onClick={() => setActiveTab('sessions')}
-                className={`flex items-center space-x-3 w-full px-4 py-3 rounded-2xl font-medium text-sm transition text-left ${
+                className={`flex items-center space-x-2.5 md:space-x-3 px-3.5 py-2.5 md:px-4 md:py-3 rounded-xl md:rounded-2xl font-medium text-xs md:text-sm transition text-left shrink-0 md:w-full ${
                   activeTab === 'sessions'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
@@ -285,7 +285,7 @@ export default function SettingsPage() {
                 <div className="flex-1">
                   <div>Active Sessions</div>
                   <div
-                    className={`text-xs ${
+                    className={`hidden md:block text-xs ${
                       activeTab === 'sessions'
                         ? 'text-indigo-100'
                         : 'text-slate-400 dark:text-slate-500'
@@ -296,7 +296,7 @@ export default function SettingsPage() {
                 </div>
                 {sessions.length > 1 && (
                   <span
-                    className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                    className={`px-1.5 py-0.2 md:px-2 md:py-0.5 rounded-full text-[10px] md:text-xs font-semibold ${
                       activeTab === 'sessions'
                         ? 'bg-white/20 text-white'
                         : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300'
@@ -309,7 +309,7 @@ export default function SettingsPage() {
 
               <button
                 onClick={() => setActiveTab('notifications')}
-                className={`flex items-center space-x-3 w-full px-4 py-3 rounded-2xl font-medium text-sm transition text-left ${
+                className={`flex items-center space-x-2.5 md:space-x-3 px-3.5 py-2.5 md:px-4 md:py-3 rounded-xl md:rounded-2xl font-medium text-xs md:text-sm transition text-left shrink-0 md:w-full ${
                   activeTab === 'notifications'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
@@ -319,7 +319,7 @@ export default function SettingsPage() {
                 <div className="flex-1">
                   <div>Notifications</div>
                   <div
-                    className={`text-xs ${
+                    className={`hidden md:block text-xs ${
                       activeTab === 'notifications'
                         ? 'text-indigo-100'
                         : 'text-slate-400 dark:text-slate-500'
@@ -332,7 +332,7 @@ export default function SettingsPage() {
 
               <button
                 onClick={() => setActiveTab('privacy')}
-                className={`flex items-center space-x-3 w-full px-4 py-3 rounded-2xl font-medium text-sm transition text-left ${
+                className={`flex items-center space-x-2.5 md:space-x-3 px-3.5 py-2.5 md:px-4 md:py-3 rounded-xl md:rounded-2xl font-medium text-xs md:text-sm transition text-left shrink-0 md:w-full ${
                   activeTab === 'privacy'
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
@@ -342,7 +342,7 @@ export default function SettingsPage() {
                 <div className="flex-1">
                   <div>Privacy & E2EE</div>
                   <div
-                    className={`text-xs ${
+                    className={`hidden md:block text-xs ${
                       activeTab === 'privacy'
                         ? 'text-indigo-100'
                         : 'text-slate-400 dark:text-slate-500'
@@ -354,10 +354,10 @@ export default function SettingsPage() {
               </button>
 
               {user?.role === 'admin' && (
-                <div className="pt-2 mt-2 border-t border-slate-200 dark:border-slate-800">
+                <div className="md:pt-2 md:mt-2 md:border-t border-slate-200 dark:border-slate-800 shrink-0">
                   <Link
                     to="/admin"
-                    className="flex items-center space-x-3 w-full px-4 py-3 rounded-2xl font-medium text-sm transition text-left bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20 dark:hover:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/40 shadow-sm"
+                    className="flex items-center space-x-2.5 md:space-x-3 px-3.5 py-2.5 md:px-4 md:py-3 rounded-xl md:rounded-2xl font-medium text-xs md:text-sm transition text-left bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20 dark:hover:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/40 shadow-sm"
                   >
                     <Shield className="w-4 h-4 shrink-0 text-purple-600 dark:text-purple-400" />
                     <div className="flex-1">
@@ -367,7 +367,7 @@ export default function SettingsPage() {
                           SYSTEM
                         </span>
                       </div>
-                      <div className="text-xs text-purple-600/70 dark:text-purple-300/70">
+                      <div className="hidden md:block text-xs text-purple-600/70 dark:text-purple-300/70">
                         Manage users & monitor messages
                       </div>
                     </div>
@@ -385,7 +385,7 @@ export default function SettingsPage() {
                 <div>
                   <h2 className="text-xl font-bold text-slate-900 dark:text-white">Appearance</h2>
                   <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                    Customize how Whispr looks and feels across your workspace.
+                    Customize how Whhispr looks and feels across your workspace.
                   </p>
                 </div>
 
@@ -456,7 +456,7 @@ export default function SettingsPage() {
                       Message Density
                     </h3>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Whispr automatically formats bubbles for comfortable reading
+                      Whhispr automatically formats bubbles for comfortable reading
                     </p>
                   </div>
                   <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-300">
@@ -510,7 +510,7 @@ export default function SettingsPage() {
                           value={currentPassword}
                           onChange={(e) => setCurrentPassword(e.target.value)}
                           placeholder="Enter current password"
-                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-10"
+                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-10"
                         />
                         <button
                           type="button"
@@ -537,7 +537,7 @@ export default function SettingsPage() {
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             placeholder="Min 8 chars, uppercase & digit"
-                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-10"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-10"
                           />
                           <button
                             type="button"
@@ -562,7 +562,7 @@ export default function SettingsPage() {
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           placeholder="Re-type new password"
-                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                       </div>
                     </div>
@@ -571,7 +571,7 @@ export default function SettingsPage() {
                       <button
                         type="submit"
                         disabled={isUpdatingPassword}
-                        className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition shadow-sm disabled:opacity-50 flex items-center space-x-2"
+                        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition shadow-sm disabled:opacity-50 flex items-center justify-center space-x-2"
                       >
                         {isUpdatingPassword ? (
                           <>
@@ -616,7 +616,7 @@ export default function SettingsPage() {
                         <span>Danger Zone</span>
                       </h3>
                       <p className="text-xs text-rose-600/80 dark:text-rose-400/80 mt-1 max-w-md">
-                        Permanently deactivate your Whispr account, revoke all credentials, and
+                        Permanently deactivate your Whhispr account, revoke all credentials, and
                         remove your profile from directories.
                       </p>
                     </div>
@@ -641,7 +641,7 @@ export default function SettingsPage() {
                       Active Sessions
                     </h2>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                      Devices currently signed in to your Whispr account.
+                      Devices currently signed in to your Whhispr account.
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -670,25 +670,25 @@ export default function SettingsPage() {
                   {sessions.map((session) => (
                     <div
                       key={session.id}
-                      className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex items-center justify-between hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition"
+                      className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition"
                     >
-                      <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/40 flex items-center justify-center">
+                      <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
+                        <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/40 flex items-center justify-center shrink-0">
                           {getDeviceIcon(session.userAgent)}
                         </div>
-                        <div>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                            <span className="text-sm font-semibold text-slate-900 dark:text-white truncate">
                               {parseBrowser(session.userAgent)}
                             </span>
                             {session.isCurrent && (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 flex items-center space-x-1">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 flex items-center space-x-1 shrink-0">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                 <span>Current Device</span>
                               </span>
                             )}
                           </div>
-                          <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center space-x-3">
+                          <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
                             <span>IP: {session.ipAddress || '127.0.0.1'}</span>
                             <span>•</span>
                             <span>Signed in {new Date(session.createdAt).toLocaleDateString()}</span>
@@ -699,7 +699,7 @@ export default function SettingsPage() {
                       {!session.isCurrent && (
                         <button
                           onClick={() => revokeSession(session.id)}
-                          className="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition"
+                          className="self-end sm:self-center px-3 py-1.5 rounded-xl text-xs font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition shrink-0"
                         >
                           Revoke
                         </button>
@@ -724,7 +724,7 @@ export default function SettingsPage() {
                     Notification Preferences
                   </h2>
                   <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                    Control how and when Whispr alerts you about messages and calls.
+                    Control how and when Whhispr alerts you about messages and calls.
                   </p>
                 </div>
 
@@ -869,7 +869,7 @@ export default function SettingsPage() {
                     </div>
                     <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
                       All 1-on-1 private conversations and media attachments are cryptographically
-                      secured via ECDH key exchange and AES-256-GCM. Whispr servers cannot inspect
+                      secured via ECDH key exchange and AES-256-GCM. Whhispr servers cannot inspect
                       your private message content.
                     </p>
                   </div>
@@ -910,7 +910,7 @@ export default function SettingsPage() {
                         Online Status
                       </h4>
                       <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Show a green indicator when you are actively using Whispr
+                        Show a green indicator when you are actively using Whhispr
                       </p>
                     </div>
                     <button
@@ -942,8 +942,8 @@ export default function SettingsPage() {
 
       {/* Delete Account Confirmation Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-rose-200 dark:border-rose-900/60 p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-xs">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-rose-200 dark:border-rose-900/60 p-5 sm:p-8 max-w-md w-full shadow-2xl space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 flex items-center justify-center">
               <AlertTriangle className="w-6 h-6" />
             </div>
@@ -974,7 +974,7 @@ export default function SettingsPage() {
                   value={deletePassword}
                   onChange={(e) => setDeletePassword(e.target.value)}
                   placeholder="Enter your current password"
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-rose-500 outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-base sm:text-xs focus:ring-2 focus:ring-rose-500 outline-none"
                 />
               </div>
 
@@ -987,7 +987,7 @@ export default function SettingsPage() {
                   value={deleteConfirmText}
                   onChange={(e) => setDeleteConfirmText(e.target.value)}
                   placeholder="Type DELETE"
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-rose-500 outline-none font-mono"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-base sm:text-xs focus:ring-2 focus:ring-rose-500 outline-none font-mono"
                 />
               </div>
             </div>

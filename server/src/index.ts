@@ -25,7 +25,7 @@ async function bootstrap(): Promise<void> {
   initSocketIO(httpServer);
 
   httpServer.listen(env.PORT, () => {
-    logger.info(`🚀 Whispr server running`, {
+    logger.info(`🚀 Whhispr server running`, {
       port: env.PORT,
       env: env.NODE_ENV,
       pid: process.pid,

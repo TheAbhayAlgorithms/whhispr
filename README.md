@@ -1,4 +1,4 @@
-# 🌐 Whispr — Enterprise Real-Time Chat Platform
+# 🌐 Whhispr — Enterprise Real-Time Chat Platform
 
 [![CI/CD Pipeline](https://github.com/whispr-chat/whispr/actions/workflows/ci.yml/badge.svg)](https://github.com/whispr-chat/whispr)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4-blue?logo=typescript)](https://www.typescriptlang.org/)
@@ -8,7 +8,7 @@
 [![Redis](https://img.shields.io/badge/Redis-7-dc382d?logo=redis)](https://redis.io/)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-2496ed?logo=docker)](https://www.docker.com/)
 
-**Whispr** is a modern, high-concurrency real-time communication platform engineered for sub-5ms messaging latency, end-to-end encryption (Signal Protocol keys), audio/video calling (WebRTC mesh), group channels, and high availability.
+**Whhispr** is a modern, high-concurrency real-time communication platform engineered for sub-5ms messaging latency, end-to-end encryption (Signal Protocol keys), audio/video calling (WebRTC mesh), group channels, and high availability.
 
 ---
 
@@ -77,7 +77,7 @@ npm --prefix server run dev
 npm --prefix client run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to open the Whispr app.
+Visit [http://localhost:3000](http://localhost:3000) to open the Whhispr app.
 Interactive API docs are live at [http://localhost:4000/api/docs](http://localhost:4000/api/docs).
 
 ---
@@ -113,4 +113,4 @@ For complete production deployment guides (AWS, DigitalOcean, SSL/TLS Let's Encr
 ---
 
 ## 📄 License
-MIT © Whispr Team
+MIT © Whhispr Team

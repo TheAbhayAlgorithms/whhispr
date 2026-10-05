@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useContactStore } from '../store/useContactStore';
 import { useProfileStore } from '../store/useProfileStore';
 import { useChatStore } from '../store/useChatStore';
+import { useSocketStore } from '../store/useSocketStore';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { ContactCardsSkeleton } from '../components/Skeletons';
 import {
@@ -26,6 +27,7 @@ export default function ContactsPage() {
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
   const { getOrCreateDirectChat } = useChatStore();
+  const { onlineUsers, queryBatchPresence } = useSocketStore();
 
 
   const {
@@ -47,6 +49,13 @@ export default function ContactsPage() {
     void fetchContacts();
     void fetchRequests();
   }, [fetchContacts, fetchRequests]);
+
+  useEffect(() => {
+    if (contacts.length > 0) {
+      const ids = contacts.map((c) => c.userId);
+      void queryBatchPresence(ids);
+    }
+  }, [contacts, queryBatchPresence]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,7 +138,7 @@ export default function ContactsPage() {
               <h1 className="text-base font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
                 Contacts & Connections
               </h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">
                 Manage your friendships and contact requests
               </p>
             </div>
@@ -169,10 +178,10 @@ export default function ContactsPage() {
         )}
 
         {/* Tab Navigation */}
-        <div className="flex items-center space-x-2 border-b border-slate-200 dark:border-slate-800 pb-3 mb-6">
+        <div className="flex items-center space-x-2 border-b border-slate-200 dark:border-slate-800 pb-3 mb-6 overflow-x-auto no-scrollbar">
           <button
             onClick={() => setActiveTab('contacts')}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition ${
+            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition shrink-0 ${
               activeTab === 'contacts'
                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -187,7 +196,7 @@ export default function ContactsPage() {
 
           <button
             onClick={() => setActiveTab('requests')}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition relative ${
+            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition relative shrink-0 ${
               activeTab === 'requests'
                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -204,7 +213,7 @@ export default function ContactsPage() {
 
           <button
             onClick={() => setActiveTab('add')}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition ${
+            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition shrink-0 ${
               activeTab === 'add'
                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -239,41 +248,59 @@ export default function ContactsPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {contacts.map((contact) => (
-                  <div
-                    key={contact.contactId}
-                    className="p-4 bg-white dark:bg-slate-900/70 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-md transition flex items-start justify-between space-x-3"
-                  >
-                    <div className="flex items-start space-x-3 min-w-0">
-                      <div className="relative shrink-0">
-                        {contact.avatarUrl ? (
-                          <img
-                            src={contact.avatarUrl}
-                            alt={contact.displayName}
-                            className="w-12 h-12 rounded-xl object-cover border border-slate-200 dark:border-slate-700"
-                          />
-                        ) : (
-                          <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-lg shadow-xs">
-                            {contact.displayName.charAt(0).toUpperCase()}
-                          </div>
-                        )}
-                        <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900" />
-                      </div>
+                {contacts.map((contact) => {
+                  const isOnline = onlineUsers[contact.userId]?.status === 'online';
 
-                      <div className="min-w-0">
-                        <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">
-                          {contact.displayName}
-                        </h4>
-                        <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium truncate">
-                          @{contact.username}
-                        </p>
-                        {contact.statusMessage && (
-                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-1 italic">
-                            "{contact.statusMessage}"
-                          </p>
-                        )}
+                  return (
+                    <div
+                      key={contact.contactId}
+                      className="p-4 bg-white dark:bg-slate-900/70 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-md transition flex items-start justify-between space-x-3"
+                    >
+                      <div className="flex items-start space-x-3 min-w-0">
+                        <div className="relative shrink-0">
+                          {contact.avatarUrl ? (
+                            <img
+                              src={contact.avatarUrl}
+                              alt={contact.displayName}
+                              className="w-12 h-12 rounded-xl object-cover border border-slate-200 dark:border-slate-700"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-lg shadow-xs">
+                              {contact.displayName.charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                          <span
+                            className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-slate-900 ${
+                              isOnline ? 'bg-emerald-500' : 'bg-slate-400'
+                            }`}
+                            title={isOnline ? 'Online' : 'Offline'}
+                          />
+                        </div>
+
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                            {contact.displayName}
+                          </h4>
+                          <div className="flex items-center space-x-1.5 mt-0.5">
+                            <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium truncate">
+                              @{contact.username}
+                            </p>
+                            <span className="text-[10px] text-slate-300 dark:text-slate-600">&bull;</span>
+                            <span
+                              className={`text-[10px] font-semibold ${
+                                isOnline ? 'text-emerald-500' : 'text-slate-400'
+                              }`}
+                            >
+                              {isOnline ? 'Online' : 'Offline'}
+                            </span>
+                          </div>
+                          {contact.statusMessage && (
+                            <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-1 italic">
+                              "{contact.statusMessage}"
+                            </p>
+                          )}
+                        </div>
                       </div>
-                    </div>
 
                     <div className="flex items-center space-x-1 shrink-0">
                       <button
@@ -292,7 +319,8 @@ export default function ContactsPage() {
                       </button>
                     </div>
                   </div>
-                ))}
+                );
+              })}
               </div>
             )}
           </div>
@@ -441,13 +469,13 @@ export default function ContactsPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search by username or name..."
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={isSearching}
-                  className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition shadow-sm"
+                  className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs sm:text-sm transition shadow-sm shrink-0"
                 >
                   {isSearching ? 'Searching...' : 'Search'}
                 </button>

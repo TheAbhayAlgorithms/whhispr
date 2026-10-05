@@ -37,10 +37,10 @@ export class EmailService {
       await this.getTransporter().sendMail({
         from: env.EMAIL_FROM,
         to,
-        subject: 'Verify your Whispr account',
+        subject: 'Verify your Whhispr account',
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h2>Welcome to Whispr!</h2>
+            <h2>Welcome to Whhispr!</h2>
             <p>Please click the button below to verify your email address:</p>
             <p><a href="${verifyUrl}" style="background-color: #6366f1; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block;">Verify Email</a></p>
             <p style="color: #6b7280; font-size: 12px;">If you did not create this account, you can safely ignore this email.</p>
@@ -64,11 +64,11 @@ export class EmailService {
       await this.getTransporter().sendMail({
         from: env.EMAIL_FROM,
         to,
-        subject: 'Reset your Whispr password',
+        subject: 'Reset your Whhispr password',
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h2>Password Reset Request</h2>
-            <p>You requested a password reset for your Whispr account. Click below to choose a new password:</p>
+            <p>You requested a password reset for your Whhispr account. Click below to choose a new password:</p>
             <p><a href="${resetUrl}" style="background-color: #6366f1; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block;">Reset Password</a></p>
             <p style="color: #6b7280; font-size: 12px;">This link will expire in 1 hour. If you didn't request this, ignore this email.</p>
           </div>

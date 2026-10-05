@@ -64,6 +64,7 @@ import {
   Clock,
   AlertTriangle,
   MessageSquarePlus,
+  Menu,
 } from 'lucide-react';
 
 function formatMessageTime(dateString: string): string {
@@ -148,6 +149,7 @@ export default function DashboardPage() {
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
   const [showChannelBrowserModal, setShowChannelBrowserModal] = useState(false);
   const [showGroupDrawer, setShowGroupDrawer] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Emoji Picker State
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -251,7 +253,9 @@ export default function DashboardPage() {
   });
   const activeChat = chatsList.find((c) => c.id === activeChatId);
   const currentMessages = activeChatId ? messages[activeChatId] || [] : [];
-  const activeTyping = activeChatId ? typingUsers[activeChatId] || [] : [];
+  const activeTyping = (activeChatId ? typingUsers[activeChatId] || [] : []).filter(
+    (name) => name !== user?.username && name !== user?.displayName,
+  );
 
   // Close emoji picker when clicking outside
   useEffect(() => {
@@ -280,6 +284,25 @@ export default function DashboardPage() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [currentMessages.length, activeChatId]);
+
+  // Sync presence when window/tab becomes visible again
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        const socket = getSocket();
+        if (socket.connected) {
+          const directUserIds = chatsList
+            .filter((c) => c.type === 'direct' && c.otherUser?.id)
+            .map((c) => c.otherUser!.id);
+          if (directUserIds.length > 0) {
+            void useSocketStore.getState().queryBatchPresence(directUserIds);
+          }
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [chatsList]);
 
   // Generate local preview URL when staged file changes
   useEffect(() => {
@@ -341,17 +364,27 @@ export default function DashboardPage() {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMessageInput(e.target.value);
+    const val = e.target.value;
+    setMessageInput(val);
     if (activeChatId) {
       const socket = getSocket();
       if (socket.connected) {
-        socket.emit('typing:start', { chatId: activeChatId });
-        if (typingTimeoutRef.current) {
-          clearTimeout(typingTimeoutRef.current);
-        }
-        typingTimeoutRef.current = setTimeout(() => {
+        if (!val.trim()) {
+          if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+            typingTimeoutRef.current = null;
+          }
           socket.emit('typing:stop', { chatId: activeChatId });
-        }, 3000);
+        } else {
+          socket.emit('typing:start', { chatId: activeChatId });
+          if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+          }
+          typingTimeoutRef.current = setTimeout(() => {
+            socket.emit('typing:stop', { chatId: activeChatId });
+            typingTimeoutRef.current = null;
+          }, 2500);
+        }
       }
     }
   };
@@ -462,7 +495,7 @@ export default function DashboardPage() {
             <MessageSquare className="w-5 h-5 text-white" />
           </div>
           <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-slate-900 via-slate-700 to-indigo-600 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent">
-            Whispr
+            Whhispr
           </span>
 
           {/* Real-time Socket Connection Badge */}
@@ -484,7 +517,7 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="flex items-center space-x-2.5">
+        <div className="flex items-center space-x-1.5 sm:space-x-2.5">
           {/* Daylight / Dark Theme Toggle Button */}
           <ThemeToggle />
 
@@ -503,21 +536,13 @@ export default function DashboardPage() {
             )}
           </button>
 
-          <button
-            onClick={() => setShowChannelBrowserModal(true)}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800 text-xs font-semibold text-indigo-600 dark:text-indigo-400 transition"
-            title="Discover Public Channels"
-          >
-            <Compass className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Explore Channels</span>
-          </button>
-
+          {/* Contacts - visible on all screen sizes */}
           <Link
             to="/contacts"
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 transition relative"
+            className="flex items-center space-x-1 sm:space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 transition relative"
           >
             <Users className="w-3.5 h-3.5 text-indigo-500" />
-            <span>Contacts</span>
+            <span className="hidden sm:inline">Contacts</span>
             {incomingRequests.length > 0 && (
               <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">
                 {incomingRequests.length}
@@ -525,65 +550,177 @@ export default function DashboardPage() {
             )}
           </Link>
 
-          <Link
-            to="/profile"
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-600/20 hover:bg-indigo-100 dark:hover:bg-indigo-600/30 border border-indigo-200 dark:border-indigo-500/30 text-xs font-semibold text-indigo-600 dark:text-indigo-300 transition"
-          >
-            <UserIcon className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Profile</span>
-          </Link>
-
-          <Link
-            to="/settings"
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 transition"
-            title="Settings & Preferences"
-          >
-            <SettingsIcon className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-            <span className="hidden sm:inline">Settings</span>
-          </Link>
-
-          {user?.role === 'admin' && (
-            <Link
-              to="/admin"
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/50 border border-purple-200 dark:border-purple-500/40 text-xs font-semibold text-purple-600 dark:text-purple-300 transition"
-              title="Admin Portal"
+          {/* Desktop Navigation Items */}
+          <div className="hidden md:flex items-center space-x-2">
+            <button
+              onClick={() => setShowChannelBrowserModal(true)}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800 text-xs font-semibold text-indigo-600 dark:text-indigo-400 transition"
+              title="Discover Public Channels"
             >
-              <Shield className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-              <span className="hidden sm:inline">Admin</span>
-            </Link>
-          )}
+              <Compass className="w-3.5 h-3.5" />
+              <span>Explore Channels</span>
+            </button>
 
-          <div className="hidden md:flex items-center space-x-2 pl-2 border-l border-slate-200 dark:border-slate-800 text-right">
-            <div>
-              <p className="text-xs font-semibold text-slate-900 dark:text-white leading-none">
-                {user?.displayName}
-              </p>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">
-                @{user?.username}
-              </p>
+            <Link
+              to="/profile"
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-600/20 hover:bg-indigo-100 dark:hover:bg-indigo-600/30 border border-indigo-200 dark:border-indigo-500/30 text-xs font-semibold text-indigo-600 dark:text-indigo-300 transition"
+            >
+              <UserIcon className="w-3.5 h-3.5" />
+              <span>Profile</span>
+            </Link>
+
+            <Link
+              to="/settings"
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 transition"
+              title="Settings & Preferences"
+            >
+              <SettingsIcon className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+              <span>Settings</span>
+            </Link>
+
+            {user?.role === 'admin' && (
+              <Link
+                to="/admin"
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/50 border border-purple-200 dark:border-purple-500/40 text-xs font-semibold text-purple-600 dark:text-purple-300 transition"
+                title="Admin Portal"
+              >
+                <Shield className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                <span>Admin</span>
+              </Link>
+            )}
+
+            <div className="flex items-center space-x-2 pl-2 border-l border-slate-200 dark:border-slate-800 text-right">
+              <div>
+                <p className="text-xs font-semibold text-slate-900 dark:text-white leading-none">
+                  {user?.displayName}
+                </p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">
+                  @{user?.username}
+                </p>
+              </div>
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800 border border-indigo-500/40 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-300 shrink-0">
+                {user?.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.displayName}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span>{user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}</span>
+                )}
+              </div>
             </div>
-            <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800 border border-indigo-500/40 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-300 shrink-0">
-              {user?.avatarUrl ? (
-                <img
-                  src={user.avatarUrl}
-                  alt={user.displayName}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span>{user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}</span>
-              )}
-            </div>
+
+            <button
+              onClick={handleLogout}
+              disabled={loggingOut}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 dark:bg-slate-800 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 dark:hover:border-rose-500/30 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300 transition"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>{loggingOut ? 'Signing out...' : 'Sign Out'}</span>
+            </button>
           </div>
 
+          {/* Mobile Menu Button for screens < md */}
           <button
-            onClick={handleLogout}
-            disabled={loggingOut}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 dark:bg-slate-800 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 dark:hover:border-rose-500/30 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300 transition"
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition"
+            aria-label="Toggle navigation menu"
           >
-            <LogOut className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{loggingOut ? 'Signing out...' : 'Sign Out'}</span>
+            {mobileMenuOpen ? <CloseIcon className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </button>
         </div>
+
+        {/* Mobile Dropdown Menu Sheet */}
+        {mobileMenuOpen && (
+          <>
+            <div
+              className="fixed inset-0 z-30 bg-black/40 backdrop-blur-2xs md:hidden"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            <div className="absolute top-16 right-3 left-3 sm:left-auto sm:w-72 z-40 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-3 space-y-2 md:hidden animate-in fade-in slide-in-from-top-2 duration-150">
+              {/* User Profile Card */}
+              <div className="flex items-center space-x-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
+                <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800 border border-indigo-500/40 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-300 shrink-0">
+                  {user?.avatarUrl ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.displayName}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span>{user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}</span>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                    {user?.displayName}
+                  </p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                    @{user?.username}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-1 pt-1">
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setShowChannelBrowserModal(true);
+                  }}
+                  className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                >
+                  <Compass className="w-4 h-4 text-indigo-500" />
+                  <span>Explore Channels</span>
+                </button>
+
+                <Link
+                  to="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                >
+                  <UserIcon className="w-4 h-4 text-indigo-500" />
+                  <span>Profile</span>
+                </Link>
+
+                <Link
+                  to="/settings"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                >
+                  <SettingsIcon className="w-4 h-4 text-slate-400" />
+                  <span>Settings</span>
+                </Link>
+
+                {user?.role === 'admin' && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 transition"
+                  >
+                    <Shield className="w-4 h-4" />
+                    <span>Admin Portal</span>
+                  </Link>
+                )}
+
+                <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      void handleLogout();
+                    }}
+                    disabled={loggingOut}
+                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>{loggingOut ? 'Signing out...' : 'Sign Out'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </header>
 
       {/* Main Two-Panel Chat Workspace */}
@@ -630,7 +767,7 @@ export default function DashboardPage() {
                 onChange={(e) => setChatSearch(e.target.value)}
                 placeholder="Search conversations..."
                 aria-label="Search conversations"
-                className="w-full pl-9 pr-14 py-2 bg-slate-100 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                className="w-full pl-9 pr-14 py-2 bg-slate-100 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-xl text-base sm:text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
               />
               <button
                 type="button"
@@ -666,7 +803,7 @@ export default function DashboardPage() {
                   <EmptyState
                     icon={<MessageSquarePlus className="w-7 h-7" />}
                     title="No active chats yet"
-                    description="Connect with contacts or explore public channels to begin chatting securely on Whispr!"
+                    description="Connect with contacts or explore public channels to begin chatting securely on Whhispr!"
                     actionText="Find Contacts"
                     actionIcon={<Users className="w-4 h-4" />}
                     onAction={() => navigate('/contacts')}
@@ -733,7 +870,13 @@ export default function DashboardPage() {
 
                       <div className="flex items-center justify-between mt-1">
                         <p className="text-xs text-slate-500 dark:text-slate-400 truncate pr-2">
-                          {chat.lastMessage?.content ? (
+                          {(typingUsers[chat.id] || []).filter(
+                            (name) => name !== user?.username && name !== user?.displayName,
+                          ).length > 0 ? (
+                            <span className="text-indigo-600 dark:text-indigo-400 font-semibold animate-pulse">
+                              typing...
+                            </span>
+                          ) : chat.lastMessage?.content ? (
                             chat.lastMessage.content.startsWith('{') &&
                             chat.lastMessage.content.includes('"e2ee":true') ? (
                               '🔒 Encrypted message'
@@ -851,7 +994,11 @@ export default function DashboardPage() {
                           {onlineUsers[activeChat.otherUser.id]?.status === 'online' ? (
                             <span className="text-emerald-500 font-medium">Online</span>
                           ) : (
-                            <span className="text-slate-400">Offline</span>
+                            <span className="text-slate-400">
+                              {onlineUsers[activeChat.otherUser.id]?.lastSeen
+                                ? `Offline • Last seen ${formatMessageTime(onlineUsers[activeChat.otherUser.id]!.lastSeen!)}`
+                                : 'Offline'}
+                            </span>
                           )}
                         </>
                       ) : (
@@ -861,11 +1008,11 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1 sm:space-x-2 shrink-0">
                   <button
                     type="button"
                     onClick={() => toggleInChatSearch()}
-                    className={`p-2 rounded-xl transition cursor-pointer ${
+                    className={`p-1.5 sm:p-2 rounded-xl transition cursor-pointer ${
                       inChatSearchOpen
                         ? 'bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400'
                         : 'text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -887,7 +1034,7 @@ export default function DashboardPage() {
                             callType: 'audio',
                           })
                         }
-                        className="p-2 rounded-xl text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                        className="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                         title="Voice Call"
                       >
                         <Phone className="w-4 h-4" />
@@ -903,7 +1050,7 @@ export default function DashboardPage() {
                             callType: 'video',
                           })
                         }
-                        className="p-2 rounded-xl text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                        className="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                         title="Video Call"
                       >
                         <Video className="w-4 h-4" />
@@ -919,7 +1066,7 @@ export default function DashboardPage() {
                           activeChat.otherUser!.displayName || activeChat.otherUser!.username,
                         )
                       }
-                      className="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-300 text-xs font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition cursor-pointer"
+                      className="inline-flex items-center space-x-1 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-300 text-xs font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition cursor-pointer"
                       title="End-to-End Encrypted (Click to verify safety number)"
                     >
                       <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -929,7 +1076,7 @@ export default function DashboardPage() {
                   {activeChat.type === 'direct' && activeChat.otherUser ? (
                     <button
                       onClick={() => handleInspectOtherUser(activeChat.otherUser!.id)}
-                      className="p-2 rounded-xl text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                      className="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                       title="View Profile"
                     >
                       <Info className="w-4 h-4" />
@@ -937,7 +1084,7 @@ export default function DashboardPage() {
                   ) : (
                     <button
                       onClick={() => setShowGroupDrawer(!showGroupDrawer)}
-                      className={`p-2 rounded-xl transition cursor-pointer ${
+                      className={`p-1.5 sm:p-2 rounded-xl transition cursor-pointer ${
                         showGroupDrawer
                           ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
                           : 'text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -1026,7 +1173,7 @@ export default function DashboardPage() {
                             </div>
                           )}
 
-                          <div id={`msg-${msg.id}`} className="relative group max-w-xs sm:max-w-md md:max-w-lg transition-all rounded-2xl">
+                          <div id={`msg-${msg.id}`} className="relative group max-w-[85%] sm:max-w-md md:max-w-lg transition-all rounded-2xl">
                             {/* Hover Quick Reaction Bar */}
                             {/* Quick Reactions & Actions Hover Bar */}
                             <div
@@ -1344,7 +1491,7 @@ export default function DashboardPage() {
                 {showEmojiPicker && (
                   <div
                     ref={emojiPickerRef}
-                    className="absolute bottom-18 left-3 sm:left-4 z-30 w-72 sm:w-80 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl p-3 animate-in fade-in zoom-in-95 duration-150 backdrop-blur-xl"
+                    className="absolute bottom-18 left-2 sm:left-4 z-30 w-[calc(100vw-1.5rem)] max-w-xs sm:w-80 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl p-3 animate-in fade-in zoom-in-95 duration-150 backdrop-blur-xl"
                   >
                     <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 dark:border-slate-800">
                       <div className="flex space-x-1">
@@ -1490,7 +1637,7 @@ export default function DashboardPage() {
                         ? `Message ${activeChat.name}...`
                         : 'Type a message... (Press Enter to send)'
                     }
-                    className="flex-1 px-4 py-2.5 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                    className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
                   />
                   <button
                     type="submit"
@@ -1514,7 +1661,7 @@ export default function DashboardPage() {
                 <MessageSquare className="w-8 h-8" />
               </div>
               <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">
-                Your Whispr Hub
+                Your Whhispr Hub
               </h2>
               <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mb-6 leading-relaxed">
                 Select a conversation on the left, start a new group or channel, or share media with

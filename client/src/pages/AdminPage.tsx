@@ -198,7 +198,7 @@ export default function AdminPage() {
           </div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Access Denied</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-            You do not have Administrator permissions to access the Whispr Admin Portal.
+            You do not have Administrator permissions to access the Whhispr Admin Portal.
           </p>
           <button
             onClick={() => navigate('/')}
@@ -230,13 +230,13 @@ export default function AdminPage() {
             <div>
               <div className="flex items-center space-x-2">
                 <h1 className="text-base font-bold tracking-tight text-slate-900 dark:text-white">
-                  Whispr Admin Portal
+                  Whhispr Admin Portal
                 </h1>
                 <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 rounded-full">
                   Superadmin
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">
                 Manage users, accounts, and monitor platform messages
               </p>
             </div>
@@ -257,7 +257,7 @@ export default function AdminPage() {
       </header>
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-8 py-6 sm:py-8 space-y-6">
         {/* Banner Alert if any */}
         {actionMessage && (
           <div
@@ -285,7 +285,7 @@ export default function AdminPage() {
         )}
 
         {/* Overview Stats Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -391,7 +391,7 @@ export default function AdminPage() {
               placeholder={
                 activeTab === 'users' ? 'Search by name, @username, email...' : 'Search message content or sender...'
               }
-              className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-base sm:text-xs placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
         </div>
@@ -400,7 +400,7 @@ export default function AdminPage() {
         {activeTab === 'users' && (
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+              <table className="w-full min-w-[650px] text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     <th className="py-3 px-4">User</th>
@@ -545,7 +545,7 @@ export default function AdminPage() {
         {activeTab === 'messages' && (
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+              <table className="w-full min-w-[700px] text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     <th className="py-3 px-4">Sender</th>

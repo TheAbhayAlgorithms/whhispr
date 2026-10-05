@@ -1,7 +1,7 @@
 {
   "name": "whispr",
   "version": "1.0.0",
-  "description": "Whispr — Real-time chat platform monorepo",
+  "description": "Whhispr — Real-time chat platform monorepo",
   "private": true,
   "workspaces": [
     "client",

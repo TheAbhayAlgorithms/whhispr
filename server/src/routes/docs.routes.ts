@@ -36,7 +36,7 @@ router.get('/', (_req: Request, res: Response) => {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Whispr Chat API Documentation</title>
+  <title>Whhispr Chat API Documentation</title>
   <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
   <link rel="icon" type="image/png" href="https://unpkg.com/swagger-ui-dist@5/favicon-32x32.png" />
   <style>

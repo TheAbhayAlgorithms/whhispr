@@ -101,19 +101,27 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
   };
 
   return (
-    <aside className="w-80 md:w-88 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0 overflow-hidden shadow-2xl transition-all">
-      {/* Header */}
-      <div className="h-16 px-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
-        <h3 className="font-bold text-sm text-slate-900 dark:text-white">
-          {activeGroupDetails.type === 'channel' ? 'Channel Info' : 'Group Details'}
-        </h3>
-        <button
-          onClick={onClose}
-          className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-        >
-          <X className="w-4 h-4" />
-        </button>
-      </div>
+    <>
+      {/* Mobile backdrop overlay */}
+      <div
+        className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs sm:hidden animate-fade-in"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      <aside className="fixed inset-y-0 right-0 z-50 w-80 max-w-[85vw] sm:max-w-none sm:relative sm:inset-auto sm:z-auto sm:w-80 md:w-88 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0 overflow-hidden shadow-2xl transition-all">
+        {/* Header */}
+        <div className="h-16 px-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
+          <h3 className="font-bold text-sm text-slate-900 dark:text-white">
+            {activeGroupDetails.type === 'channel' ? 'Channel Info' : 'Group Details'}
+          </h3>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
 
       {/* Body Container */}
       <div className="flex-1 overflow-y-auto p-5 space-y-6">
@@ -322,5 +330,6 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
         </div>
       </div>
     </aside>
+    </>
   );
 }

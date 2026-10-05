@@ -84,13 +84,13 @@ export function CallModal() {
   const isVideo = session.callType === 'video';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-2 sm:p-4 animate-in fade-in duration-200">
       {/* Hidden audio element for pure voice calls */}
       <audio ref={remoteAudioRef} autoPlay />
 
-      <div className="relative w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col min-h-[540px] max-h-[90vh]">
+      <div className="relative w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col min-h-[380px] sm:min-h-[520px] max-h-[92vh]">
         {/* Top Status Header */}
-        <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-6 py-4 bg-gradient-to-b from-black/60 to-transparent">
+        <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-b from-black/60 to-transparent">
           <div className="flex items-center space-x-3">
             <span className="flex h-3 w-3 relative">
               <span
@@ -149,7 +149,7 @@ export function CallModal() {
               />
 
               {/* Local Video PiP (Floating Top Right) */}
-              <div className="absolute top-20 right-6 w-48 h-32 md:w-56 md:h-36 rounded-2xl overflow-hidden shadow-2xl border-2 border-indigo-500/60 bg-slate-900 z-10 transition-all duration-300">
+              <div className="absolute top-16 sm:top-20 right-3 sm:right-6 w-28 h-20 sm:w-48 sm:h-32 md:w-56 md:h-36 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border-2 border-indigo-500/60 bg-slate-900 z-10 transition-all duration-300">
                 <video
                   ref={localVideoRef}
                   autoPlay
@@ -157,7 +157,7 @@ export function CallModal() {
                   muted
                   className="w-full h-full object-cover transform -scale-x-100"
                 />
-                <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/60 backdrop-blur-sm text-[10px] text-white font-medium">
+                <div className="absolute bottom-1 sm:bottom-2 left-1 sm:left-2 px-1.5 sm:px-2 py-0.5 rounded bg-black/60 backdrop-blur-sm text-[9px] sm:text-[10px] text-white font-medium">
                   You {isMuted ? '• Muted' : ''}
                 </div>
               </div>
@@ -259,62 +259,62 @@ export function CallModal() {
         </div>
 
         {/* Bottom Floating Control Dock */}
-        <div className="px-6 py-5 bg-slate-900/90 border-t border-slate-800/80 flex items-center justify-center space-x-4">
+        <div className="px-3 sm:px-6 py-3 sm:py-5 bg-slate-900/90 border-t border-slate-800/80 flex items-center justify-center space-x-3 sm:space-x-4">
           {session.status === 'incoming' ? (
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-4 sm:space-x-6">
               <button
                 onClick={() => rejectCall('declined')}
-                className="flex items-center justify-center w-14 h-14 rounded-full bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/30 transition transform hover:scale-105 active:scale-95"
+                className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/30 transition transform hover:scale-105 active:scale-95"
                 title="Decline Call"
               >
-                <PhoneOff className="w-6 h-6" />
+                <PhoneOff className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
 
               <button
                 onClick={() => acceptCall('audio')}
-                className="flex items-center justify-center w-14 h-14 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30 transition transform hover:scale-105 active:scale-95"
+                className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30 transition transform hover:scale-105 active:scale-95"
                 title="Accept with Audio"
               >
-                <Phone className="w-6 h-6" />
+                <Phone className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
 
               {session.callType === 'video' && (
                 <button
                   onClick={() => acceptCall('video')}
-                  className="flex items-center justify-center w-14 h-14 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-900/30 transition transform hover:scale-105 active:scale-95"
+                  className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-900/30 transition transform hover:scale-105 active:scale-95"
                   title="Accept with Video"
                 >
-                  <Video className="w-6 h-6" />
+                  <Video className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
               )}
             </div>
           ) : session.status === 'connected' ? (
-            <div className="flex items-center space-x-3 sm:space-x-4">
+            <div className="flex items-center space-x-2.5 sm:space-x-4">
               {/* Mic Mute/Unmute */}
               <button
                 onClick={toggleMute}
-                className={`flex items-center justify-center w-12 h-12 rounded-full border transition ${
+                className={`flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full border transition ${
                   isMuted
                     ? 'bg-rose-500/20 border-rose-500 text-rose-400 hover:bg-rose-500/30'
                     : 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700'
                 }`}
                 title={isMuted ? 'Unmute Microphone' : 'Mute Microphone'}
               >
-                {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                {isMuted ? <MicOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Mic className="w-4 h-4 sm:w-5 sm:h-5" />}
               </button>
 
               {/* Video Toggle */}
               {isVideo && (
                 <button
                   onClick={toggleVideo}
-                  className={`flex items-center justify-center w-12 h-12 rounded-full border transition ${
+                  className={`flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full border transition ${
                     isVideoOff
                       ? 'bg-rose-500/20 border-rose-500 text-rose-400 hover:bg-rose-500/30'
                       : 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700'
                   }`}
                   title={isVideoOff ? 'Turn Camera On' : 'Turn Camera Off'}
                 >
-                  {isVideoOff ? <VideoOff className="w-5 h-5" /> : <Video className="w-5 h-5" />}
+                  {isVideoOff ? <VideoOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Video className="w-4 h-4 sm:w-5 sm:h-5" />}
                 </button>
               )}
 
@@ -322,34 +322,34 @@ export function CallModal() {
               {isVideo && (
                 <button
                   onClick={() => void toggleScreenShare()}
-                  className={`flex items-center justify-center w-12 h-12 rounded-full border transition ${
+                  className={`flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full border transition ${
                     isScreenSharing
                       ? 'bg-indigo-600 border-indigo-500 text-white'
                       : 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700'
                   }`}
                   title={isScreenSharing ? 'Stop Screen Share' : 'Share Screen'}
                 >
-                  <MonitorUp className="w-5 h-5" />
+                  <MonitorUp className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               )}
 
               {/* End Call Button */}
               <button
                 onClick={endCall}
-                className="flex items-center justify-center w-12 h-12 rounded-full bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/30 transition transform hover:scale-105 active:scale-95 ml-2"
+                className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/30 transition transform hover:scale-105 active:scale-95 ml-1 sm:ml-2"
                 title="End Call"
               >
-                <PhoneOff className="w-5 h-5" />
+                <PhoneOff className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
           ) : session.status === 'outgoing' ? (
             <div className="flex items-center justify-center">
               <button
                 onClick={endCall}
-                className="flex items-center justify-center w-14 h-14 rounded-full bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/30 transition transform hover:scale-105 active:scale-95"
+                className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/30 transition transform hover:scale-105 active:scale-95"
                 title="Cancel Call"
               >
-                <PhoneOff className="w-6 h-6" />
+                <PhoneOff className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             </div>
           ) : null}

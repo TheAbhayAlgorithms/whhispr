@@ -75,10 +75,10 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+      <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="p-6 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+        <div className="p-4 sm:p-6 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-xs">
               {tab === 'group' ? <Users className="w-5 h-5" /> : <Hash className="w-5 h-5" />}
@@ -103,7 +103,7 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
         </div>
 
         {/* Tab Selector */}
-        <div className="px-6 pt-4 flex gap-2">
+        <div className="px-4 sm:px-6 pt-4 flex gap-2">
           <button
             type="button"
             onClick={() => setTab('group')}
@@ -131,7 +131,7 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
           {errorMsg && (
             <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-medium flex items-center space-x-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
@@ -155,7 +155,7 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                 placeholder={tab === 'group' ? 'e.g. Design Sync' : 'general'}
                 className={`w-full ${
                   tab === 'channel' ? 'pl-8' : 'pl-3.5'
-                } pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition`}
+                } pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-base sm:text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition`}
               />
             </div>
           </div>
@@ -169,7 +169,7 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What is this conversation about?"
-              className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-base sm:text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
             />
           </div>
 
@@ -188,7 +188,7 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                     </p>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">
                       {isPublic
-                        ? 'Anyone in Whispr can discover and join this channel'
+                        ? 'Anyone in Whhispr can discover and join this channel'
                         : 'Only invited members can view and join'}
                     </p>
                   </div>

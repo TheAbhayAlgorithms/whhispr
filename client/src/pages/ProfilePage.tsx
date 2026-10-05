@@ -156,24 +156,24 @@ export default function ProfilePage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 w-full">
         {error && (
-          <div className="mb-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-start space-x-3 text-rose-300 text-sm">
-            <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-400 mt-0.5" />
+          <div className="mb-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-start space-x-3 text-rose-700 dark:text-rose-300 text-sm">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-500 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleSave} className="space-y-8">
+        <form onSubmit={handleSave} className="space-y-6 sm:space-y-8">
           {/* Avatar Section */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800/80 shadow-md dark:shadow-xl">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-6 flex items-center space-x-2">
+          <div className="p-4 sm:p-6 rounded-3xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800/80 shadow-md dark:shadow-xl">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4 sm:mb-6 flex items-center space-x-2">
               <User className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
               <span>Profile Photo</span>
             </h2>
 
-            <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
-              <div className="relative group">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left space-y-4 sm:space-y-0 sm:space-x-6">
+              <div className="relative group shrink-0">
                 <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-indigo-500/40 flex items-center justify-center text-2xl font-bold text-indigo-600 dark:text-indigo-300 shadow-xl">
                   {profile?.avatarUrl ? (
                     <img
@@ -193,7 +193,7 @@ export default function ProfilePage() {
                 )}
               </div>
 
-              <div className="flex flex-col space-y-2">
+              <div className="flex flex-col space-y-2 items-center sm:items-start">
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -202,7 +202,7 @@ export default function ProfilePage() {
                   className="hidden"
                 />
 
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
                   <button
                     type="button"
                     disabled={uploadingAvatar}
@@ -225,7 +225,7 @@ export default function ProfilePage() {
                     </button>
                   )}
                 </div>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 text-center sm:text-left">
                   Recommended: Square JPG, PNG, or WebP. Maximum size: 5 MB.
                 </p>
               </div>
@@ -233,7 +233,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Profile Details */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800/80 shadow-md dark:shadow-xl space-y-5">
+          <div className="p-4 sm:p-6 rounded-3xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800/80 shadow-md dark:shadow-xl space-y-5">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 flex items-center space-x-2">
               <Shield className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
               <span>Personal Information</span>
@@ -254,7 +254,7 @@ export default function ProfilePage() {
                 onChange={(e) => setDisplayName(e.target.value)}
                 maxLength={60}
                 placeholder="Your full name or alias"
-                className="block w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition"
+                className="block w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base sm:text-sm transition"
               />
             </div>
 
@@ -275,7 +275,7 @@ export default function ProfilePage() {
                 onChange={(e) => setStatusMessage(e.target.value)}
                 maxLength={140}
                 placeholder="What's on your mind? (e.g., Coding 💻, In a meeting 📵)"
-                className="block w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition"
+                className="block w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base sm:text-sm transition"
               />
             </div>
 
@@ -296,19 +296,19 @@ export default function ProfilePage() {
                 onChange={(e) => setBio(e.target.value)}
                 maxLength={500}
                 placeholder="Share a short bio about what you do or your interests..."
-                className="block w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition resize-none"
+                className="block w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base sm:text-sm transition resize-none"
               />
             </div>
           </div>
 
           {/* Privacy Settings */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800/80 shadow-md dark:shadow-xl space-y-5">
+          <div className="p-4 sm:p-6 rounded-3xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800/80 shadow-md dark:shadow-xl space-y-5">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 flex items-center space-x-2">
               <Eye className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
               <span>Privacy & Visibility</span>
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <div>
                 <label
                   htmlFor="lastSeenVisibility"
@@ -322,7 +322,7 @@ export default function ProfilePage() {
                   onChange={(e) =>
                     setLastSeenVisibility(e.target.value as 'everyone' | 'contacts' | 'nobody')
                   }
-                  className="block w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  className="block w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base sm:text-sm"
                 >
                   <option value="everyone">Everyone</option>
                   <option value="contacts">My Contacts</option>
@@ -343,7 +343,7 @@ export default function ProfilePage() {
                   onChange={(e) =>
                     setAvatarVisibility(e.target.value as 'everyone' | 'contacts' | 'nobody')
                   }
-                  className="block w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  className="block w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base sm:text-sm"
                 >
                   <option value="everyone">Everyone</option>
                   <option value="contacts">My Contacts</option>
@@ -351,7 +351,7 @@ export default function ProfilePage() {
                 </select>
               </div>
 
-              <div>
+              <div className="sm:col-span-2 md:col-span-1">
                 <label
                   htmlFor="addMePolicy"
                   className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5"
@@ -364,7 +364,7 @@ export default function ProfilePage() {
                   onChange={(e) =>
                     setAddMePolicy(e.target.value as 'everyone' | 'contacts' | 'nobody')
                   }
-                  className="block w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                  className="block w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base sm:text-sm"
                 >
                   <option value="everyone">Everyone</option>
                   <option value="contacts">Friends of Friends</option>
@@ -379,7 +379,7 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={saving || isLoading}
-              className="flex items-center space-x-2 px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold text-white shadow-xl shadow-indigo-600/30 transition disabled:opacity-50"
+              className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold text-white shadow-xl shadow-indigo-600/30 transition disabled:opacity-50"
             >
               {saving ? (
                 <div className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" />

@@ -40,24 +40,24 @@ export default function VerifyEmailPage() {
   }, [token]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 text-slate-900 dark:text-slate-100 transition-colors duration-200 relative">
-      <div className="absolute top-6 right-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 text-slate-900 dark:text-slate-100 transition-colors duration-200 relative">
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
         <ThemeToggle />
       </div>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <div className="flex justify-center">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-500 via-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
             <MessageSquare className="w-6 h-6 text-white" />
           </div>
         </div>
-        <h2 className="mt-4 text-center text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+        <h2 className="mt-4 text-center text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
           Email Verification
         </h2>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
-        <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl py-8 px-6 sm:px-10 shadow-xl rounded-3xl border border-slate-200 dark:border-slate-800 text-center">
+      <div className="mt-6 sm:mt-8 sm:mx-auto sm:w-full sm:max-w-md w-full">
+        <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl py-6 px-4 sm:py-8 sm:px-10 shadow-xl rounded-3xl border border-slate-200 dark:border-slate-800 text-center">
           {loading ? (
             <div className="py-8">
               <div className="mx-auto w-10 h-10 rounded-full border-3 border-indigo-500 border-t-transparent animate-spin mb-4" />

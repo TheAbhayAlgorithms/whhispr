@@ -23,6 +23,8 @@ export class PresenceService {
       const now = new Date().toISOString();
 
       const exists = await redis.exists(key);
+      await redis.sadd('online_users', userId);
+
       if (!exists) {
         await redis.hset(key, {
           status: 'online',
@@ -54,6 +56,7 @@ export class PresenceService {
       const count = await redis.hincrby(key, 'socketCount', -1);
       if (count <= 0) {
         await redis.del(key);
+        await redis.srem('online_users', userId);
 
         // Update database profiles last_seen
         await query(
@@ -72,6 +75,32 @@ export class PresenceService {
       logger.warn('Failed to set user offline in Redis', { userId, error: msg });
       return false;
     }
+  }
+
+  /**
+   * Returns an array of user IDs that are currently online.
+   */
+  static async getAllOnlineUsers(): Promise<string[]> {
+    try {
+      const userIds = await redis.smembers('online_users');
+      return userIds || [];
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      logger.warn('Failed to get all online users from Redis', { error: msg });
+      return [];
+    }
+  }
+
+  /**
+   * Retrieves presence status for multiple users in batch.
+   */
+  static async getBatchUserPresence(userIds: string[]): Promise<UserPresence[]> {
+    if (!userIds || userIds.length === 0) return [];
+    const results: UserPresence[] = [];
+    for (const uid of userIds) {
+      results.push(await this.getUserPresence(uid));
+    }
+    return results;
   }
 
   /**

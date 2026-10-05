@@ -7,6 +7,7 @@ import { logger } from '../utils/logger';
 import { socketAuthMiddleware, AuthenticatedSocket } from './auth.socket';
 import { PresenceService } from './presence.service';
 import { ChatService } from '../services/chat.service';
+import { query } from '../config/database';
 import { Redis } from 'ioredis';
 
 let io: Server | null = null;
@@ -50,14 +51,18 @@ export function initSocketIO(httpServer: http.Server): Server {
     // 1. Join user's individual room for targeted notifications
     await socket.join(`user:${user.userId}`);
 
-    // 2. Mark online in presence service
-    const isNewlyOnline = await PresenceService.setUserOnline(user.userId);
-    if (isNewlyOnline) {
-      io?.emit('presence:update', {
-        userId: user.userId,
-        status: 'online',
-      });
-    }
+    // 2. Mark online in presence service and broadcast to all users
+    await PresenceService.setUserOnline(user.userId);
+    io?.emit('presence:update', {
+      userId: user.userId,
+      status: 'online',
+    });
+
+    // 3. Immediately send current online users list to this connected client
+    const allOnlineIds = await PresenceService.getAllOnlineUsers();
+    socket.emit('presence:init', {
+      onlineUserIds: allOnlineIds,
+    });
 
     // Acknowledge connection to client with current user ID
     socket.emit('connected', {
@@ -76,6 +81,16 @@ export function initSocketIO(httpServer: http.Server): Server {
         if (typeof callback === 'function') {
           const presence = await PresenceService.getUserPresence(targetUserId);
           (callback as (res: unknown) => void)(presence);
+        }
+      })();
+    });
+
+    // Batch query presence
+    socket.on('presence:query_batch', (targetUserIds: string[], callback: unknown) => {
+      void (async () => {
+        if (typeof callback === 'function' && Array.isArray(targetUserIds)) {
+          const presences = await PresenceService.getBatchUserPresence(targetUserIds);
+          (callback as (res: unknown) => void)(presences);
         }
       })();
     });
@@ -99,24 +114,56 @@ export function initSocketIO(httpServer: http.Server): Server {
     });
 
     // 7. Real-time typing indicators
-    socket.on('typing:start', (data: { chatId: string }) => {
+    socket.on('typing:start', async (data: { chatId: string }) => {
       if (!data?.chatId) return;
-      socket.to(`chat:${data.chatId}`).emit('typing:update', {
+      const typingPayload = {
         chatId: data.chatId,
         userId: user.userId,
         username: user.username,
         isTyping: true,
-      });
+      };
+
+      socket.to(`chat:${data.chatId}`).emit('typing:update', typingPayload);
+
+      try {
+        const { rows } = await query<{ user_id: string }>(
+          `SELECT user_id FROM chat_members WHERE chat_id = $1 AND left_at IS NULL`,
+          [data.chatId],
+        );
+        for (const row of rows) {
+          if (row.user_id !== user.userId) {
+            io?.to(`user:${row.user_id}`).emit('typing:update', typingPayload);
+          }
+        }
+      } catch {
+        // Fallback already delivered to chat room
+      }
     });
 
-    socket.on('typing:stop', (data: { chatId: string }) => {
+    socket.on('typing:stop', async (data: { chatId: string }) => {
       if (!data?.chatId) return;
-      socket.to(`chat:${data.chatId}`).emit('typing:update', {
+      const typingPayload = {
         chatId: data.chatId,
         userId: user.userId,
         username: user.username,
         isTyping: false,
-      });
+      };
+
+      socket.to(`chat:${data.chatId}`).emit('typing:update', typingPayload);
+
+      try {
+        const { rows } = await query<{ user_id: string }>(
+          `SELECT user_id FROM chat_members WHERE chat_id = $1 AND left_at IS NULL`,
+          [data.chatId],
+        );
+        for (const row of rows) {
+          if (row.user_id !== user.userId) {
+            io?.to(`user:${row.user_id}`).emit('typing:update', typingPayload);
+          }
+        }
+      } catch {
+        // Fallback already delivered to chat room
+      }
     });
 
     // 8. Real-time message status updates

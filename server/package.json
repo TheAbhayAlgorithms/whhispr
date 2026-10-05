@@ -1,7 +1,7 @@
 {
   "name": "@whispr/server",
   "version": "1.0.0",
-  "description": "Whispr backend — Node.js + Express + Socket.IO",
+  "description": "Whhispr backend — Node.js + Express + Socket.IO",
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
