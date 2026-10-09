@@ -31,6 +31,8 @@ export interface PublicProfile {
   statusMessage: string | null;
   lastSeen: Date | null;
   isContact: boolean;
+  contactStatus?: 'none' | 'pending_sent' | 'pending_received' | 'accepted';
+  contactRequestId?: string | null;
   canAdd: boolean;
 }
 
@@ -228,20 +230,35 @@ export class UserService {
 
     const target = profiles[0];
 
-    // Determine whether requester is an accepted contact
+    // Determine whether requester is an accepted contact and retrieve contact request status
     let isContact = false;
+    let contactStatus: 'none' | 'pending_sent' | 'pending_received' | 'accepted' = 'none';
+    let contactRequestId: string | null = null;
+
     if (requesterId !== targetUserId) {
-      const { rows: contactRows } = await query<{ status: string }>(
-        `SELECT status FROM contacts 
-         WHERE ((requester_id = $1 AND addressee_id = $2) 
-            OR (requester_id = $2 AND addressee_id = $1))
-           AND status = 'accepted'
+      const { rows: contactRows } = await query<{ id: string; status: string; requester_id: string }>(
+        `SELECT id, status, requester_id FROM contacts 
+         WHERE (requester_id = $1 AND addressee_id = $2) 
+            OR (requester_id = $2 AND addressee_id = $1)
+         ORDER BY updated_at DESC
          LIMIT 1`,
         [requesterId, targetUserId],
       );
-      isContact = contactRows.length > 0;
+
+      if (contactRows.length > 0) {
+        const c = contactRows[0];
+        if (c.status === 'accepted') {
+          isContact = true;
+          contactStatus = 'accepted';
+          contactRequestId = c.id;
+        } else if (c.status === 'pending') {
+          contactStatus = c.requester_id === requesterId ? 'pending_sent' : 'pending_received';
+          contactRequestId = c.id;
+        }
+      }
     } else {
       isContact = true;
+      contactStatus = 'accepted';
     }
 
     // Apply avatar privacy filter
@@ -275,6 +292,8 @@ export class UserService {
       statusMessage: target.status_message,
       lastSeen: visibleLastSeen,
       isContact,
+      contactStatus,
+      contactRequestId,
       canAdd,
     };
   }

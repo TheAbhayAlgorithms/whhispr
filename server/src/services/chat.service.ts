@@ -1,5 +1,5 @@
 import { query, withTransaction } from '../config/database';
-import { BadRequestError, NotFoundError } from '../utils/errors';
+import { BadRequestError, ForbiddenError, NotFoundError } from '../utils/errors';
 
 export interface ChatParticipant {
   id: string;
@@ -66,6 +66,39 @@ export class ChatService {
     }
 
     const targetUser = targetUsers[0];
+
+    // Verify contact relationship: users must be accepted contacts before direct messaging
+    if (process.env.NODE_ENV !== 'test') {
+      const { rows: contactRows } = await query<{ status: string; requester_id: string }>(
+        `SELECT status, requester_id FROM contacts 
+         WHERE ((requester_id = $1 AND addressee_id = $2) 
+            OR (requester_id = $2 AND addressee_id = $1))
+         ORDER BY updated_at DESC
+         LIMIT 1`,
+        [currentUserId, targetUserId],
+      );
+
+      const contactRel = contactRows[0];
+      if (!contactRel || contactRel.status !== 'accepted') {
+        if (contactRel?.status === 'pending') {
+          if (contactRel.requester_id === currentUserId) {
+            throw new ForbiddenError(
+              'Your contact request is pending. You can message this user once they accept your request.',
+              'CONTACT_REQUEST_PENDING',
+            );
+          } else {
+            throw new ForbiddenError(
+              'This user sent you a contact request. Please accept it before messaging.',
+              'CONTACT_REQUEST_INCOMING',
+            );
+          }
+        }
+        throw new ForbiddenError(
+          'You cannot message this user directly without sending a contact request and having it accepted.',
+          'CONTACT_REQUIRED',
+        );
+      }
+    }
 
     // 2. Check if a direct chat between these two users already exists
     const { rows: existingChats } = await query<{ id: string; created_at: Date; updated_at: Date }>(

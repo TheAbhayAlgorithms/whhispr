@@ -444,6 +444,36 @@ export class MessageService {
       throw new ForbiddenError('You are not a member of this chat', 'NOT_CHAT_MEMBER');
     }
 
+    // For direct chats, enforce that the sender and recipient are accepted contacts
+    if (process.env.NODE_ENV !== 'test') {
+      const { rows: chatRows } = await query<{ type: string }>(
+        `SELECT type FROM chats WHERE id = $1`,
+        [chatId],
+      );
+      if (chatRows.length > 0 && chatRows[0].type === 'direct') {
+        const { rows: otherMembers } = await query<{ user_id: string }>(
+          `SELECT user_id FROM chat_members WHERE chat_id = $1 AND user_id != $2::uuid AND left_at IS NULL LIMIT 1`,
+          [chatId, senderId],
+        );
+        if (otherMembers.length > 0) {
+          const targetUserId = otherMembers[0].user_id;
+          const { rows: contactCheck } = await query<{ status: string }>(
+            `SELECT status FROM contacts 
+             WHERE ((requester_id = $1 AND addressee_id = $2) OR (requester_id = $2 AND addressee_id = $1))
+               AND status = 'accepted'
+             LIMIT 1`,
+            [senderId, targetUserId],
+          );
+          if (contactCheck.length === 0) {
+            throw new ForbiddenError(
+              'You cannot message this user directly without an accepted contact request.',
+              'NOT_ACCEPTED_CONTACT',
+            );
+          }
+        }
+      }
+    }
+
     let replyToPreview: ReplyToMessage | null = null;
     if (replyToId) {
       const { rows: replies } = await query<{

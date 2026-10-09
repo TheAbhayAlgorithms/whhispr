@@ -79,6 +79,8 @@ import {
   Pin,
   Sparkles,
   ArrowUp,
+  UserPlus,
+  Info,
 } from 'lucide-react';
 
 function formatMessageTime(dateString: string): string {
@@ -157,11 +159,18 @@ export default function DashboardPage() {
     getOrCreateDirectChat,
   } = useChatStore();
 
-  const { incomingRequests, fetchRequests } = useContactStore();
+  const {
+    contacts,
+    incomingRequests,
+    fetchContacts,
+    fetchRequests,
+    sendContactRequest,
+  } = useContactStore();
   const { onlineUsers } = useSocketStore();
   const { fetchUserProfile, viewingProfile, clearViewingProfile } = useProfileStore();
 
   const [messageInput, setMessageInput] = useState('');
+  const [bannerNotice, setBannerNotice] = useState<string | null>(null);
   const [chatSearch, setChatSearch] = useState('');
   const [loggingOut, setLoggingOut] = useState(false);
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
@@ -334,10 +343,11 @@ export default function DashboardPage() {
   // Initialize chats and socket listeners
   useEffect(() => {
     void fetchChats();
+    void fetchContacts();
     void fetchRequests();
     const cleanup = setupSocketListeners();
     return cleanup;
-  }, [fetchChats, fetchRequests, setupSocketListeners]);
+  }, [fetchChats, fetchContacts, fetchRequests, setupSocketListeners]);
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -555,9 +565,20 @@ export default function DashboardPage() {
     });
 
 
+  const isDirectChatContact =
+    activeChat?.type === 'direct' && activeChat.otherUser
+      ? contacts.some((c) => c.userId === activeChat.otherUser?.id)
+      : true;
+
   const handleVoiceCall = () => {
     if (!activeChat) return;
     if (activeChat.type === 'direct' && activeChat.otherUser) {
+      if (!isDirectChatContact) {
+        setBannerNotice('You must send a contact request and be accepted by this user before calling.');
+        setTimeout(() => setBannerNotice(null), 4000);
+        void handleInspectOtherUser(activeChat.otherUser.id);
+        return;
+      }
       void startCall({
         recipientId: activeChat.otherUser.id,
         recipientName: activeChat.otherUser.displayName || activeChat.otherUser.username,
@@ -582,6 +603,12 @@ export default function DashboardPage() {
   const handleVideoCall = () => {
     if (!activeChat) return;
     if (activeChat.type === 'direct' && activeChat.otherUser) {
+      if (!isDirectChatContact) {
+        setBannerNotice('You must send a contact request and be accepted by this user before calling.');
+        setTimeout(() => setBannerNotice(null), 4000);
+        void handleInspectOtherUser(activeChat.otherUser.id);
+        return;
+      }
       void startCall({
         recipientId: activeChat.otherUser.id,
         recipientName: activeChat.otherUser.displayName || activeChat.otherUser.username,
@@ -1926,145 +1953,183 @@ export default function DashboardPage() {
                   </div>
                 )}
 
-                {/* Perplexity Styled Floating Prompt Bar */}
-                <form
-                  onSubmit={handleSendMessage}
-                  className="bg-[#202222] border border-[#2D3030] focus-within:border-[#20B2AA] focus-within:ring-1 focus-within:ring-[#20B2AA]/30 rounded-2xl p-2 sm:p-2.5 flex items-end space-x-1.5 sm:space-x-2 transition-all shadow-md"
-                >
-                  {/* Hidden file input */}
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileSelect}
-                    className="hidden"
-                    accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt,.zip"
-                  />
-
-                  {/* Mobile Collapsed Action Menu (< sm) */}
-                  <div className="relative sm:hidden shrink-0">
+                {/* Perplexity Styled Floating Prompt Bar or Contact Request Gate */}
+                {!isDirectChatContact && activeChat.type === 'direct' && activeChat.otherUser ? (
+                  <div className="bg-[#202222] border border-amber-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md animate-in fade-in duration-150">
+                    <div className="flex items-center space-x-3 text-left w-full sm:w-auto">
+                      <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-400 flex items-center justify-center shrink-0">
+                        <UserPlus className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-[#EDEDED]">
+                          Contact Request Required
+                        </p>
+                        <p className="text-[11px] text-[#9EA3A3]">
+                          You cannot directly text {activeChat.otherUser.displayName || 'this user'} until you send a contact request and they accept it.
+                        </p>
+                      </div>
+                    </div>
                     <button
                       type="button"
-                      onClick={() => setShowMobileActionsMenu(!showMobileActionsMenu)}
-                      disabled={isSending || isUploadingMedia}
-                      className={`p-2 rounded-xl transition touch-target-44 flex items-center justify-center shrink-0 cursor-pointer ${
-                        showMobileActionsMenu
-                          ? 'bg-[#20B2AA] text-black rotate-45'
-                          : 'text-[#9EA3A3] hover:text-[#20B2AA] hover:bg-[#262828]'
-                      }`}
-                      title="More actions"
-                      aria-label="Add attachment or emoji"
+                      onClick={async () => {
+                        if (activeChat.otherUser?.id) {
+                          try {
+                            const res = await sendContactRequest({ targetUserId: activeChat.otherUser.id });
+                            setBannerNotice(res.message || 'Contact request sent! You can text once accepted.');
+                            setTimeout(() => setBannerNotice(null), 4000);
+                          } catch (err: unknown) {
+                            const msg = err instanceof Error ? err.message : 'Failed to send contact request';
+                            setBannerNotice(msg);
+                            setTimeout(() => setBannerNotice(null), 4000);
+                          }
+                        }
+                      }}
+                      className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#20B2AA] hover:bg-[#1CA099] text-black text-xs font-semibold transition cursor-pointer flex items-center justify-center space-x-1.5 shrink-0 shadow-md shadow-[#20B2AA]/20 active:scale-95"
                     >
-                      <Plus className="w-4 h-4 transition-transform" />
+                      <UserPlus className="w-3.5 h-3.5" />
+                      <span>Send Contact Request</span>
                     </button>
-
-                    {showMobileActionsMenu && (
-                      <div className="absolute bottom-12 left-0 z-30 bg-[#202222] border border-[#2D3030] rounded-2xl shadow-xl p-1.5 flex flex-col space-y-1 min-w-[170px] animate-in fade-in slide-in-from-bottom-2 duration-150">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setShowMobileActionsMenu(false);
-                            fileInputRef.current?.click();
-                          }}
-                          className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#EDEDED] hover:bg-[#262828] transition cursor-pointer"
-                        >
-                          <Paperclip className="w-4 h-4 text-[#20B2AA] shrink-0" />
-                          <span>Attach Media / File</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setShowMobileActionsMenu(false);
-                            setShowEmojiPicker(true);
-                          }}
-                          className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#EDEDED] hover:bg-[#262828] transition cursor-pointer"
-                        >
-                          <Smile className="w-4 h-4 text-[#20B2AA] shrink-0" />
-                          <span>Insert Emoji</span>
-                        </button>
-                      </div>
-                    )}
                   </div>
+                ) : (
+                  <form
+                    onSubmit={handleSendMessage}
+                    className="bg-[#202222] border border-[#2D3030] focus-within:border-[#20B2AA] focus-within:ring-1 focus-within:ring-[#20B2AA]/30 rounded-2xl p-2 sm:p-2.5 flex items-end space-x-1.5 sm:space-x-2 transition-all shadow-md"
+                  >
+                    {/* Hidden file input */}
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileSelect}
+                      className="hidden"
+                      accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt,.zip"
+                    />
 
-                  {/* Desktop & Tablet attachment/emoji buttons (sm:flex) */}
-                  <div className="hidden sm:flex items-center space-x-0.5 shrink-0 mb-0.5">
-                    <WarmTooltip content="Attach File or Media" side="top">
+                    {/* Mobile Collapsed Action Menu (< sm) */}
+                    <div className="relative sm:hidden shrink-0">
                       <button
                         type="button"
-                        onClick={() => fileInputRef.current?.click()}
+                        onClick={() => setShowMobileActionsMenu(!showMobileActionsMenu)}
                         disabled={isSending || isUploadingMedia}
-                        className="p-2 rounded-xl text-[#9EA3A3] hover:text-[#20B2AA] hover:bg-[#262828] transition shrink-0 cursor-pointer"
-                        aria-label="Attach file or photo"
-                      >
-                        <Paperclip className="w-4 h-4" />
-                      </button>
-                    </WarmTooltip>
-                    <WarmTooltip content="Insert Emoji" side="top">
-                      <button
-                        type="button"
-                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                        disabled={isSending || isUploadingMedia}
-                        className={`p-2 rounded-xl transition shrink-0 cursor-pointer ${
-                          showEmojiPicker
-                            ? 'bg-[#1D2B29] text-[#20B2AA]'
+                        className={`p-2 rounded-xl transition touch-target-44 flex items-center justify-center shrink-0 cursor-pointer ${
+                          showMobileActionsMenu
+                            ? 'bg-[#20B2AA] text-black rotate-45'
                             : 'text-[#9EA3A3] hover:text-[#20B2AA] hover:bg-[#262828]'
                         }`}
-                        aria-label="Insert emoji"
+                        title="More actions"
+                        aria-label="Add attachment or emoji"
                       >
-                        <Smile className="w-4 h-4" />
+                        <Plus className="w-4 h-4 transition-transform" />
+                      </button>
+
+                      {showMobileActionsMenu && (
+                        <div className="absolute bottom-12 left-0 z-30 bg-[#202222] border border-[#2D3030] rounded-2xl shadow-xl p-1.5 flex flex-col space-y-1 min-w-[170px] animate-in fade-in slide-in-from-bottom-2 duration-150">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowMobileActionsMenu(false);
+                              fileInputRef.current?.click();
+                            }}
+                            className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#EDEDED] hover:bg-[#262828] transition cursor-pointer"
+                          >
+                            <Paperclip className="w-4 h-4 text-[#20B2AA] shrink-0" />
+                            <span>Attach Media / File</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowMobileActionsMenu(false);
+                              setShowEmojiPicker(true);
+                            }}
+                            className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#EDEDED] hover:bg-[#262828] transition cursor-pointer"
+                          >
+                            <Smile className="w-4 h-4 text-[#20B2AA] shrink-0" />
+                            <span>Insert Emoji</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Desktop & Tablet attachment/emoji buttons (sm:flex) */}
+                    <div className="hidden sm:flex items-center space-x-0.5 shrink-0 mb-0.5">
+                      <WarmTooltip content="Attach File or Media" side="top">
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={isSending || isUploadingMedia}
+                          className="p-2 rounded-xl text-[#9EA3A3] hover:text-[#20B2AA] hover:bg-[#262828] transition shrink-0 cursor-pointer"
+                          aria-label="Attach file or photo"
+                        >
+                          <Paperclip className="w-4 h-4" />
+                        </button>
+                      </WarmTooltip>
+                      <WarmTooltip content="Insert Emoji" side="top">
+                        <button
+                          type="button"
+                          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                          disabled={isSending || isUploadingMedia}
+                          className={`p-2 rounded-xl transition shrink-0 cursor-pointer ${
+                            showEmojiPicker
+                              ? 'bg-[#1D2B29] text-[#20B2AA]'
+                              : 'text-[#9EA3A3] hover:text-[#20B2AA] hover:bg-[#262828]'
+                          }`}
+                          aria-label="Insert emoji"
+                        >
+                          <Smile className="w-4 h-4" />
+                        </button>
+                      </WarmTooltip>
+                    </div>
+
+                    {/* Auto-growing message textarea */}
+                    <textarea
+                      ref={messageInputRef}
+                      rows={1}
+                      value={messageInput}
+                      onChange={(e) => {
+                        handleInputChange(e);
+                        e.target.style.height = 'auto';
+                        e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          void handleSendMessage(e);
+                        } else if (e.key === 'Escape') {
+                          if (editingMessage) {
+                            setEditingMessage(null);
+                            setMessageInput('');
+                          }
+                          if (replyingTo) {
+                            setReplyingTo(null);
+                          }
+                        }
+                      }}
+                      placeholder={
+                        editingMessage
+                          ? 'Editing message... (Enter to save, Esc to cancel)'
+                          : activeChat.type === 'channel'
+                          ? `Message in #${activeChat.name}...`
+                          : 'Ask anything or write a message...'
+                      }
+                      className="flex-1 px-2.5 py-1.5 bg-transparent border-none text-base sm:text-sm text-[#EDEDED] placeholder-[#737878] focus:outline-none focus:ring-0 transition resize-none max-h-32 overflow-y-auto leading-relaxed"
+                      style={{ minHeight: '38px' }}
+                    />
+
+                    <WarmTooltip content="Send Message" shortcut="↵" side="top">
+                      <button
+                        type="submit"
+                        disabled={(!messageInput.trim() && !stagedFile) || isSending || isUploadingMedia}
+                        className="w-9 h-9 rounded-full bg-[#20B2AA] hover:bg-[#1CA099] disabled:opacity-30 text-black shadow-md shadow-[#20B2AA]/20 transition touch-target-44 flex items-center justify-center shrink-0 self-end font-bold cursor-pointer active:scale-95 mb-0.5"
+                        aria-label="Send Message"
+                      >
+                        {isUploadingMedia ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-black" />
+                        ) : (
+                          <ArrowUp className="w-4 h-4 stroke-[2.5] text-black" />
+                        )}
                       </button>
                     </WarmTooltip>
-                  </div>
-
-                  {/* Auto-growing message textarea */}
-                  <textarea
-                    ref={messageInputRef}
-                    rows={1}
-                    value={messageInput}
-                    onChange={(e) => {
-                      handleInputChange(e);
-                      e.target.style.height = 'auto';
-                      e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        void handleSendMessage(e);
-                      } else if (e.key === 'Escape') {
-                        if (editingMessage) {
-                          setEditingMessage(null);
-                          setMessageInput('');
-                        }
-                        if (replyingTo) {
-                          setReplyingTo(null);
-                        }
-                      }
-                    }}
-                    placeholder={
-                      editingMessage
-                        ? 'Editing message... (Enter to save, Esc to cancel)'
-                        : activeChat.type === 'channel'
-                        ? `Message in #${activeChat.name}...`
-                        : 'Ask anything or write a message...'
-                    }
-                    className="flex-1 px-2.5 py-1.5 bg-transparent border-none text-base sm:text-sm text-[#EDEDED] placeholder-[#737878] focus:outline-none focus:ring-0 transition resize-none max-h-32 overflow-y-auto leading-relaxed"
-                    style={{ minHeight: '38px' }}
-                  />
-
-                  <WarmTooltip content="Send Message" shortcut="↵" side="top">
-                    <button
-                      type="submit"
-                      disabled={(!messageInput.trim() && !stagedFile) || isSending || isUploadingMedia}
-                      className="w-9 h-9 rounded-full bg-[#20B2AA] hover:bg-[#1CA099] disabled:opacity-30 text-black shadow-md shadow-[#20B2AA]/20 transition touch-target-44 flex items-center justify-center shrink-0 self-end font-bold cursor-pointer active:scale-95 mb-0.5"
-                      aria-label="Send Message"
-                    >
-                      {isUploadingMedia ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-black" />
-                      ) : (
-                        <ArrowUp className="w-4 h-4 stroke-[2.5] text-black" />
-                      )}
-                    </button>
-                  </WarmTooltip>
-                </form>
+                  </form>
+                )}
               </div>
             </>
           ) : (
@@ -2235,15 +2300,36 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* Floating Notice / Toast */}
+      {bannerNotice && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#202222] border border-[#20B2AA]/50 text-[#EDEDED] px-4 py-2.5 rounded-xl shadow-2xl text-xs font-semibold flex items-center space-x-2 animate-in fade-in slide-in-from-top-2 duration-150">
+          <Info className="w-4 h-4 text-[#20B2AA] shrink-0" />
+          <span>{bannerNotice}</span>
+          <button
+            type="button"
+            onClick={() => setBannerNotice(null)}
+            className="p-1 text-[#9EA3A3] hover:text-[#EDEDED] rounded-full transition ml-2 cursor-pointer"
+          >
+            <CloseIcon className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* Modals */}
       <UserProfileModal
         profile={viewingProfile}
         onClose={clearViewingProfile}
         onStartCall={(params) => void startCall(params)}
         onOpenChat={async (userId) => {
-          const chat = await getOrCreateDirectChat(userId);
-          await handleSelectChat(chat.id);
-          clearViewingProfile();
+          try {
+            const chat = await getOrCreateDirectChat(userId);
+            await handleSelectChat(chat.id);
+            clearViewingProfile();
+          } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : 'Cannot direct message this user without accepted contact';
+            setBannerNotice(msg);
+            setTimeout(() => setBannerNotice(null), 4000);
+          }
         }}
       />
       <CreateGroupModal

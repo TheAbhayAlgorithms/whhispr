@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { useSearchStore } from '../store/useSearchStore';
 import { useChatStore } from '../store/useChatStore';
+import { useContactStore } from '../store/useContactStore';
+import { useProfileStore } from '../store/useProfileStore';
 import {
   Search,
   X,
@@ -28,6 +30,8 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
   } = useSearchStore();
 
   const { selectChat, getOrCreateDirectChat } = useChatStore();
+  const { contacts } = useContactStore();
+  const { fetchUserProfile } = useProfileStore();
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -49,9 +53,15 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
   };
 
   const handleSelectUser = async (targetUserId: string) => {
-    const chat = await getOrCreateDirectChat(targetUserId);
-    await selectChat(chat.id);
-    onClose();
+    const isContact = contacts.some((c) => c.userId === targetUserId);
+    if (isContact) {
+      const chat = await getOrCreateDirectChat(targetUserId);
+      await selectChat(chat.id);
+      onClose();
+    } else {
+      await fetchUserProfile(targetUserId);
+      onClose();
+    }
   };
 
   const handleSelectChannel = async (channelId: string) => {
@@ -234,36 +244,45 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
                       <span>{unifiedResults.users.length}</span>
                     </div>
                     <div className="space-y-1.5">
-                      {unifiedResults.users.map((u) => (
-                        <div
-                          key={u.userId}
-                          onClick={() => void handleSelectUser(u.userId)}
-                          className="p-2.5 rounded-xl bg-[#202222] border border-[#2D3030] hover:border-[#20B2AA]/50 hover:bg-[#262828] transition cursor-pointer flex items-center justify-between"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <div className="w-9 h-9 rounded-full bg-[#1D2B29] border border-[#25423E] text-[#20B2AA] flex items-center justify-center font-bold text-xs">
-                              {u.avatarUrl ? (
-                                <img
-                                  src={u.avatarUrl}
-                                  alt={u.displayName}
-                                  className="w-full h-full rounded-full object-cover"
-                                />
-                              ) : (
-                                u.displayName.charAt(0).toUpperCase()
-                              )}
+                      {unifiedResults.users.map((u) => {
+                        const isContact = contacts.some((c) => c.userId === u.userId);
+                        return (
+                          <div
+                            key={u.userId}
+                            onClick={() => void handleSelectUser(u.userId)}
+                            className="p-2.5 rounded-xl bg-[#202222] border border-[#2D3030] hover:border-[#20B2AA]/50 hover:bg-[#262828] transition cursor-pointer flex items-center justify-between"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className="w-9 h-9 rounded-full bg-[#1D2B29] border border-[#25423E] text-[#20B2AA] flex items-center justify-center font-bold text-xs">
+                                {u.avatarUrl ? (
+                                  <img
+                                    src={u.avatarUrl}
+                                    alt={u.displayName}
+                                    className="w-full h-full rounded-full object-cover"
+                                  />
+                                ) : (
+                                  u.displayName.charAt(0).toUpperCase()
+                                )}
+                              </div>
+                              <div>
+                                <p className="text-xs font-semibold text-[#EDEDED]">
+                                  {u.displayName}
+                                </p>
+                                <p className="text-[11px] text-[#737878]">@{u.username}</p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="text-xs font-semibold text-[#EDEDED]">
-                                {u.displayName}
-                              </p>
-                              <p className="text-[11px] text-[#737878]">@{u.username}</p>
-                            </div>
+                            {isContact ? (
+                              <span className="text-[11px] font-semibold text-[#20B2AA] hover:text-[#1CA099]">
+                                Message
+                              </span>
+                            ) : (
+                              <span className="text-[11px] font-semibold text-amber-400 hover:text-amber-300">
+                                View / Add
+                              </span>
+                            )}
                           </div>
-                          <span className="text-[11px] font-semibold text-[#20B2AA] hover:text-[#1CA099]">
-                            Message
-                          </span>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}

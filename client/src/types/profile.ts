@@ -24,6 +24,8 @@ export interface PublicProfile {
   statusMessage: string | null;
   lastSeen: string | null;
   isContact: boolean;
+  contactStatus?: 'none' | 'pending_sent' | 'pending_received' | 'accepted';
+  contactRequestId?: string | null;
   canAdd: boolean;
 }
 

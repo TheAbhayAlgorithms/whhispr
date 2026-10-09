@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { PublicProfile } from '../types/profile';
 import { useAuthStore } from '../store/useAuthStore';
 import { useProfileStore } from '../store/useProfileStore';
+import { useContactStore } from '../store/useContactStore';
 import {
   X,
   Clock,
@@ -15,6 +16,10 @@ import {
   MessageSquare,
   AlertCircle,
   Save,
+  UserPlus,
+  UserCheck,
+  UserX,
+  Info,
 } from 'lucide-react';
 
 interface UserProfileModalProps {
@@ -37,6 +42,13 @@ export function UserProfileModal({
 }: UserProfileModalProps) {
   const currentUser = useAuthStore((s) => s.user);
   const { updateProfile, uploadAvatar, removeAvatar } = useProfileStore();
+  const {
+    contacts,
+    incomingRequests,
+    outgoingRequests,
+    sendContactRequest,
+    respondToRequest,
+  } = useContactStore();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -52,8 +64,28 @@ export function UserProfileModal({
 
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingDp, setIsUploadingDp] = useState(false);
+  const [isContactActionLoading, setIsContactActionLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  const isAcceptedContact = Boolean(
+    profile?.isContact || (profile && contacts.some((c) => c.userId === profile.userId))
+  );
+
+  const outgoingReq =
+    (profile && outgoingRequests.find((r) => r.userId === profile.userId)) ||
+    (profile?.contactStatus === 'pending_sent'
+      ? { requestId: profile.contactRequestId || '' }
+      : null);
+
+  const incomingReq =
+    (profile && incomingRequests.find((r) => r.userId === profile.userId)) ||
+    (profile?.contactStatus === 'pending_received'
+      ? { requestId: profile.contactRequestId || '' }
+      : null);
+
+  const isPendingSent = !isAcceptedContact && Boolean(outgoingReq);
+  const isPendingReceived = !isAcceptedContact && Boolean(incomingReq);
 
   useEffect(() => {
     if (profile) {
@@ -110,6 +142,38 @@ export function UserProfileModal({
       setErrorMsg(msg);
     } finally {
       setIsUploadingDp(false);
+    }
+  };
+
+  const handleSendContactReq = async () => {
+    if (!profile?.userId) return;
+    setIsContactActionLoading(true);
+    setErrorMsg(null);
+    try {
+      const res = await sendContactRequest({ targetUserId: profile.userId });
+      setSuccessMsg(res.message || 'Contact request sent successfully!');
+      setTimeout(() => setSuccessMsg(null), 4000);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to send contact request';
+      setErrorMsg(msg);
+    } finally {
+      setIsContactActionLoading(false);
+    }
+  };
+
+  const handleAcceptContactReq = async () => {
+    if (!incomingReq?.requestId) return;
+    setIsContactActionLoading(true);
+    setErrorMsg(null);
+    try {
+      await respondToRequest(incomingReq.requestId, 'accept');
+      setSuccessMsg('Contact request accepted! You can now message and call.');
+      setTimeout(() => setSuccessMsg(null), 4000);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to accept contact request';
+      setErrorMsg(msg);
+    } finally {
+      setIsContactActionLoading(false);
     }
   };
 
@@ -254,11 +318,30 @@ export function UserProfileModal({
                 </button>
               )}
 
-              {profile.isContact && !isSelf && (
-                <span className="px-3 py-1 rounded-full bg-[#1D2B29] border border-[#25423E] text-[#20B2AA] text-xs font-semibold flex items-center space-x-1">
-                  <Check className="w-3.5 h-3.5" />
-                  <span>In Contacts</span>
-                </span>
+              {!isSelf && (
+                <div>
+                  {isAcceptedContact ? (
+                    <span className="px-3 py-1 rounded-full bg-[#1D2B29] border border-[#25423E] text-[#20B2AA] text-xs font-semibold flex items-center space-x-1">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>In Contacts</span>
+                    </span>
+                  ) : isPendingSent ? (
+                    <span className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-400 text-xs font-semibold flex items-center space-x-1">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>Request Pending</span>
+                    </span>
+                  ) : isPendingReceived ? (
+                    <span className="px-3 py-1 rounded-full bg-[#20B2AA]/10 border border-[#20B2AA]/30 text-[#20B2AA] text-xs font-semibold flex items-center space-x-1">
+                      <UserCheck className="w-3.5 h-3.5" />
+                      <span>Request Received</span>
+                    </span>
+                  ) : (
+                    <span className="px-3 py-1 rounded-full bg-[#202222] border border-[#2D3030] text-[#9EA3A3] text-xs font-semibold flex items-center space-x-1">
+                      <UserX className="w-3.5 h-3.5" />
+                      <span>Not in Contacts</span>
+                    </span>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -424,47 +507,139 @@ export function UserProfileModal({
 
               {/* Actions for PEER: Voice Call, Video Call, and Message */}
               {!isSelf ? (
-                <div className="mt-6 space-y-2.5">
-                  <div className="flex items-center space-x-2">
-                    <button
-                      type="button"
-                      onClick={handleVoiceCall}
-                      className="flex-1 flex items-center justify-center space-x-2 min-h-[44px] py-2.5 px-3 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-xs font-semibold text-[#20B2AA] hover:text-[#1CA099] transition cursor-pointer"
-                    >
-                      <Phone className="w-4 h-4" />
-                      <span>Voice Call</span>
-                    </button>
+                <div className="mt-6 space-y-3">
+                  {isAcceptedContact ? (
+                    <>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          type="button"
+                          onClick={handleVoiceCall}
+                          className="flex-1 flex items-center justify-center space-x-2 min-h-[44px] py-2.5 px-3 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-xs font-semibold text-[#20B2AA] hover:text-[#1CA099] transition cursor-pointer"
+                        >
+                          <Phone className="w-4 h-4" />
+                          <span>Voice Call</span>
+                        </button>
 
-                    <button
-                      type="button"
-                      onClick={handleVideoCall}
-                      className="flex-1 flex items-center justify-center space-x-2 min-h-[44px] py-2.5 px-3 rounded-xl bg-[#20B2AA] hover:bg-[#1CA099] text-xs font-semibold text-black transition cursor-pointer"
-                    >
-                      <Video className="w-4 h-4" />
-                      <span>Video Call</span>
-                    </button>
-                  </div>
+                        <button
+                          type="button"
+                          onClick={handleVideoCall}
+                          className="flex-1 flex items-center justify-center space-x-2 min-h-[44px] py-2.5 px-3 rounded-xl bg-[#20B2AA] hover:bg-[#1CA099] text-xs font-semibold text-black transition cursor-pointer"
+                        >
+                          <Video className="w-4 h-4" />
+                          <span>Video Call</span>
+                        </button>
+                      </div>
 
-                  <div className="flex items-center space-x-2">
-                    {onOpenChat && (
-                      <button
-                        type="button"
-                        onClick={handleSendMessage}
-                        className="flex-1 flex items-center justify-center space-x-2 min-h-[40px] py-2 px-3 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-xs font-semibold text-[#EDEDED] transition cursor-pointer"
-                      >
-                        <MessageSquare className="w-4 h-4 text-[#20B2AA]" />
-                        <span>Send Message</span>
-                      </button>
-                    )}
+                      <div className="flex items-center space-x-2">
+                        {onOpenChat && (
+                          <button
+                            type="button"
+                            onClick={handleSendMessage}
+                            className="flex-1 flex items-center justify-center space-x-2 min-h-[40px] py-2 px-3 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-xs font-semibold text-[#EDEDED] transition cursor-pointer"
+                          >
+                            <MessageSquare className="w-4 h-4 text-[#20B2AA]" />
+                            <span>Send Message</span>
+                          </button>
+                        )}
 
-                    <button
-                      type="button"
-                      onClick={onClose}
-                      className="flex-1 flex items-center justify-center space-x-2 min-h-[40px] py-2 px-3 rounded-xl bg-[#191A1A] hover:bg-[#202222] border border-[#2C2E2E] text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] transition cursor-pointer"
-                    >
-                      <span>Close</span>
-                    </button>
-                  </div>
+                        <button
+                          type="button"
+                          onClick={onClose}
+                          className="flex-1 flex items-center justify-center space-x-2 min-h-[40px] py-2 px-3 rounded-xl bg-[#191A1A] hover:bg-[#202222] border border-[#2C2E2E] text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] transition cursor-pointer"
+                        >
+                          <span>Close</span>
+                        </button>
+                      </div>
+                    </>
+                  ) : isPendingSent ? (
+                    <>
+                      <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-300 flex items-start space-x-2.5">
+                        <Clock className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                        <span>Contact request sent. You will be able to text and call this user once they accept your request.</span>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <button
+                          type="button"
+                          disabled
+                          className="flex-1 flex items-center justify-center space-x-2 min-h-[44px] py-2.5 px-3 rounded-xl bg-[#202222] border border-[#2D3030] text-xs font-semibold text-[#737878] opacity-75 cursor-not-allowed"
+                        >
+                          <Clock className="w-4 h-4 text-amber-400" />
+                          <span>Request Pending Approval</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={onClose}
+                          className="px-4 min-h-[44px] py-2.5 rounded-xl bg-[#191A1A] hover:bg-[#202222] border border-[#2C2E2E] text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] transition cursor-pointer"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </>
+                  ) : isPendingReceived ? (
+                    <>
+                      <div className="p-3 rounded-xl bg-[#1D2B29] border border-[#25423E] text-xs text-[#20B2AA] flex items-start space-x-2.5">
+                        <UserCheck className="w-4 h-4 text-[#20B2AA] shrink-0 mt-0.5" />
+                        <span>This user sent you a contact request. Accept it below to start texting and calling each other.</span>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <button
+                          type="button"
+                          onClick={handleAcceptContactReq}
+                          disabled={isContactActionLoading}
+                          className="flex-1 flex items-center justify-center space-x-2 min-h-[44px] py-2.5 px-3 rounded-xl bg-[#20B2AA] hover:bg-[#1CA099] text-xs font-semibold text-black transition shadow-md shadow-[#20B2AA]/20 cursor-pointer disabled:opacity-50"
+                        >
+                          {isContactActionLoading ? (
+                            <Loader2 className="w-4 h-4 animate-spin text-black" />
+                          ) : (
+                            <UserCheck className="w-4 h-4 text-black" />
+                          )}
+                          <span>Accept Contact Request</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={onClose}
+                          className="px-4 min-h-[44px] py-2.5 rounded-xl bg-[#191A1A] hover:bg-[#202222] border border-[#2C2E2E] text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] transition cursor-pointer"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-300 flex items-start space-x-2.5">
+                        <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                        <span>You cannot directly text or call this user without sending a contact request and getting accepted first.</span>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <button
+                          type="button"
+                          onClick={handleSendContactReq}
+                          disabled={isContactActionLoading}
+                          className="flex-1 flex items-center justify-center space-x-2 min-h-[44px] py-2.5 px-3 rounded-xl bg-[#20B2AA] hover:bg-[#1CA099] text-xs font-semibold text-black transition shadow-md shadow-[#20B2AA]/20 cursor-pointer disabled:opacity-50"
+                        >
+                          {isContactActionLoading ? (
+                            <Loader2 className="w-4 h-4 animate-spin text-black" />
+                          ) : (
+                            <UserPlus className="w-4 h-4 text-black" />
+                          )}
+                          <span>Send Contact Request</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={onClose}
+                          className="px-4 min-h-[44px] py-2.5 rounded-xl bg-[#191A1A] hover:bg-[#202222] border border-[#2C2E2E] text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] transition cursor-pointer"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               ) : (
                 /* Action for SELF */
