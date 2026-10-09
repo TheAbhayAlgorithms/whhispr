@@ -14,8 +14,8 @@ export function Bubble({
 }: BubbleProps) {
   const variantStyles =
     variant === 'muted'
-      ? 'bg-slate-100 text-slate-900 dark:bg-[#202222] dark:text-[#EDEDED] border border-slate-200/80 dark:border-[#2D3030] shadow-xs'
-      : 'bg-[#0066FF] text-white dark:bg-[#1D2B29] dark:text-[#EDEDED] border border-transparent dark:border-[#25423E] shadow-sm';
+      ? 'bg-[#F3F3F2] text-[#191A1A] dark:bg-[#202222] dark:text-[#EDEDED] border border-[#E5E5E3] dark:border-[#2D3030] shadow-xs'
+      : 'bg-[#E6F7F6] text-[#191A1A] dark:bg-[#1D2B29] dark:text-[#EDEDED] border border-[#B2E5E2] dark:border-[#25423E] shadow-xs';
 
   return (
     <div

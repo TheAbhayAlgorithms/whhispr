@@ -1090,14 +1090,17 @@ export default function DashboardPage() {
                   const isUserOnline =
                     chat.otherUser && onlineUsers[chat.otherUser.id]?.status === 'online';
                   const isPinned = isChatPinned(chat.id);
+                  const hasUnread = Boolean(chat.unreadCount && chat.unreadCount > 0);
 
                   return (
                     <div
                       key={chat.id}
                       onClick={() => void handleSelectChat(chat.id)}
-                      className={`w-full text-left p-3 rounded-xl flex items-center space-x-3 transition-all cursor-pointer relative group ${
+                      className={`w-full text-left p-3 rounded-xl flex items-center space-x-3 transition-all duration-150 cursor-pointer relative group ${
                         isSelected
                           ? 'bg-[#202222] border border-[#20B2AA]/50 shadow-sm ring-1 ring-[#20B2AA]/20'
+                          : hasUnread
+                          ? 'bg-[#191A1A] hover:bg-[#202222] border-l-4 border-l-[#20B2AA] border-t border-r border-b border-[#20B2AA]/40 shadow-[0_0_12px_rgba(32,178,170,0.18)] ring-1 ring-[#20B2AA]/25 hover:border-[#20B2AA]'
                           : 'bg-[#191A1A] hover:bg-[#202222] border border-[#262828] hover:border-[#2D3030]'
                       }`}
                     >
@@ -1129,6 +1132,15 @@ export default function DashboardPage() {
                             className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#20B2AA] border-2 border-[#191A1A] shadow-xs"
                           />
                         )}
+                        {/* Pulsing Unread Notification Dot Badge on Avatar */}
+                        {hasUnread && !isSelected && (
+                          <span
+                            title={`${chat.unreadCount} unread message${chat.unreadCount > 1 ? 's' : ''}`}
+                            className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#20B2AA] border-2 border-[#191A1A] shadow-[0_0_8px_rgba(32,178,170,0.85)] flex items-center justify-center text-[8px] font-black text-black animate-pulse"
+                          >
+                            {chat.unreadCount > 9 ? '•' : chat.unreadCount}
+                          </span>
+                        )}
                       </div>
 
                       {/* Chat Info */}
@@ -1136,9 +1148,15 @@ export default function DashboardPage() {
                         <div className="flex items-center justify-between mb-0.5">
                           <div className="flex items-center space-x-1.5 truncate">
                             {chat.type === 'channel' && <Hash className="w-3.5 h-3.5 text-[#20B2AA] shrink-0" />}
-                            <h3 className="font-medium text-xs sm:text-sm text-[#EDEDED] truncate">
+                            <h3 className={`text-xs sm:text-sm truncate ${hasUnread ? 'font-bold text-[#EDEDED]' : 'font-medium text-[#EDEDED]'}`}>
                               {chat.name || 'Conversation'}
                             </h3>
+                            {hasUnread && !isSelected && (
+                              <span
+                                className="w-2 h-2 rounded-full bg-[#20B2AA] shadow-[0_0_6px_rgba(32,178,170,0.9)] animate-pulse shrink-0"
+                                title="Unread message"
+                              />
+                            )}
                           </div>
                           <div className="flex items-center space-x-1.5 shrink-0 ml-1">
                             {isPinned && (
@@ -1415,8 +1433,8 @@ export default function DashboardPage() {
                     const el = document.getElementById(`msg-${msgId}`);
                     if (el) {
                       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      el.classList.add('ring-4', 'ring-blue-500', 'ring-offset-2');
-                      setTimeout(() => el.classList.remove('ring-4', 'ring-blue-500', 'ring-offset-2'), 2500);
+                      el.classList.add('ring-4', 'ring-[#20B2AA]', 'ring-offset-2');
+                      setTimeout(() => el.classList.remove('ring-4', 'ring-[#20B2AA]', 'ring-offset-2'), 2500);
                     }
                   }}
                 />
@@ -1432,53 +1450,21 @@ export default function DashboardPage() {
                 {isLoadingMessages && currentMessages.length === 0 ? (
                   <MessagesSkeleton count={7} />
                 ) : currentMessages.length === 0 ? (
-                  <div className="max-w-2xl mx-auto space-y-4 py-2">
-                    {/* Featured Scenery Banner matching Image 1 */}
-                    <div className="relative rounded-2xl overflow-hidden border border-[#2B2D3A] shadow-lg max-h-56 bg-[#1C1D24]">
-                      <img
-                        src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80"
-                        alt="Workspace banner"
-                        className="w-full h-48 sm:h-56 object-cover opacity-90 hover:opacity-100 transition"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#18191E] via-transparent to-transparent" />
-                      <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
-                        <span className="text-xs font-semibold text-zinc-200 drop-shadow-md">
-                          {activeChat.name || 'ICG Chat'} • General Discussion
-                        </span>
-                      </div>
+                  <div className="max-w-md mx-auto text-center py-12 px-4 space-y-4 animate-fade-in my-auto">
+                    <div className="w-14 h-14 mx-auto rounded-2xl bg-[#202222] border border-[#2D3030] text-[#20B2AA] flex items-center justify-center shadow-xs">
+                      <Shield className="w-7 h-7 text-[#20B2AA]" />
                     </div>
-
-                    {/* Date separator badge */}
-                    <div className="flex items-center justify-center my-3">
-                      <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-[#22242D] border border-[#2B2C37] text-zinc-400 shadow-xs">
-                        Today
-                      </span>
+                    <div>
+                      <h3 className="text-sm font-semibold text-[#EDEDED]">
+                        End-to-End Encrypted Conversation
+                      </h3>
+                      <p className="text-xs text-[#9EA3A3] mt-1.5 leading-relaxed max-w-sm mx-auto">
+                        Messages with <span className="text-[#EDEDED] font-semibold">{activeChat.name || 'this contact'}</span> are protected with Signal protocol encryption. No one outside of this chat can read them.
+                      </p>
                     </div>
-
-                    {/* System message notice */}
-                    <div className="text-center text-xs text-zinc-400 py-1 flex items-center justify-center space-x-1.5">
-                      <span>&rarr;</span>
-                      <span className="font-semibold text-zinc-300">{activeChat.name || 'Host'}</span>
-                      <span>initialized this encrypted conversation</span>
-                    </div>
-
-                    {/* Call Invite Banner matching Image 1 */}
-                    <div className="mx-auto my-3 w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-[#1C1D24] border border-[#2B2D3A] shadow-md">
-                      <div className="flex items-center space-x-3 min-w-0">
-                        <div className="w-9 h-9 rounded-full bg-[#242632] flex items-center justify-center text-[#E2F952] shrink-0">
-                          <Phone className="w-4 h-4" />
-                        </div>
-                        <p className="text-xs text-zinc-300 truncate">
-                          <span className="font-semibold text-zinc-100">{activeChat.name || 'Richard Wilson'}</span> started a video call
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleVideoCall}
-                        className="px-4 py-1.5 rounded-full bg-[#E2F952] hover:bg-[#d6ee3c] text-black text-xs font-bold transition shadow-xs cursor-pointer shrink-0 ml-2"
-                      >
-                        Join
-                      </button>
+                    <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-[#1D2B29] border border-[#25423E] text-[#20B2AA]">
+                      <Lock className="w-3 h-3 text-[#20B2AA]" />
+                      <span>Zero-Knowledge Security</span>
                     </div>
                   </div>
                 ) : (
@@ -1534,7 +1520,7 @@ export default function DashboardPage() {
                                   </AvatarFallback>
                                 </Avatar>
                                 {onlineUsers[msg.sender.id]?.status === 'online' && (
-                                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#E2F952] border-2 border-[#18191E]" />
+                                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#20B2AA] border-2 border-[#141515]" />
                                 )}
                               </div>
                             ) : (
@@ -1548,7 +1534,7 @@ export default function DashboardPage() {
                               <div
                                 className={`absolute -top-3.5 ${
                                   isMe ? 'right-2' : 'left-2'
-                                } hidden group-hover:flex items-center space-x-1 bg-white dark:bg-zinc-800 shadow-md border border-slate-200 dark:border-zinc-700 rounded-full px-2 py-0.5 z-10 transition`}
+                                } hidden group-hover:flex items-center space-x-1 bg-white dark:bg-[#202222] shadow-md border border-[#E5E5E3] dark:border-[#2D3030] rounded-full px-2 py-0.5 z-10 transition`}
                               >
                                 {QUICK_REACTIONS.map((emoji) => (
                                   <button
@@ -1561,14 +1547,14 @@ export default function DashboardPage() {
                                     {emoji}
                                   </button>
                                 ))}
-                                <div className="w-px h-3 bg-slate-200 dark:bg-zinc-700 mx-0.5" />
+                                <div className="w-px h-3 bg-slate-200 dark:bg-[#2D3030] mx-0.5" />
                                 <button
                                   type="button"
                                   onClick={() => {
                                     setReplyingTo(msg);
                                     messageInputRef.current?.focus();
                                   }}
-                                  className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition"
+                                  className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-[#20B2AA] transition"
                                   title="Reply"
                                 >
                                   <Reply className="w-3.5 h-3.5" />
@@ -1581,7 +1567,7 @@ export default function DashboardPage() {
                                       setMessageInput(msg.content);
                                       messageInputRef.current?.focus();
                                     }}
-                                    className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition"
+                                    className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-amber-500 transition"
                                     title="Edit (within 15m)"
                                   >
                                     <Pencil className="w-3.5 h-3.5" />
@@ -1590,7 +1576,7 @@ export default function DashboardPage() {
                                 <button
                                   type="button"
                                   onClick={() => setDeletingMessage(msg)}
-                                  className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition"
+                                  className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-rose-500 transition"
                                   title="Delete"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
@@ -1600,7 +1586,7 @@ export default function DashboardPage() {
                               {/* Message Bubble */}
                               <Bubble variant={isMe ? 'default' : 'muted'} className="w-fit max-w-full">
                                 {!isMe && isFirstInSenderSequence && activeChat?.type !== 'direct' && (
-                                  <p className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 mb-1">
+                                  <p className="text-[11px] font-semibold text-[#20B2AA] mb-1">
                                     {msg.sender.displayName}
                                   </p>
                                 )}
@@ -1610,11 +1596,11 @@ export default function DashboardPage() {
                                   <div
                                     className={`mb-2 p-2 rounded-xl border-l-2 text-xs ${
                                       isMe
-                                        ? 'bg-blue-700/60 border-white/60 text-blue-100'
-                                        : 'bg-black/5 dark:bg-black/30 border-blue-500 text-slate-700 dark:text-zinc-200'
+                                        ? 'bg-[#1D2B29] border-[#20B2AA] text-[#EDEDED]'
+                                        : 'bg-[#202222] border-[#20B2AA] text-[#EDEDED]'
                                     }`}
                                   >
-                                    <p className="font-semibold text-[11px] text-blue-200 dark:text-blue-400">
+                                    <p className="font-semibold text-[11px] text-[#20B2AA]">
                                       {msg.replyTo.sender.displayName || msg.replyTo.sender.username}
                                     </p>
                                     <p className="truncate text-[11px] opacity-90">
@@ -1672,8 +1658,8 @@ export default function DashboardPage() {
                                           key={att.id}
                                           className={`flex items-center justify-between p-2.5 rounded-xl border ${
                                             isMe
-                                              ? 'bg-blue-700/60 border-blue-400/40 text-white'
-                                              : 'bg-white/60 dark:bg-zinc-900/60 border-slate-200 dark:border-zinc-700/60 text-slate-900 dark:text-zinc-100'
+                                              ? 'bg-[#1D2B29] border-[#25423E] text-[#20B2AA]'
+                                              : 'bg-white/60 dark:bg-[#202222] border-[#E5E5E3] dark:border-[#2D3030] text-[#191A1A] dark:text-[#EDEDED]'
                                           }`}
                                         >
                                           <div className="flex items-center space-x-2.5 min-w-0 pr-2">
@@ -1692,8 +1678,8 @@ export default function DashboardPage() {
                                             download={att.fileName}
                                             className={`p-1.5 rounded-lg transition shrink-0 ${
                                               isMe
-                                                ? 'hover:bg-white/20 text-white'
-                                                : 'hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-600 dark:text-zinc-300'
+                                                ? 'hover:bg-[#20B2AA]/20 text-[#20B2AA]'
+                                                : 'hover:bg-[#F3F3F2] dark:hover:bg-[#262828] text-[#737878] dark:text-[#9EA3A3]'
                                             }`}
                                             title="Download"
                                           >
@@ -1718,7 +1704,7 @@ export default function DashboardPage() {
 
                                 <div
                                   className={`flex items-center justify-end space-x-1 mt-1 text-[10px] select-none ${
-                                    isMe ? 'text-blue-100/80' : 'text-slate-400 dark:text-zinc-400'
+                                    isMe ? 'text-[#20B2AA]/90' : 'text-[#737878] dark:text-[#9EA3A3]'
                                   }`}
                                 >
                                   {msg.isEdited && (
@@ -1728,18 +1714,18 @@ export default function DashboardPage() {
                                   {isMe && (
                                     <span title={msg.status || 'sent'} className="inline-flex items-center">
                                       {msg.status === 'read' ? (
-                                        <CheckCheck className="w-3.5 h-3.5 text-white drop-shadow-xs" />
+                                        <CheckCheck className="w-3.5 h-3.5 text-[#20B2AA] drop-shadow-xs" />
                                       ) : msg.status === 'delivered' ? (
-                                        <CheckCheck className="w-3.5 h-3.5 text-blue-200/90" />
+                                        <CheckCheck className="w-3.5 h-3.5 text-[#20B2AA]/75" />
                                       ) : msg.status === 'sending' ? (
-                                        <Clock className="w-3 h-3 text-blue-200 animate-spin" />
+                                        <Clock className="w-3 h-3 text-[#20B2AA] animate-spin" />
                                       ) : msg.status === 'failed' ? (
-                                        <span className="flex items-center text-rose-200 text-[10px] space-x-0.5">
-                                          <AlertTriangle className="w-3 h-3 text-rose-200" />
+                                        <span className="flex items-center text-rose-400 text-[10px] space-x-0.5">
+                                          <AlertTriangle className="w-3 h-3 text-rose-400" />
                                           <span>Failed</span>
                                         </span>
                                       ) : (
-                                        <Check className="w-3.5 h-3.5 text-blue-200/70" />
+                                        <Check className="w-3.5 h-3.5 text-[#20B2AA]/60" />
                                       )}
                                     </span>
                                   )}
