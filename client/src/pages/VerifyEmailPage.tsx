@@ -40,42 +40,42 @@ export default function VerifyEmailPage() {
   }, [token]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 text-slate-900 dark:text-slate-100 transition-colors duration-200 relative">
+    <div className="min-h-screen bg-[#F9F9F8] dark:bg-[#191A1A] text-[#191A1A] dark:text-[#EDEDED] flex flex-col justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200 relative">
       <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
         <ThemeToggle />
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <div className="flex justify-center">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#0066FF] to-blue-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
-            <MessageSquare className="w-6 h-6 text-white" />
+          <div className="w-12 h-12 rounded-2xl bg-[#20B2AA] flex items-center justify-center shadow-lg shadow-[#20B2AA]/20 font-bold text-black">
+            <MessageSquare className="w-6 h-6 text-black" />
           </div>
         </div>
-        <h2 className="mt-4 text-center text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+        <h2 className="mt-4 text-center text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191A1A] dark:text-[#EDEDED]">
           Email Verification
         </h2>
       </div>
 
       <div className="mt-6 sm:mt-8 sm:mx-auto sm:w-full sm:max-w-md w-full">
-        <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl py-6 px-4 sm:py-8 sm:px-10 shadow-xl rounded-3xl border border-slate-200 dark:border-slate-800 text-center">
+        <div className="bg-white dark:bg-[#141515] py-6 px-4 sm:py-8 sm:px-10 shadow-xl rounded-3xl border border-[#E5E5E3] dark:border-[#2C2E2E] text-center">
           {loading ? (
             <div className="py-8">
-              <div className="mx-auto w-10 h-10 rounded-full border-3 border-blue-500 border-t-transparent animate-spin mb-4" />
-              <p className="text-sm text-slate-600 dark:text-slate-400">Verifying your email address...</p>
+              <div className="mx-auto w-10 h-10 rounded-full border-3 border-[#20B2AA] border-t-transparent animate-spin mb-4" />
+              <p className="text-sm text-[#737878] dark:text-[#9EA3A3]">Verifying your email address...</p>
             </div>
           ) : success ? (
             <div>
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4">
-                <CheckCircle2 className="h-6 w-6 text-emerald-500 dark:text-emerald-400" />
+                <CheckCircle2 className="h-6 w-6 text-emerald-500" />
               </div>
-              <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">Verified!</h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">{message}</p>
+              <h3 className="text-lg font-bold text-[#191A1A] dark:text-[#EDEDED] mb-2">Verified!</h3>
+              <p className="text-sm text-[#737878] dark:text-[#9EA3A3] mb-6">{message}</p>
               <Link
                 to="/login"
-                className="inline-flex items-center justify-center py-2.5 px-6 rounded-xl text-sm font-semibold text-white bg-[#0066FF] hover:bg-blue-600 shadow-md shadow-blue-600/30 transition"
+                className="inline-flex items-center justify-center py-2.5 px-6 rounded-xl text-sm font-semibold text-black bg-[#20B2AA] hover:bg-[#1CA099] shadow-md shadow-[#20B2AA]/20 transition cursor-pointer active:scale-95"
               >
                 <span>Continue to Sign In</span>
-                <ArrowRight className="ml-2 w-4 h-4" />
+                <ArrowRight className="ml-2 w-4 h-4 text-black" />
               </Link>
             </div>
           ) : (
@@ -83,11 +83,11 @@ export default function VerifyEmailPage() {
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-rose-500/10 border border-rose-500/20 mb-4">
                 <AlertCircle className="h-6 w-6 text-rose-500" />
               </div>
-              <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">Verification Failed</h3>
-              <p className="text-sm text-rose-600 dark:text-rose-300 mb-6">{message}</p>
+              <h3 className="text-lg font-bold text-[#191A1A] dark:text-[#EDEDED] mb-2">Verification Failed</h3>
+              <p className="text-sm text-rose-600 dark:text-rose-400 mb-6">{message}</p>
               <Link
                 to="/login"
-                className="inline-flex items-center text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300"
+                className="inline-flex items-center text-sm font-semibold text-[#20B2AA] hover:text-[#1CA099]"
               >
                 Return to Login
               </Link>

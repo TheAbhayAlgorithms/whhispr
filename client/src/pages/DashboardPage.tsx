@@ -2147,12 +2147,6 @@ export default function DashboardPage() {
                     </p>
                   </button>
                 </div>
-
-                {/* Security footnote */}
-                <div className="mt-8 inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#202222] border border-[#2D3030] text-[11px] text-[#9EA3A3]">
-                  <Lock className="w-3.5 h-3.5 text-[#20B2AA]" />
-                  <span>Signal Protocol E2EE • Zero telemetry • Real-time WebRTC</span>
-                </div>
               </div>
             </div>
           )}
