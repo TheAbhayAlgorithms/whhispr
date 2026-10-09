@@ -1,96 +1,485 @@
+import React, { useState, useRef, useEffect } from 'react';
 import { PublicProfile } from '../types/profile';
-import { X, Clock, Check, Shield } from 'lucide-react';
+import { useAuthStore } from '../store/useAuthStore';
+import { useProfileStore } from '../store/useProfileStore';
+import {
+  X,
+  Clock,
+  Check,
+  Shield,
+  Pencil,
+  Loader2,
+  Trash2,
+  Phone,
+  Video,
+  MessageSquare,
+  AlertCircle,
+  Save,
+} from 'lucide-react';
 
 interface UserProfileModalProps {
   profile: PublicProfile | null;
   onClose: () => void;
+  onStartCall?: (params: {
+    recipientId: string;
+    recipientName: string;
+    recipientAvatar: string | null;
+    callType: 'audio' | 'video';
+  }) => void;
+  onOpenChat?: (userId: string) => void;
 }
 
-export function UserProfileModal({ profile, onClose }: UserProfileModalProps) {
+export function UserProfileModal({
+  profile,
+  onClose,
+  onStartCall,
+  onOpenChat,
+}: UserProfileModalProps) {
+  const currentUser = useAuthStore((s) => s.user);
+  const { updateProfile, uploadAvatar, removeAvatar } = useProfileStore();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const isSelf = Boolean(
+    currentUser && profile && (profile.userId === currentUser.id || profile.username === currentUser.username),
+  );
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [displayName, setDisplayName] = useState('');
+  const [username, setUsername] = useState('');
+  const [bio, setBio] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingDp, setIsUploadingDp] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (profile) {
+      setDisplayName(profile.displayName || '');
+      setUsername(profile.username || '');
+      setBio(profile.bio || '');
+      setStatusMessage(profile.statusMessage || '');
+      setErrorMsg(null);
+      setSuccessMsg(null);
+      setIsEditing(false);
+    }
+  }, [profile]);
+
   if (!profile) return null;
+
+  const handleAvatarSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setErrorMsg('Please select an image file (PNG, JPG, WEBP, GIF).');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setErrorMsg('Image size must be less than 5MB.');
+      return;
+    }
+
+    setErrorMsg(null);
+    setIsUploadingDp(true);
+    try {
+      await uploadAvatar(file);
+      setSuccessMsg('Profile picture updated successfully!');
+      setTimeout(() => setSuccessMsg(null), 3500);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Avatar upload failed';
+      setErrorMsg(msg);
+    } finally {
+      setIsUploadingDp(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    setErrorMsg(null);
+    setIsUploadingDp(true);
+    try {
+      await removeAvatar();
+      setSuccessMsg('Profile picture removed.');
+      setTimeout(() => setSuccessMsg(null), 3500);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to remove avatar';
+      setErrorMsg(msg);
+    } finally {
+      setIsUploadingDp(false);
+    }
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (displayName.trim().length < 2) {
+      setErrorMsg('Display name must be at least 2 characters');
+      return;
+    }
+    if (username.trim().length < 3) {
+      setErrorMsg('Username must be at least 3 characters');
+      return;
+    }
+
+    setIsSaving(true);
+    setErrorMsg(null);
+
+    try {
+      await updateProfile({
+        displayName: displayName.trim(),
+        username: username.trim().toLowerCase(),
+        bio: bio.trim() || null,
+        statusMessage: statusMessage.trim() || null,
+      });
+
+      setSuccessMsg('Profile updated successfully!');
+      setIsEditing(false);
+      setTimeout(() => setSuccessMsg(null), 3500);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to save profile changes';
+      setErrorMsg(msg);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleVoiceCall = () => {
+    if (onStartCall) {
+      onStartCall({
+        recipientId: profile.userId,
+        recipientName: profile.displayName || profile.username,
+        recipientAvatar: profile.avatarUrl,
+        callType: 'audio',
+      });
+      onClose();
+    }
+  };
+
+  const handleVideoCall = () => {
+    if (onStartCall) {
+      onStartCall({
+        recipientId: profile.userId,
+        recipientName: profile.displayName || profile.username,
+        recipientAvatar: profile.avatarUrl,
+        callType: 'video',
+      });
+      onClose();
+    }
+  };
+
+  const handleSendMessage = () => {
+    if (onOpenChat) {
+      onOpenChat(profile.userId);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/70 backdrop-blur-xs animate-fade-in">
-      <div className="bg-[#141515] border-t sm:border border-[#2C2E2E] rounded-t-3xl sm:rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative animate-scale-up max-h-[92dvh] sm:max-h-auto overflow-y-auto">
-        {/* Banner */}
+      {/* Hidden file input for DP change */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleAvatarSelect}
+      />
+
+      <div
+        className="bg-[#141515] border-t sm:border border-[#2C2E2E] rounded-t-3xl sm:rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative animate-scale-up max-h-[92dvh] sm:max-h-auto overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Banner with subtle Perplexity gradient */}
         <div className="h-24 sm:h-28 bg-gradient-to-r from-[#191A1A] via-[#1D2B29] to-[#191A1A] border-b border-[#2C2E2E] relative shrink-0">
           <button
             onClick={onClose}
             aria-label="Close profile"
-            className="absolute top-3 right-3 sm:top-4 sm:right-4 min-w-[44px] min-h-[44px] w-11 h-11 sm:w-8 sm:h-8 rounded-full bg-[#141515]/70 hover:bg-[#141515] text-[#9EA3A3] hover:text-[#EDEDED] flex items-center justify-center transition active:scale-95 cursor-pointer"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 min-w-[36px] min-h-[36px] w-9 h-9 sm:w-8 sm:h-8 rounded-full bg-[#141515]/70 hover:bg-[#141515] border border-[#2C2E2E] text-[#9EA3A3] hover:text-[#EDEDED] flex items-center justify-center transition active:scale-95 cursor-pointer"
           >
-            <X className="w-5 h-5 sm:w-4 sm:h-4" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Profile Details */}
+        {/* Profile Details Container */}
         <div className="px-5 sm:px-6 pb-6 pt-0 relative pb-safe bg-[#141515]">
-          {/* Avatar */}
+          {/* Avatar and Badges / Pencil Button */}
           <div className="-mt-12 mb-4 flex justify-between items-end">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-[#202222] border-4 border-[#141515] flex items-center justify-center text-2xl sm:text-3xl font-bold text-[#20B2AA] shadow-xl shrink-0">
-              {profile.avatarUrl ? (
-                <img
-                  src={profile.avatarUrl}
-                  alt={profile.displayName}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span>{profile.displayName.charAt(0).toUpperCase()}</span>
+            <div className="relative group">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-[#202222] border-4 border-[#141515] flex items-center justify-center text-2xl sm:text-3xl font-bold text-[#20B2AA] shadow-xl shrink-0">
+                {profile.avatarUrl ? (
+                  <img
+                    src={profile.avatarUrl}
+                    alt={displayName || profile.displayName}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span>{(displayName || profile.displayName || 'U').charAt(0).toUpperCase()}</span>
+                )}
+
+                {/* Upload Spinner overlay */}
+                {isUploadingDp && (
+                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center rounded-full">
+                    <Loader2 className="w-6 h-6 animate-spin text-[#20B2AA]" />
+                  </div>
+                )}
+              </div>
+
+              {/* Pencil Button on DP for current user */}
+              {isSelf && (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploadingDp}
+                  title="Change profile picture"
+                  aria-label="Change profile picture"
+                  className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-[#20B2AA] hover:bg-[#1CA099] border-2 border-[#141515] text-black flex items-center justify-center shadow-lg transition transform hover:scale-110 active:scale-95 cursor-pointer"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </button>
               )}
             </div>
 
-            {profile.isContact ? (
-              <span className="px-3 py-1 rounded-full bg-[#1D2B29] border border-[#25423E] text-[#20B2AA] text-xs font-semibold flex items-center space-x-1">
-                <Check className="w-3.5 h-3.5" />
-                <span>In Contacts</span>
-              </span>
-            ) : null}
+            <div className="flex items-center space-x-2">
+              {isSelf && profile.avatarUrl && (
+                <button
+                  type="button"
+                  onClick={handleRemoveAvatar}
+                  disabled={isUploadingDp}
+                  title="Remove avatar"
+                  className="p-2 rounded-xl bg-[#202222] border border-[#2D3030] text-[#9EA3A3] hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer text-xs"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              )}
+
+              {profile.isContact && !isSelf && (
+                <span className="px-3 py-1 rounded-full bg-[#1D2B29] border border-[#25423E] text-[#20B2AA] text-xs font-semibold flex items-center space-x-1">
+                  <Check className="w-3.5 h-3.5" />
+                  <span>In Contacts</span>
+                </span>
+              )}
+            </div>
           </div>
 
-          <div>
-            <h2 className="text-xl font-bold text-[#EDEDED] tracking-tight">{profile.displayName}</h2>
-            <p className="text-xs text-[#20B2AA] font-medium">@{profile.username}</p>
-          </div>
-
-          {/* Status Message */}
-          {profile.statusMessage && (
-            <div className="mt-4 p-3 rounded-xl bg-[#202222] border border-[#2D3030] text-xs text-[#EDEDED] flex items-center space-x-2">
-              <span className="text-[#20B2AA] text-sm">💬</span>
-              <span>{profile.statusMessage}</span>
+          {/* Feedback Alerts */}
+          {errorMsg && (
+            <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-400 text-xs font-medium flex items-center space-x-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{errorMsg}</span>
             </div>
           )}
 
-          {/* Bio */}
-          <div className="mt-4">
-            <h3 className="text-xs uppercase font-semibold text-[#737878] tracking-wider mb-1 flex items-center space-x-1.5">
-              <Shield className="w-3.5 h-3.5 text-[#20B2AA]" />
-              <span>About</span>
-            </h3>
-            <p className="text-xs text-[#9EA3A3] leading-relaxed bg-[#202222] p-3 rounded-xl border border-[#2D3030]">
-              {profile.bio || 'No bio provided yet.'}
-            </p>
-          </div>
+          {successMsg && (
+            <div className="mb-4 p-3 rounded-xl bg-[#1D2B29] border border-[#25423E] text-[#20B2AA] text-xs font-medium flex items-center space-x-2">
+              <Check className="w-4 h-4 shrink-0" />
+              <span>{successMsg}</span>
+            </div>
+          )}
 
-          {/* Last Seen */}
-          <div className="mt-4 flex items-center justify-between text-xs text-[#737878] pt-3 border-t border-[#2C2E2E]">
-            <span className="flex items-center space-x-1.5">
-              <Clock className="w-3.5 h-3.5 text-[#737878]" />
-              <span>Last Seen</span>
-            </span>
-            <span className="text-[#EDEDED] font-medium">
-              {profile.lastSeen ? new Date(profile.lastSeen).toLocaleDateString() : 'Hidden'}
-            </span>
-          </div>
+          {/* EDIT MODE (for self) */}
+          {isSelf && isEditing ? (
+            <form onSubmit={handleSaveProfile} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-[#EDEDED] mb-1">
+                  Display Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  placeholder="Your display name"
+                  className="w-full px-3.5 py-2 bg-[#191A1A] border border-[#2C2E2E] rounded-xl text-sm text-[#EDEDED] placeholder-[#737878] focus:outline-none focus:border-[#20B2AA] transition"
+                />
+              </div>
 
-          {/* Action button */}
-          <div className="mt-6">
-            <button
-              onClick={onClose}
-              className="w-full flex items-center justify-center space-x-2 min-h-[44px] py-3 sm:py-2.5 px-4 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-xs font-semibold text-[#EDEDED] transition active:scale-[0.98] cursor-pointer"
-            >
-              <span>Close Profile</span>
-            </button>
-          </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#EDEDED] mb-1">
+                  Username
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-2 text-[#737878] text-sm font-medium">@</span>
+                  <input
+                    type="text"
+                    required
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="username"
+                    className="w-full pl-8 pr-3.5 py-2 bg-[#191A1A] border border-[#2C2E2E] rounded-xl text-sm text-[#EDEDED] placeholder-[#737878] focus:outline-none focus:border-[#20B2AA] transition"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#EDEDED] mb-1">
+                  Status Message
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-2 text-xs">💬</span>
+                  <input
+                    type="text"
+                    value={statusMessage}
+                    onChange={(e) => setStatusMessage(e.target.value)}
+                    placeholder="Set a status message..."
+                    className="w-full pl-8 pr-3.5 py-2 bg-[#191A1A] border border-[#2C2E2E] rounded-xl text-sm text-[#EDEDED] placeholder-[#737878] focus:outline-none focus:border-[#20B2AA] transition"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#EDEDED] mb-1">
+                  About / Bio
+                </label>
+                <textarea
+                  rows={3}
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  placeholder="Tell people about yourself..."
+                  className="w-full px-3.5 py-2 bg-[#191A1A] border border-[#2C2E2E] rounded-xl text-sm text-[#EDEDED] placeholder-[#737878] focus:outline-none focus:border-[#20B2AA] transition resize-none"
+                />
+              </div>
+
+              <div className="flex items-center space-x-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditing(false);
+                    setDisplayName(profile.displayName || '');
+                    setUsername(profile.username || '');
+                    setBio(profile.bio || '');
+                    setStatusMessage(profile.statusMessage || '');
+                    setErrorMsg(null);
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="flex-1 py-2.5 rounded-xl bg-[#20B2AA] hover:bg-[#1CA099] text-black text-xs font-semibold flex items-center justify-center space-x-1.5 transition cursor-pointer disabled:opacity-50"
+                >
+                  {isSaving ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4" />
+                  )}
+                  <span>{isSaving ? 'Saving...' : 'Save Changes'}</span>
+                </button>
+              </div>
+            </form>
+          ) : (
+            /* VIEW MODE */
+            <div>
+              <div className="flex items-start justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-[#EDEDED] tracking-tight">{profile.displayName}</h2>
+                  <p className="text-xs text-[#20B2AA] font-medium mt-0.5">@{profile.username}</p>
+                </div>
+
+                {isSelf && (
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(true)}
+                    className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#20B2AA] text-xs font-semibold transition cursor-pointer"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                    <span>Edit Profile</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Status Message */}
+              {profile.statusMessage && (
+                <div className="mt-4 p-3 rounded-xl bg-[#202222] border border-[#2D3030] text-xs text-[#EDEDED] flex items-center space-x-2">
+                  <span className="text-[#20B2AA] text-sm">💬</span>
+                  <span>{profile.statusMessage}</span>
+                </div>
+              )}
+
+              {/* Bio */}
+              <div className="mt-4">
+                <h3 className="text-xs uppercase font-semibold text-[#737878] tracking-wider mb-1 flex items-center space-x-1.5">
+                  <Shield className="w-3.5 h-3.5 text-[#20B2AA]" />
+                  <span>About</span>
+                </h3>
+                <p className="text-xs text-[#9EA3A3] leading-relaxed bg-[#202222] p-3 rounded-xl border border-[#2D3030]">
+                  {profile.bio || 'No bio provided yet.'}
+                </p>
+              </div>
+
+              {/* Last Seen */}
+              <div className="mt-4 flex items-center justify-between text-xs text-[#737878] pt-3 border-t border-[#2C2E2E]">
+                <span className="flex items-center space-x-1.5">
+                  <Clock className="w-3.5 h-3.5 text-[#737878]" />
+                  <span>Last Seen</span>
+                </span>
+                <span className="text-[#EDEDED] font-medium">
+                  {profile.lastSeen ? new Date(profile.lastSeen).toLocaleDateString() : 'Hidden'}
+                </span>
+              </div>
+
+              {/* Actions for PEER: Voice Call, Video Call, and Message */}
+              {!isSelf ? (
+                <div className="mt-6 space-y-2.5">
+                  <div className="flex items-center space-x-2">
+                    <button
+                      type="button"
+                      onClick={handleVoiceCall}
+                      className="flex-1 flex items-center justify-center space-x-2 min-h-[44px] py-2.5 px-3 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-xs font-semibold text-[#20B2AA] hover:text-[#1CA099] transition cursor-pointer"
+                    >
+                      <Phone className="w-4 h-4" />
+                      <span>Voice Call</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleVideoCall}
+                      className="flex-1 flex items-center justify-center space-x-2 min-h-[44px] py-2.5 px-3 rounded-xl bg-[#20B2AA] hover:bg-[#1CA099] text-xs font-semibold text-black transition cursor-pointer"
+                    >
+                      <Video className="w-4 h-4" />
+                      <span>Video Call</span>
+                    </button>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    {onOpenChat && (
+                      <button
+                        type="button"
+                        onClick={handleSendMessage}
+                        className="flex-1 flex items-center justify-center space-x-2 min-h-[40px] py-2 px-3 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-xs font-semibold text-[#EDEDED] transition cursor-pointer"
+                      >
+                        <MessageSquare className="w-4 h-4 text-[#20B2AA]" />
+                        <span>Send Message</span>
+                      </button>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      className="flex-1 flex items-center justify-center space-x-2 min-h-[40px] py-2 px-3 rounded-xl bg-[#191A1A] hover:bg-[#202222] border border-[#2C2E2E] text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] transition cursor-pointer"
+                    >
+                      <span>Close</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* Action for SELF */
+                <div className="mt-6">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="w-full flex items-center justify-center space-x-2 min-h-[44px] py-3 sm:py-2.5 px-4 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-xs font-semibold text-[#EDEDED] transition active:scale-[0.98] cursor-pointer"
+                  >
+                    <span>Close Profile</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -64,20 +64,23 @@ export function CallModal() {
   useEffect(() => {
     if (localVideoRef.current && localStream) {
       localVideoRef.current.srcObject = localStream;
+      localVideoRef.current.play().catch(() => {});
     }
-  }, [localStream, session?.status]);
+  }, [localStream, session?.status, session?.callType]);
 
   // Bind remote stream to remote video or audio element
   useEffect(() => {
     if (remoteStream) {
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = remoteStream;
+        remoteVideoRef.current.play().catch(() => {});
       }
       if (remoteAudioRef.current) {
         remoteAudioRef.current.srcObject = remoteStream;
+        remoteAudioRef.current.play().catch(() => {});
       }
     }
-  }, [remoteStream, session?.status]);
+  }, [remoteStream, session?.status, session?.callType]);
 
   if (!session) return null;
 
@@ -86,7 +89,7 @@ export function CallModal() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-2 sm:p-4 animate-in fade-in duration-200">
       {/* Hidden audio element for pure voice calls */}
-      <audio ref={remoteAudioRef} autoPlay />
+      <audio ref={remoteAudioRef} autoPlay playsInline />
 
       <div className="relative w-full max-w-4xl bg-[#141515] border border-[#2C2E2E] rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col min-h-[380px] sm:min-h-[520px] max-h-[92vh]">
         {/* Top Status Header */}

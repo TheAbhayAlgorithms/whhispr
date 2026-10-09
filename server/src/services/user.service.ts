@@ -1,6 +1,6 @@
 import path from 'path';
 import { query } from '../config/database';
-import { NotFoundError, BadRequestError } from '../utils/errors';
+import { NotFoundError, BadRequestError, ConflictError } from '../utils/errors';
 import { StorageService } from './storage.service';
 import { CacheService } from './cache.service';
 import { UpdateProfileInput } from '../validation/user.schema';
@@ -96,6 +96,18 @@ export class UserService {
     const fields: string[] = [];
     const values: unknown[] = [];
     let idx = 1;
+
+    if (input.username !== undefined && input.username.trim() !== '') {
+      const cleanUsername = input.username.trim().toLowerCase();
+      const existing = await query('SELECT id FROM users WHERE username = $1 AND id != $2', [
+        cleanUsername,
+        userId,
+      ]);
+      if (existing.rows.length > 0) {
+        throw new ConflictError('Username is already taken');
+      }
+      await query('UPDATE users SET username = $1 WHERE id = $2', [cleanUsername, userId]);
+    }
 
     if (input.displayName !== undefined) {
       fields.push(`display_name = $${idx++}`);

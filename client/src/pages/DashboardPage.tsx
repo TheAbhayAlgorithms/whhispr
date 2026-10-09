@@ -154,6 +154,7 @@ export default function DashboardPage() {
     setupSocketListeners,
     togglePinChat,
     isChatPinned,
+    getOrCreateDirectChat,
   } = useChatStore();
 
   const { incomingRequests, fetchRequests } = useContactStore();
@@ -565,12 +566,12 @@ export default function DashboardPage() {
         callType: 'audio',
       });
     } else if (activeGroupDetails?.members && activeGroupDetails.members.length > 0) {
-      const target = activeGroupDetails.members.find((m) => m.id !== user?.id) || activeGroupDetails.members[0];
+      const target = activeGroupDetails.members.find((m) => m.userId !== user?.id) || activeGroupDetails.members[0];
       if (target) {
         void startCall({
-          recipientId: target.id,
-          recipientName: activeChat.name || target.displayName || target.username,
-          recipientAvatar: activeChat.avatarUrl || target.avatarUrl,
+          recipientId: target.userId,
+          recipientName: target.displayName || target.username,
+          recipientAvatar: target.avatarUrl,
           chatId: activeChat.id,
           callType: 'audio',
         });
@@ -589,12 +590,12 @@ export default function DashboardPage() {
         callType: 'video',
       });
     } else if (activeGroupDetails?.members && activeGroupDetails.members.length > 0) {
-      const target = activeGroupDetails.members.find((m) => m.id !== user?.id) || activeGroupDetails.members[0];
+      const target = activeGroupDetails.members.find((m) => m.userId !== user?.id) || activeGroupDetails.members[0];
       if (target) {
         void startCall({
-          recipientId: target.id,
-          recipientName: activeChat.name || target.displayName || target.username,
-          recipientAvatar: activeChat.avatarUrl || target.avatarUrl,
+          recipientId: target.userId,
+          recipientName: target.displayName || target.username,
+          recipientAvatar: target.avatarUrl,
           chatId: activeChat.id,
           callType: 'video',
         });
@@ -2235,7 +2236,16 @@ export default function DashboardPage() {
       )}
 
       {/* Modals */}
-      <UserProfileModal profile={viewingProfile} onClose={clearViewingProfile} />
+      <UserProfileModal
+        profile={viewingProfile}
+        onClose={clearViewingProfile}
+        onStartCall={(params) => void startCall(params)}
+        onOpenChat={async (userId) => {
+          const chat = await getOrCreateDirectChat(userId);
+          await handleSelectChat(chat.id);
+          clearViewingProfile();
+        }}
+      />
       <CreateGroupModal
         isOpen={showCreateGroupModal}
         onClose={() => setShowCreateGroupModal(false)}
@@ -2246,15 +2256,15 @@ export default function DashboardPage() {
       />
       {/* Delete Message Confirmation Modal */}
       {deletingMessage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 max-w-sm w-full shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-[#141515] border border-[#2C2E2E] rounded-2xl p-5 max-w-sm w-full shadow-2xl space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400">
+              <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-400">
                 <Trash2 className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-semibold text-slate-900 dark:text-slate-100">Delete Message</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Choose how to delete this message</p>
+                <h3 className="font-semibold text-[#EDEDED]">Delete Message</h3>
+                <p className="text-xs text-[#9EA3A3]">Choose how to delete this message</p>
               </div>
             </div>
 
@@ -2263,10 +2273,10 @@ export default function DashboardPage() {
                 type="button"
                 disabled={isDeleting}
                 onClick={() => void handleDeleteConfirm('me')}
-                className="w-full py-2.5 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium text-xs transition text-left flex items-center justify-between cursor-pointer"
+                className="w-full py-2.5 px-3 rounded-xl border border-[#2D3030] bg-[#202222] text-[#EDEDED] hover:bg-[#262828] font-medium text-xs transition text-left flex items-center justify-between cursor-pointer"
               >
                 <span>Delete for me</span>
-                <span className="text-[10px] text-slate-400">Hides on this device</span>
+                <span className="text-[10px] text-[#737878]">Hides on this device</span>
               </button>
 
               {(deletingMessage.senderId === user?.id ||
@@ -2276,7 +2286,7 @@ export default function DashboardPage() {
                   type="button"
                   disabled={isDeleting}
                   onClick={() => void handleDeleteConfirm('everyone')}
-                  className="w-full py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs transition text-left flex items-center justify-between shadow-xs cursor-pointer"
+                  className="w-full py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-medium text-xs transition text-left flex items-center justify-between shadow-xs cursor-pointer"
                 >
                   <span>Delete for everyone</span>
                   <span className="text-[10px] text-rose-100">Deletes for all participants</span>
@@ -2289,7 +2299,7 @@ export default function DashboardPage() {
                 type="button"
                 disabled={isDeleting}
                 onClick={() => setDeletingMessage(null)}
-                className="px-4 py-2 rounded-xl text-xs font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-medium text-[#9EA3A3] hover:text-[#EDEDED] hover:bg-[#202222] transition cursor-pointer"
               >
                 Cancel
               </button>

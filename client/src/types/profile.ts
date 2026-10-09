@@ -28,6 +28,7 @@ export interface PublicProfile {
 }
 
 export interface UpdateProfileInput {
+  username?: string;
   displayName?: string;
   bio?: string | null;
   statusMessage?: string | null;

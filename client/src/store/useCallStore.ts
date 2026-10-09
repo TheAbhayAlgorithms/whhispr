@@ -145,6 +145,8 @@ export const useCallStore = create<CallStoreState>((set, get) => ({
       });
     } catch (err) {
       console.error('Failed to initiate call:', err);
+      const msg = err instanceof Error ? err.message : 'Device unavailable or permission denied';
+      alert(`Could not start ${callType} call: ${msg}. Please ensure microphone/camera permissions are allowed.`);
       get().cleanup();
     }
   },
@@ -242,6 +244,8 @@ export const useCallStore = create<CallStoreState>((set, get) => ({
       });
     } catch (err) {
       console.error('Failed to accept call:', err);
+      const msg = err instanceof Error ? err.message : 'Device unavailable or permission denied';
+      alert(`Could not accept call: ${msg}. Please ensure microphone/camera permissions are allowed.`);
       get().rejectCall('error');
     }
   },

@@ -57,13 +57,27 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
       );
       set({ profile: res.data.profile, isLoading: false });
 
-      // Keep auth user store display name in sync
+      // Keep auth user store display name and username in sync
       const authUser = useAuthStore.getState().user;
-      if (authUser && res.data.profile.displayName) {
+      if (authUser) {
         useAuthStore.setState({
           user: {
             ...authUser,
+            displayName: res.data.profile.displayName || authUser.displayName,
+            username: res.data.profile.username || authUser.username,
+          },
+        });
+      }
+
+      const currentViewing = get().viewingProfile;
+      if (currentViewing && currentViewing.userId === res.data.profile.userId) {
+        set({
+          viewingProfile: {
+            ...currentViewing,
             displayName: res.data.profile.displayName,
+            username: res.data.profile.username,
+            bio: res.data.profile.bio,
+            statusMessage: res.data.profile.statusMessage,
           },
         });
       }
@@ -109,6 +123,13 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
         });
       }
 
+      const currentViewing = get().viewingProfile;
+      if (currentViewing) {
+        set({
+          viewingProfile: { ...currentViewing, avatarUrl },
+        });
+      }
+
       set({ isLoading: false });
       return avatarUrl;
     } catch (err: unknown) {
@@ -134,6 +155,13 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
       if (authUser) {
         useAuthStore.setState({
           user: { ...authUser, avatarUrl: null },
+        });
+      }
+
+      const currentViewing = get().viewingProfile;
+      if (currentViewing) {
+        set({
+          viewingProfile: { ...currentViewing, avatarUrl: null },
         });
       }
 
