@@ -29,16 +29,16 @@ export function ThemeToggle({
       id="daylight-theme-toggle-btn"
       title={isLight ? 'Daylight theme is ON (Click to switch to Dark mode)' : 'Dark theme is ON (Click to switch to Daylight mode)'}
       aria-label={isLight ? 'Switch to Dark Mode' : 'Switch to Daylight Mode'}
-      className={`group relative rounded-full flex items-center justify-center border transition-all duration-300 shadow-xs active:scale-95 cursor-pointer shrink-0 ${sizeClasses} ${
+      className={`group relative rounded-full flex items-center justify-center border transition-all duration-200 shadow-xs active:scale-95 cursor-pointer shrink-0 ${sizeClasses} ${
         isLight
-          ? 'bg-blue-50 hover:bg-blue-100 border-blue-200/90 text-blue-600 hover:border-blue-300 shadow-blue-500/10'
-          : 'bg-[#16161c] hover:bg-[#1f1f28] border-[#262633] text-blue-400 hover:border-blue-500/40 shadow-blue-500/10'
+          ? 'bg-[#F3F3F2] hover:bg-[#ECECEB] border-[#E5E5E3] text-[#20B2AA] hover:text-[#1CA099]'
+          : 'bg-[#202222] hover:bg-[#262828] border-[#2D3030] text-[#20B2AA] hover:text-[#1CA099]'
       } ${className}`}
     >
       {isLight ? (
-        <Sun className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-blue-600 fill-blue-500/30 transition-transform duration-300 group-hover:rotate-45 shrink-0" />
+        <Sun className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-amber-500 fill-amber-500/20 transition-transform duration-300 group-hover:rotate-45 shrink-0" />
       ) : (
-        <Moon className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-blue-400 fill-blue-400/30 transition-transform duration-300 group-hover:-rotate-12 shrink-0" />
+        <Moon className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#20B2AA] fill-[#20B2AA]/20 transition-transform duration-300 group-hover:-rotate-12 shrink-0" />
       )}
     </button>
   );

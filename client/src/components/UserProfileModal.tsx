@@ -20,6 +20,7 @@ import {
   UserCheck,
   UserX,
   Info,
+  Upload,
 } from 'lucide-react';
 
 interface UserProfileModalProps {
@@ -51,6 +52,7 @@ export function UserProfileModal({
   } = useContactStore();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dpMenuRef = useRef<HTMLDivElement>(null);
 
   const isSelf = Boolean(
     currentUser && profile && (profile.userId === currentUser.id || profile.username === currentUser.username),
@@ -64,9 +66,24 @@ export function UserProfileModal({
 
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingDp, setIsUploadingDp] = useState(false);
+  const [showDpMenu, setShowDpMenu] = useState(false);
   const [isContactActionLoading, setIsContactActionLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dpMenuRef.current && !dpMenuRef.current.contains(e.target as Node)) {
+        setShowDpMenu(false);
+      }
+    };
+    if (showDpMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDpMenu]);
 
   const isAcceptedContact = Boolean(
     profile?.isContact || (profile && contacts.some((c) => c.userId === profile.userId))
@@ -241,7 +258,7 @@ export function UserProfileModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/70 backdrop-blur-xs animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-xs animate-fade-in">
       {/* Hidden file input for DP change */}
       <input
         ref={fileInputRef}
@@ -252,26 +269,26 @@ export function UserProfileModal({
       />
 
       <div
-        className="bg-[#141515] border-t sm:border border-[#2C2E2E] rounded-t-3xl sm:rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative animate-scale-up max-h-[92dvh] sm:max-h-auto overflow-y-auto"
+        className="bg-white dark:bg-[#141515] border border-[#E5E5E3] dark:border-[#2C2E2E] rounded-3xl sm:rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative animate-scale-up max-h-[90vh] sm:max-h-[85vh] flex flex-col my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Banner with subtle Perplexity gradient */}
-        <div className="h-24 sm:h-28 bg-gradient-to-r from-[#191A1A] via-[#1D2B29] to-[#191A1A] border-b border-[#2C2E2E] relative shrink-0">
+        <div className="h-24 sm:h-28 bg-gradient-to-r from-[#F3F3F2] via-[#E6F7F6] to-[#F3F3F2] dark:from-[#191A1A] dark:via-[#1D2B29] dark:to-[#191A1A] border-b border-[#E5E5E3] dark:border-[#2C2E2E] relative shrink-0">
           <button
             onClick={onClose}
             aria-label="Close profile"
-            className="absolute top-3 right-3 sm:top-4 sm:right-4 min-w-[36px] min-h-[36px] w-9 h-9 sm:w-8 sm:h-8 rounded-full bg-[#141515]/70 hover:bg-[#141515] border border-[#2C2E2E] text-[#9EA3A3] hover:text-[#EDEDED] flex items-center justify-center transition active:scale-95 cursor-pointer"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 min-w-[36px] min-h-[36px] w-9 h-9 sm:w-8 sm:h-8 rounded-full bg-white/80 dark:bg-[#141515]/70 hover:bg-white dark:hover:bg-[#141515] border border-[#E5E5E3] dark:border-[#2C2E2E] text-[#737878] dark:text-[#9EA3A3] hover:text-[#191A1A] dark:hover:text-[#EDEDED] flex items-center justify-center transition active:scale-95 cursor-pointer shadow-xs"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Profile Details Container */}
-        <div className="px-5 sm:px-6 pb-6 pt-0 relative pb-safe bg-[#141515]">
+        {/* Profile Details Container - generous bottom padding, no pb-safe clipping */}
+        <div className="px-5 sm:px-6 pt-0 pb-8 sm:pb-8 overflow-y-auto flex-1 bg-white dark:bg-[#141515]">
           {/* Avatar and Badges / Pencil Button */}
           <div className="-mt-12 mb-4 flex justify-between items-end">
             <div className="relative group">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-[#202222] border-4 border-[#141515] flex items-center justify-center text-2xl sm:text-3xl font-bold text-[#20B2AA] shadow-xl shrink-0">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-[#F3F3F2] dark:bg-[#202222] border-4 border-white dark:border-[#141515] flex items-center justify-center text-2xl sm:text-3xl font-bold text-[#20B2AA] shadow-xl shrink-0">
                 {profile.avatarUrl ? (
                   <img
                     src={profile.avatarUrl}
@@ -290,53 +307,74 @@ export function UserProfileModal({
                 )}
               </div>
 
-              {/* Pencil Button on DP for current user */}
+              {/* Pencil Button & Dropdown Menu on DP for current user */}
               {isSelf && (
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploadingDp}
-                  title="Change profile picture"
-                  aria-label="Change profile picture"
-                  className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-[#20B2AA] hover:bg-[#1CA099] border-2 border-[#141515] text-black flex items-center justify-center shadow-lg transition transform hover:scale-110 active:scale-95 cursor-pointer"
-                >
-                  <Pencil className="w-3.5 h-3.5" />
-                </button>
+                <div className="absolute bottom-0 right-0 z-20" ref={dpMenuRef}>
+                  <button
+                    type="button"
+                    onClick={() => setShowDpMenu((prev) => !prev)}
+                    disabled={isUploadingDp}
+                    title="Profile photo options"
+                    aria-label="Profile photo options"
+                    className="w-8 h-8 rounded-full bg-[#20B2AA] hover:bg-[#1CA099] border-2 border-white dark:border-[#141515] text-black flex items-center justify-center shadow-lg transition transform hover:scale-110 active:scale-95 cursor-pointer"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+
+                  {/* Options Menu: Upload new one or Remove */}
+                  {showDpMenu && (
+                    <div className="absolute left-0 sm:left-auto sm:right-0 top-10 z-50 bg-white dark:bg-[#202222] border border-[#E5E5E3] dark:border-[#2D3030] rounded-2xl shadow-2xl p-1.5 min-w-[190px] flex flex-col space-y-1 animate-in fade-in zoom-in-95 duration-150">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowDpMenu(false);
+                          fileInputRef.current?.click();
+                        }}
+                        className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#191A1A] dark:text-[#EDEDED] hover:bg-[#F3F3F2] dark:hover:bg-[#262828] transition cursor-pointer text-left"
+                      >
+                        <Upload className="w-4 h-4 text-[#20B2AA] shrink-0" />
+                        <span>Upload new photo</span>
+                      </button>
+
+                      {profile.avatarUrl && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowDpMenu(false);
+                            void handleRemoveAvatar();
+                          }}
+                          className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 dark:hover:bg-rose-500/15 transition cursor-pointer text-left"
+                        >
+                          <Trash2 className="w-4 h-4 shrink-0" />
+                          <span>Remove photo</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 
             <div className="flex items-center space-x-2">
-              {isSelf && profile.avatarUrl && (
-                <button
-                  type="button"
-                  onClick={handleRemoveAvatar}
-                  disabled={isUploadingDp}
-                  title="Remove avatar"
-                  className="p-2 rounded-xl bg-[#202222] border border-[#2D3030] text-[#9EA3A3] hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer text-xs"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              )}
-
               {!isSelf && (
                 <div>
                   {isAcceptedContact ? (
-                    <span className="px-3 py-1 rounded-full bg-[#1D2B29] border border-[#25423E] text-[#20B2AA] text-xs font-semibold flex items-center space-x-1">
+                    <span className="px-3 py-1 rounded-full bg-[#E6F7F6] dark:bg-[#1D2B29] border border-[#B2E5E2] dark:border-[#25423E] text-[#148F87] dark:text-[#20B2AA] text-xs font-semibold flex items-center space-x-1">
                       <Check className="w-3.5 h-3.5" />
                       <span>In Contacts</span>
                     </span>
                   ) : isPendingSent ? (
-                    <span className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-400 text-xs font-semibold flex items-center space-x-1">
+                    <span className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-500 dark:text-amber-400 text-xs font-semibold flex items-center space-x-1">
                       <Clock className="w-3.5 h-3.5" />
                       <span>Request Pending</span>
                     </span>
                   ) : isPendingReceived ? (
-                    <span className="px-3 py-1 rounded-full bg-[#20B2AA]/10 border border-[#20B2AA]/30 text-[#20B2AA] text-xs font-semibold flex items-center space-x-1">
+                    <span className="px-3 py-1 rounded-full bg-[#E6F7F6] dark:bg-[#20B2AA]/10 border border-[#B2E5E2] dark:border-[#20B2AA]/30 text-[#148F87] dark:text-[#20B2AA] text-xs font-semibold flex items-center space-x-1">
                       <UserCheck className="w-3.5 h-3.5" />
                       <span>Request Received</span>
                     </span>
                   ) : (
-                    <span className="px-3 py-1 rounded-full bg-[#202222] border border-[#2D3030] text-[#9EA3A3] text-xs font-semibold flex items-center space-x-1">
+                    <span className="px-3 py-1 rounded-full bg-[#F3F3F2] dark:bg-[#202222] border border-[#E5E5E3] dark:border-[#2D3030] text-[#737878] dark:text-[#9EA3A3] text-xs font-semibold flex items-center space-x-1">
                       <UserX className="w-3.5 h-3.5" />
                       <span>Not in Contacts</span>
                     </span>
@@ -365,7 +403,7 @@ export function UserProfileModal({
           {isSelf && isEditing ? (
             <form onSubmit={handleSaveProfile} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-[#EDEDED] mb-1">
+                <label className="block text-xs font-semibold text-[#191A1A] dark:text-[#EDEDED] mb-1">
                   Display Name
                 </label>
                 <input
@@ -374,12 +412,12 @@ export function UserProfileModal({
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder="Your display name"
-                  className="w-full px-3.5 py-2 bg-[#191A1A] border border-[#2C2E2E] rounded-xl text-sm text-[#EDEDED] placeholder-[#737878] focus:outline-none focus:border-[#20B2AA] transition"
+                  className="w-full px-3.5 py-2 bg-[#F9F9F8] dark:bg-[#191A1A] border border-[#E5E5E3] dark:border-[#2C2E2E] rounded-xl text-sm text-[#191A1A] dark:text-[#EDEDED] placeholder-[#9CA3AF] dark:placeholder-[#737878] focus:outline-none focus:border-[#20B2AA] transition"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#EDEDED] mb-1">
+                <label className="block text-xs font-semibold text-[#191A1A] dark:text-[#EDEDED] mb-1">
                   Username
                 </label>
                 <div className="relative">
@@ -390,13 +428,13 @@ export function UserProfileModal({
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="username"
-                    className="w-full pl-8 pr-3.5 py-2 bg-[#191A1A] border border-[#2C2E2E] rounded-xl text-sm text-[#EDEDED] placeholder-[#737878] focus:outline-none focus:border-[#20B2AA] transition"
+                    className="w-full pl-8 pr-3.5 py-2 bg-[#F9F9F8] dark:bg-[#191A1A] border border-[#E5E5E3] dark:border-[#2C2E2E] rounded-xl text-sm text-[#191A1A] dark:text-[#EDEDED] placeholder-[#9CA3AF] dark:placeholder-[#737878] focus:outline-none focus:border-[#20B2AA] transition"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#EDEDED] mb-1">
+                <label className="block text-xs font-semibold text-[#191A1A] dark:text-[#EDEDED] mb-1">
                   Status Message
                 </label>
                 <div className="relative">
@@ -406,13 +444,13 @@ export function UserProfileModal({
                     value={statusMessage}
                     onChange={(e) => setStatusMessage(e.target.value)}
                     placeholder="Set a status message..."
-                    className="w-full pl-8 pr-3.5 py-2 bg-[#191A1A] border border-[#2C2E2E] rounded-xl text-sm text-[#EDEDED] placeholder-[#737878] focus:outline-none focus:border-[#20B2AA] transition"
+                    className="w-full pl-8 pr-3.5 py-2 bg-[#F9F9F8] dark:bg-[#191A1A] border border-[#E5E5E3] dark:border-[#2C2E2E] rounded-xl text-sm text-[#191A1A] dark:text-[#EDEDED] placeholder-[#9CA3AF] dark:placeholder-[#737878] focus:outline-none focus:border-[#20B2AA] transition"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#EDEDED] mb-1">
+                <label className="block text-xs font-semibold text-[#191A1A] dark:text-[#EDEDED] mb-1">
                   About / Bio
                 </label>
                 <textarea
@@ -420,7 +458,7 @@ export function UserProfileModal({
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   placeholder="Tell people about yourself..."
-                  className="w-full px-3.5 py-2 bg-[#191A1A] border border-[#2C2E2E] rounded-xl text-sm text-[#EDEDED] placeholder-[#737878] focus:outline-none focus:border-[#20B2AA] transition resize-none"
+                  className="w-full px-3.5 py-2 bg-[#F9F9F8] dark:bg-[#191A1A] border border-[#E5E5E3] dark:border-[#2C2E2E] rounded-xl text-sm text-[#191A1A] dark:text-[#EDEDED] placeholder-[#9CA3AF] dark:placeholder-[#737878] focus:outline-none focus:border-[#20B2AA] transition resize-none"
                 />
               </div>
 
@@ -435,7 +473,7 @@ export function UserProfileModal({
                     setStatusMessage(profile.statusMessage || '');
                     setErrorMsg(null);
                   }}
-                  className="flex-1 py-2.5 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] transition cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl bg-[#F3F3F2] dark:bg-[#202222] hover:bg-[#ECECEB] dark:hover:bg-[#262828] border border-[#E5E5E3] dark:border-[#2D3030] text-xs font-semibold text-[#737878] dark:text-[#9EA3A3] hover:text-[#191A1A] dark:hover:text-[#EDEDED] transition cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -459,7 +497,7 @@ export function UserProfileModal({
             <div>
               <div className="flex items-start justify-between">
                 <div>
-                  <h2 className="text-xl font-bold text-[#EDEDED] tracking-tight">{profile.displayName}</h2>
+                  <h2 className="text-xl font-bold text-[#191A1A] dark:text-[#EDEDED] tracking-tight">{profile.displayName}</h2>
                   <p className="text-xs text-[#20B2AA] font-medium mt-0.5">@{profile.username}</p>
                 </div>
 
@@ -467,7 +505,7 @@ export function UserProfileModal({
                   <button
                     type="button"
                     onClick={() => setIsEditing(true)}
-                    className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#20B2AA] text-xs font-semibold transition cursor-pointer"
+                    className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#F3F3F2] dark:bg-[#202222] hover:bg-[#ECECEB] dark:hover:bg-[#262828] border border-[#E5E5E3] dark:border-[#2D3030] text-[#20B2AA] text-xs font-semibold transition cursor-pointer"
                   >
                     <Pencil className="w-3.5 h-3.5" />
                     <span>Edit Profile</span>
@@ -477,7 +515,7 @@ export function UserProfileModal({
 
               {/* Status Message */}
               {profile.statusMessage && (
-                <div className="mt-4 p-3 rounded-xl bg-[#202222] border border-[#2D3030] text-xs text-[#EDEDED] flex items-center space-x-2">
+                <div className="mt-4 p-3 rounded-xl bg-[#F9F9F8] dark:bg-[#202222] border border-[#E5E5E3] dark:border-[#2D3030] text-xs text-[#191A1A] dark:text-[#EDEDED] flex items-center space-x-2">
                   <span className="text-[#20B2AA] text-sm">💬</span>
                   <span>{profile.statusMessage}</span>
                 </div>
@@ -489,18 +527,18 @@ export function UserProfileModal({
                   <Shield className="w-3.5 h-3.5 text-[#20B2AA]" />
                   <span>About</span>
                 </h3>
-                <p className="text-xs text-[#9EA3A3] leading-relaxed bg-[#202222] p-3 rounded-xl border border-[#2D3030]">
+                <p className="text-xs text-[#4B5563] dark:text-[#9EA3A3] leading-relaxed bg-[#F9F9F8] dark:bg-[#202222] p-3 rounded-xl border border-[#E5E5E3] dark:border-[#2D3030]">
                   {profile.bio || 'No bio provided yet.'}
                 </p>
               </div>
 
               {/* Last Seen */}
-              <div className="mt-4 flex items-center justify-between text-xs text-[#737878] pt-3 border-t border-[#2C2E2E]">
+              <div className="mt-4 flex items-center justify-between text-xs text-[#737878] pt-3 border-t border-[#E5E5E3] dark:border-[#2C2E2E]">
                 <span className="flex items-center space-x-1.5">
                   <Clock className="w-3.5 h-3.5 text-[#737878]" />
                   <span>Last Seen</span>
                 </span>
-                <span className="text-[#EDEDED] font-medium">
+                <span className="text-[#191A1A] dark:text-[#EDEDED] font-medium">
                   {profile.lastSeen ? new Date(profile.lastSeen).toLocaleDateString() : 'Hidden'}
                 </span>
               </div>
@@ -514,7 +552,7 @@ export function UserProfileModal({
                         <button
                           type="button"
                           onClick={handleVoiceCall}
-                          className="flex-1 flex items-center justify-center space-x-2 min-h-[44px] py-2.5 px-3 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-xs font-semibold text-[#20B2AA] hover:text-[#1CA099] transition cursor-pointer"
+                          className="flex-1 flex items-center justify-center space-x-2 min-h-[44px] py-2.5 px-3 rounded-xl bg-[#F3F3F2] dark:bg-[#202222] hover:bg-[#ECECEB] dark:hover:bg-[#262828] border border-[#E5E5E3] dark:border-[#2D3030] text-xs font-semibold text-[#20B2AA] hover:text-[#1CA099] transition cursor-pointer"
                         >
                           <Phone className="w-4 h-4" />
                           <span>Voice Call</span>
@@ -535,7 +573,7 @@ export function UserProfileModal({
                           <button
                             type="button"
                             onClick={handleSendMessage}
-                            className="flex-1 flex items-center justify-center space-x-2 min-h-[40px] py-2 px-3 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-xs font-semibold text-[#EDEDED] transition cursor-pointer"
+                            className="flex-1 flex items-center justify-center space-x-2 min-h-[40px] py-2 px-3 rounded-xl bg-[#F3F3F2] dark:bg-[#202222] hover:bg-[#ECECEB] dark:hover:bg-[#262828] border border-[#E5E5E3] dark:border-[#2D3030] text-xs font-semibold text-[#191A1A] dark:text-[#EDEDED] transition cursor-pointer"
                           >
                             <MessageSquare className="w-4 h-4 text-[#20B2AA]" />
                             <span>Send Message</span>
@@ -545,7 +583,7 @@ export function UserProfileModal({
                         <button
                           type="button"
                           onClick={onClose}
-                          className="flex-1 flex items-center justify-center space-x-2 min-h-[40px] py-2 px-3 rounded-xl bg-[#191A1A] hover:bg-[#202222] border border-[#2C2E2E] text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] transition cursor-pointer"
+                          className="flex-1 flex items-center justify-center space-x-2 min-h-[40px] py-2 px-3 rounded-xl bg-[#EBEBEA] dark:bg-[#191A1A] hover:bg-[#E2E2E0] dark:hover:bg-[#202222] border border-[#E5E5E3] dark:border-[#2C2E2E] text-xs font-semibold text-[#737878] dark:text-[#9EA3A3] hover:text-[#191A1A] dark:hover:text-[#EDEDED] transition cursor-pointer"
                         >
                           <span>Close</span>
                         </button>
@@ -553,8 +591,8 @@ export function UserProfileModal({
                     </>
                   ) : isPendingSent ? (
                     <>
-                      <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-300 flex items-start space-x-2.5">
-                        <Clock className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                      <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-600 dark:text-amber-300 flex items-start space-x-2.5">
+                        <Clock className="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
                         <span>Contact request sent. You will be able to text and call this user once they accept your request.</span>
                       </div>
 
@@ -562,16 +600,16 @@ export function UserProfileModal({
                         <button
                           type="button"
                           disabled
-                          className="flex-1 flex items-center justify-center space-x-2 min-h-[44px] py-2.5 px-3 rounded-xl bg-[#202222] border border-[#2D3030] text-xs font-semibold text-[#737878] opacity-75 cursor-not-allowed"
+                          className="flex-1 flex items-center justify-center space-x-2 min-h-[44px] py-2.5 px-3 rounded-xl bg-[#F3F3F2] dark:bg-[#202222] border border-[#E5E5E3] dark:border-[#2D3030] text-xs font-semibold text-[#9CA3AF] dark:text-[#737878] opacity-75 cursor-not-allowed"
                         >
-                          <Clock className="w-4 h-4 text-amber-400" />
+                          <Clock className="w-4 h-4 text-amber-500 dark:text-amber-400" />
                           <span>Request Pending Approval</span>
                         </button>
 
                         <button
                           type="button"
                           onClick={onClose}
-                          className="px-4 min-h-[44px] py-2.5 rounded-xl bg-[#191A1A] hover:bg-[#202222] border border-[#2C2E2E] text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] transition cursor-pointer"
+                          className="px-4 min-h-[44px] py-2.5 rounded-xl bg-[#EBEBEA] dark:bg-[#191A1A] hover:bg-[#E2E2E0] dark:hover:bg-[#202222] border border-[#E5E5E3] dark:border-[#2C2E2E] text-xs font-semibold text-[#737878] dark:text-[#9EA3A3] hover:text-[#191A1A] dark:hover:text-[#EDEDED] transition cursor-pointer"
                         >
                           Close
                         </button>
@@ -579,7 +617,7 @@ export function UserProfileModal({
                     </>
                   ) : isPendingReceived ? (
                     <>
-                      <div className="p-3 rounded-xl bg-[#1D2B29] border border-[#25423E] text-xs text-[#20B2AA] flex items-start space-x-2.5">
+                      <div className="p-3 rounded-xl bg-[#E6F7F6] dark:bg-[#1D2B29] border border-[#B2E5E2] dark:border-[#25423E] text-xs text-[#148F87] dark:text-[#20B2AA] flex items-start space-x-2.5">
                         <UserCheck className="w-4 h-4 text-[#20B2AA] shrink-0 mt-0.5" />
                         <span>This user sent you a contact request. Accept it below to start texting and calling each other.</span>
                       </div>
@@ -602,7 +640,7 @@ export function UserProfileModal({
                         <button
                           type="button"
                           onClick={onClose}
-                          className="px-4 min-h-[44px] py-2.5 rounded-xl bg-[#191A1A] hover:bg-[#202222] border border-[#2C2E2E] text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] transition cursor-pointer"
+                          className="px-4 min-h-[44px] py-2.5 rounded-xl bg-[#EBEBEA] dark:bg-[#191A1A] hover:bg-[#E2E2E0] dark:hover:bg-[#202222] border border-[#E5E5E3] dark:border-[#2C2E2E] text-xs font-semibold text-[#737878] dark:text-[#9EA3A3] hover:text-[#191A1A] dark:hover:text-[#EDEDED] transition cursor-pointer"
                         >
                           Close
                         </button>
@@ -610,8 +648,8 @@ export function UserProfileModal({
                     </>
                   ) : (
                     <>
-                      <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-300 flex items-start space-x-2.5">
-                        <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                      <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-600 dark:text-amber-300 flex items-start space-x-2.5">
+                        <Info className="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
                         <span>You cannot directly text or call this user without sending a contact request and getting accepted first.</span>
                       </div>
 
@@ -633,7 +671,7 @@ export function UserProfileModal({
                         <button
                           type="button"
                           onClick={onClose}
-                          className="px-4 min-h-[44px] py-2.5 rounded-xl bg-[#191A1A] hover:bg-[#202222] border border-[#2C2E2E] text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] transition cursor-pointer"
+                          className="px-4 min-h-[44px] py-2.5 rounded-xl bg-[#EBEBEA] dark:bg-[#191A1A] hover:bg-[#E2E2E0] dark:hover:bg-[#202222] border border-[#E5E5E3] dark:border-[#2C2E2E] text-xs font-semibold text-[#737878] dark:text-[#9EA3A3] hover:text-[#191A1A] dark:hover:text-[#EDEDED] transition cursor-pointer"
                         >
                           Close
                         </button>
@@ -642,12 +680,12 @@ export function UserProfileModal({
                   )}
                 </div>
               ) : (
-                /* Action for SELF */
-                <div className="mt-6">
+                /* Action for SELF - comfortable bottom margin and padding */
+                <div className="mt-6 mb-2">
                   <button
                     type="button"
                     onClick={onClose}
-                    className="w-full flex items-center justify-center space-x-2 min-h-[44px] py-3 sm:py-2.5 px-4 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-xs font-semibold text-[#EDEDED] transition active:scale-[0.98] cursor-pointer"
+                    className="w-full flex items-center justify-center space-x-2 min-h-[44px] py-3 sm:py-2.5 px-4 rounded-xl bg-[#F3F3F2] dark:bg-[#202222] hover:bg-[#ECECEB] dark:hover:bg-[#262828] border border-[#E5E5E3] dark:border-[#2D3030] text-xs font-semibold text-[#191A1A] dark:text-[#EDEDED] transition active:scale-[0.98] cursor-pointer"
                   >
                     <span>Close Profile</span>
                   </button>
