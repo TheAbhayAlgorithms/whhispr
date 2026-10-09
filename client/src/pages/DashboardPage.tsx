@@ -8,7 +8,6 @@ import { useProfileStore } from '../store/useProfileStore';
 import { UserProfileModal } from '../components/UserProfileModal';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { CreateGroupModal } from '../components/CreateGroupModal';
-import { ChannelBrowserModal } from '../components/ChannelBrowserModal';
 import { GroupDetailsDrawer } from '../components/GroupDetailsDrawer';
 import { GlobalSearchModal } from '../components/GlobalSearchModal';
 import { InChatSearchBar } from '../components/InChatSearchBar';
@@ -52,7 +51,6 @@ import {
   CheckCheck,
   Smile,
   Hash,
-  Compass,
   Plus,
   Globe,
   Lock,
@@ -174,11 +172,9 @@ export default function DashboardPage() {
   const [chatSearch, setChatSearch] = useState('');
   const [loggingOut, setLoggingOut] = useState(false);
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
-  const [showChannelBrowserModal, setShowChannelBrowserModal] = useState(false);
   const [showGroupDrawer, setShowGroupDrawer] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showMobileActionsMenu, setShowMobileActionsMenu] = useState(false);
-  const [categoryFilter, setCategoryFilter] = useState<'all' | 'direct' | 'group' | 'pinned'>('all');
 
   // Synchronize URL search param `?chat=id` with activeChatId for back navigation
   const urlChatId = searchParams.get('chat');
@@ -390,7 +386,6 @@ export default function DashboardPage() {
       if (e.key === 'Escape') {
         setShowGlobalSearch(false);
         setShowCreateGroupModal(false);
-        setShowChannelBrowserModal(false);
         setShowCallHistoryModal(false);
         setShowGroupDrawer(false);
         setShowEmojiPicker(false);
@@ -546,10 +541,6 @@ export default function DashboardPage() {
 
   const filteredChats = chatsList
     .filter((chat) => {
-      if (categoryFilter === 'direct' && chat.type !== 'direct') return false;
-      if (categoryFilter === 'group' && chat.type !== 'group' && chat.type !== 'channel') return false;
-      if (categoryFilter === 'pinned' && !isChatPinned(chat.id)) return false;
-
       if (!chatSearch.trim()) return true;
       const query = chatSearch.toLowerCase();
       const nameMatch = chat.name?.toLowerCase().includes(query);
@@ -657,69 +648,6 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          {/* Center: Main Navigation Links (Desktop/Tablet md+) */}
-          <nav aria-label="Main Navigation" className="hidden md:flex items-center space-x-1 lg:space-x-2">
-            {/* Chats Pill */}
-            <WarmTooltip content="Conversations" shortcut="⌘1" side="bottom">
-              <button
-                type="button"
-                onClick={() => void handleSelectChat(null)}
-                className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer active:scale-95 ${
-                  !activeChat
-                    ? 'bg-[#202222] text-[#20B2AA] border border-[#2D3030] shadow-xs'
-                    : 'text-[#9EA3A3] hover:text-[#EDEDED] hover:bg-[#202222]'
-                }`}
-                aria-label="Conversations"
-              >
-                <MessageSquare className="w-4 h-4 fill-current" />
-                <span>Chats</span>
-              </button>
-            </WarmTooltip>
-
-            {/* Calls */}
-            <WarmTooltip content="Call History" side="bottom">
-              <button
-                type="button"
-                onClick={() => setShowCallHistoryModal(true)}
-                className="flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] hover:bg-[#202222] transition cursor-pointer active:scale-95"
-                aria-label="Call History"
-              >
-                <PhoneCall className="w-4 h-4 text-[#20B2AA]" />
-                <span>Calls</span>
-              </button>
-            </WarmTooltip>
-
-            {/* Contacts */}
-            <WarmTooltip content="Contacts" shortcut="⌘2" side="bottom">
-              <Link
-                to="/contacts"
-                className="relative flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] hover:bg-[#202222] transition active:scale-95"
-                aria-label="Contacts"
-              >
-                <Users className="w-4 h-4 text-[#20B2AA]" />
-                <span>Contacts</span>
-                {incomingRequests.length > 0 && (
-                  <span className="px-1.5 min-w-[16px] h-4 rounded-full text-[10px] font-bold bg-[#20B2AA] text-black flex items-center justify-center">
-                    {incomingRequests.length}
-                  </span>
-                )}
-              </Link>
-            </WarmTooltip>
-
-            {/* Explore Channels */}
-            <WarmTooltip content="Explore Channels" shortcut="⌘3" side="bottom">
-              <button
-                type="button"
-                onClick={() => setShowChannelBrowserModal(true)}
-                className="flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] hover:bg-[#202222] transition cursor-pointer active:scale-95"
-                aria-label="Explore Channels"
-              >
-                <Compass className="w-4 h-4 text-[#20B2AA]" />
-                <span>Explore</span>
-              </button>
-            </WarmTooltip>
-          </nav>
-
           {/* Right: Tools, Theme Toggle, Profile, Sign Out */}
           <div className="flex items-center space-x-1.5 sm:space-x-2.5">
             {/* Global Search Trigger */}
@@ -732,6 +660,22 @@ export default function DashboardPage() {
               >
                 <Search className="w-4 h-4" />
               </button>
+            </WarmTooltip>
+
+            {/* Contacts Button directly to the right of search button */}
+            <WarmTooltip content="Contacts" shortcut="⌘2" side="bottom">
+              <Link
+                to="/contacts"
+                className="relative w-9 h-9 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED] flex items-center justify-center transition cursor-pointer active:scale-95"
+                aria-label="Contacts"
+              >
+                <Users className="w-4 h-4 text-[#20B2AA]" />
+                {incomingRequests.length > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[#20B2AA] text-black rounded-full text-[10px] font-bold flex items-center justify-center shadow-xs">
+                    {incomingRequests.length > 9 ? '9+' : incomingRequests.length}
+                  </span>
+                )}
+              </Link>
             </WarmTooltip>
 
             {/* Notifications Bell */}
@@ -907,16 +851,6 @@ export default function DashboardPage() {
                     )}
                   </Link>
 
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setShowChannelBrowserModal(true);
-                    }}
-                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#EDEDED] hover:bg-[#202222] transition text-left active:scale-[0.99]"
-                  >
-                    <Compass className="w-4 h-4 text-[#20B2AA] shrink-0" />
-                    <span>Explore Channels</span>
-                  </button>
 
                   <Link
                     to="/profile"
@@ -1029,30 +963,6 @@ export default function DashboardPage() {
                 </button>
               </div>
 
-              {/* Category Filter Tabs */}
-              <div className="flex items-center space-x-1.5 pt-0.5 overflow-x-auto no-scrollbar">
-                {(
-                  [
-                    { id: 'all', label: 'All' },
-                    { id: 'direct', label: 'Direct' },
-                    { id: 'group', label: 'Groups' },
-                    { id: 'pinned', label: 'Pinned' },
-                  ] as const
-                ).map((tab) => (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setCategoryFilter(tab.id)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium transition shrink-0 cursor-pointer ${
-                      categoryFilter === tab.id
-                        ? 'bg-[#202222] text-[#20B2AA] border border-[#2D3030] shadow-xs'
-                        : 'text-[#9EA3A3] hover:text-[#EDEDED] hover:bg-[#202222]'
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
             </div>
 
             {/* Chats Scroll List */}
@@ -2166,14 +2076,6 @@ export default function DashboardPage() {
                         <Users className="w-3.5 h-3.5 text-[#20B2AA]" />
                         <span>Contacts</span>
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowChannelBrowserModal(true)}
-                        className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-[#2A2C2C] hover:bg-[#333636] border border-[#333636] text-[#EDEDED] text-xs font-medium transition cursor-pointer"
-                      >
-                        <Compass className="w-3.5 h-3.5 text-[#20B2AA]" />
-                        <span>Channels</span>
-                      </button>
                     </div>
                     <button
                       type="button"
@@ -2187,7 +2089,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Quick starter cards grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full text-left">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full text-left">
                   <button
                     type="button"
                     onClick={() => setShowCreateGroupModal(true)}
@@ -2213,20 +2115,6 @@ export default function DashboardPage() {
                     <h4 className="text-xs font-semibold text-[#EDEDED] mb-1">Audio & Video</h4>
                     <p className="text-[11px] text-[#9EA3A3] leading-relaxed">
                       Instant crystal-clear WebRTC calls with screen sharing.
-                    </p>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowChannelBrowserModal(true)}
-                    className="p-3.5 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] hover:border-[#383B3B] transition text-left cursor-pointer group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-[#2A2C2C] flex items-center justify-center text-[#20B2AA] mb-2.5 group-hover:scale-105 transition">
-                      <Compass className="w-4 h-4" />
-                    </div>
-                    <h4 className="text-xs font-semibold text-[#EDEDED] mb-1">Public Channels</h4>
-                    <p className="text-[11px] text-[#9EA3A3] leading-relaxed">
-                      Discover community discussions and collaborate in team channels.
                     </p>
                   </button>
                 </div>
@@ -2322,10 +2210,7 @@ export default function DashboardPage() {
         isOpen={showCreateGroupModal}
         onClose={() => setShowCreateGroupModal(false)}
       />
-      <ChannelBrowserModal
-        isOpen={showChannelBrowserModal}
-        onClose={() => setShowChannelBrowserModal(false)}
-      />
+
       {/* Delete Message Confirmation Modal */}
       {deletingMessage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-150">
