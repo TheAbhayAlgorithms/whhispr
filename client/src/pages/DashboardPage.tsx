@@ -40,6 +40,7 @@ import {
   MessageAvatar,
   MessageContent,
 } from '@/components/ui/message';
+import WarmTooltip, { WarmTooltipGroup } from '@/components/ui/WarmTooltip';
 import {
   MessageSquare,
   LogOut,
@@ -541,130 +542,152 @@ export default function DashboardPage() {
   return (
     <div className="h-screen h-dvh bg-slate-100 dark:bg-black text-slate-900 dark:text-slate-100 flex flex-col md:flex-row overflow-hidden transition-colors duration-200">
       {/* Desktop Vertical Navigation Rail (Electric Blue #0066FF matching user reference design) */}
-      <nav
-        aria-label="Platform navigation"
-        className="hidden md:flex w-20 flex-col items-center justify-between py-5 bg-[#0066FF] text-white shrink-0 z-30 shadow-2xl select-none"
-      >
-        {/* Top: User Avatar */}
-        <div className="flex flex-col items-center space-y-2">
-          <button
-            type="button"
-            onClick={() => user && fetchUserProfile(user.id)}
-            className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/80 hover:border-white shadow-lg transition active:scale-95 cursor-pointer shrink-0"
-            title={`${user?.displayName} (@${user?.username})`}
-          >
-            {user?.avatarUrl ? (
-              <img src={user.avatarUrl} alt={user.displayName} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-blue-700 text-white font-bold flex items-center justify-center text-sm">
-                {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
-              </div>
-            )}
-          </button>
+      <WarmTooltipGroup delay={250} warmWindow={350} travel={260} lean={2}>
+        <nav
+          aria-label="Platform navigation"
+          className="hidden md:flex w-20 flex-col items-center justify-between py-5 bg-[#0066FF] text-white shrink-0 z-30 shadow-2xl select-none"
+        >
+          {/* Top: User Avatar */}
+          <div className="flex flex-col items-center space-y-2">
+            <WarmTooltip content={user?.displayName || 'Your Profile'} shortcut="⌘P" side="right">
+              <button
+                type="button"
+                onClick={() => user && fetchUserProfile(user.id)}
+                className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/80 hover:border-white shadow-lg transition active:scale-95 cursor-pointer shrink-0"
+                aria-label={`${user?.displayName} (@${user?.username})`}
+              >
+                {user?.avatarUrl ? (
+                  <img src={user.avatarUrl} alt={user.displayName} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-blue-700 text-white font-bold flex items-center justify-center text-sm">
+                    {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                )}
+              </button>
+            </WarmTooltip>
 
-          {/* Socket live indicator dot */}
-          <span
-            title={socketStatus === 'connected' ? 'Connected (Live)' : socketStatus}
-            className={`w-2.5 h-2.5 rounded-full ring-2 ring-[#0066FF] ${
-              socketStatus === 'connected'
-                ? 'bg-emerald-400 animate-pulse'
-                : socketStatus === 'connecting'
-                ? 'bg-amber-400 animate-ping'
-                : 'bg-slate-300'
-            }`}
-          />
-        </div>
-
-        {/* Middle: Navigation Action Icons */}
-        <div className="flex flex-col items-center space-y-3.5">
-          {/* Active Chats Button (Highlighted in White Pill matching user screenshot) */}
-          <button
-            type="button"
-            onClick={() => void handleSelectChat(null)}
-            className="relative w-12 h-12 rounded-2xl bg-white text-[#0066FF] shadow-lg flex items-center justify-center transition active:scale-95 cursor-pointer"
-            title="Conversations"
-          >
-            <MessageSquare className="w-6 h-6 fill-current" />
-          </button>
-
-          {/* Contacts */}
-          <Link
-            to="/contacts"
-            className="relative w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95"
-            title="Contacts"
-          >
-            <Users className="w-6 h-6" />
-            {incomingRequests.length > 0 && (
-              <span className="absolute top-1.5 right-1.5 px-1 min-w-[16px] h-4 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900 flex items-center justify-center ring-2 ring-[#0066FF]">
-                {incomingRequests.length}
-              </span>
-            )}
-          </Link>
-
-          {/* Explore Channels */}
-          <button
-            type="button"
-            onClick={() => setShowChannelBrowserModal(true)}
-            className="w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95 cursor-pointer"
-            title="Explore Channels"
-          >
-            <Compass className="w-6 h-6" />
-          </button>
-
-          {/* Notifications */}
-          <button
-            type="button"
-            onClick={() => toggleNotificationCenter()}
-            className="relative w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95 cursor-pointer"
-            title="Notifications"
-          >
-            <Bell className="w-6 h-6" />
-            {unreadNotificationsCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-rose-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center ring-2 ring-[#0066FF] animate-pulse">
-                {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
-              </span>
-            )}
-          </button>
-
-          {/* Settings */}
-          <Link
-            to="/settings"
-            className="w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95"
-            title="Settings"
-          >
-            <SettingsIcon className="w-6 h-6" />
-          </Link>
-
-          {/* Admin link if user is admin */}
-          {user?.role === 'admin' && (
-            <Link
-              to="/admin"
-              className="w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95"
-              title="Admin Portal"
-            >
-              <Shield className="w-6 h-6" />
-            </Link>
-          )}
-
-          {/* Circular Daylight / Dark Theme Toggle Button */}
-          <div className="pt-1">
-            <ThemeToggle className="!bg-white/20 !border-white/30 !text-white hover:!bg-white/30" />
+            {/* Socket live indicator dot */}
+            <span
+              title={socketStatus === 'connected' ? 'Connected (Live)' : socketStatus}
+              className={`w-2.5 h-2.5 rounded-full ring-2 ring-[#0066FF] ${
+                socketStatus === 'connected'
+                  ? 'bg-emerald-400 animate-pulse'
+                  : socketStatus === 'connecting'
+                  ? 'bg-amber-400 animate-ping'
+                  : 'bg-slate-300'
+              }`}
+            />
           </div>
-        </div>
 
-        {/* Bottom: Logout / Exit */}
-        <div className="flex flex-col items-center">
-          <button
-            type="button"
-            onClick={handleLogout}
-            disabled={loggingOut}
-            className="w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95 cursor-pointer"
-            title="Sign Out"
-          >
-            <LogOut className="w-6 h-6" />
-          </button>
-        </div>
-      </nav>
+          {/* Middle: Navigation Action Icons */}
+          <div className="flex flex-col items-center space-y-3.5">
+            {/* Active Chats Button (Highlighted in White Pill matching user screenshot) */}
+            <WarmTooltip content="Conversations" shortcut="⌘1" side="right">
+              <button
+                type="button"
+                onClick={() => void handleSelectChat(null)}
+                className="relative w-12 h-12 rounded-2xl bg-white text-[#0066FF] shadow-lg flex items-center justify-center transition active:scale-95 cursor-pointer"
+                aria-label="Conversations"
+              >
+                <MessageSquare className="w-6 h-6 fill-current" />
+              </button>
+            </WarmTooltip>
+
+            {/* Contacts */}
+            <WarmTooltip content="Contacts" shortcut="⌘2" side="right">
+              <Link
+                to="/contacts"
+                className="relative w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95"
+                aria-label="Contacts"
+              >
+                <Users className="w-6 h-6" />
+                {incomingRequests.length > 0 && (
+                  <span className="absolute top-1.5 right-1.5 px-1 min-w-[16px] h-4 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900 flex items-center justify-center ring-2 ring-[#0066FF]">
+                    {incomingRequests.length}
+                  </span>
+                )}
+              </Link>
+            </WarmTooltip>
+
+            {/* Explore Channels */}
+            <WarmTooltip content="Explore Channels" shortcut="⌘3" side="right">
+              <button
+                type="button"
+                onClick={() => setShowChannelBrowserModal(true)}
+                className="w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95 cursor-pointer"
+                aria-label="Explore Channels"
+              >
+                <Compass className="w-6 h-6" />
+              </button>
+            </WarmTooltip>
+
+            {/* Notifications */}
+            <WarmTooltip content="Notifications" shortcut="⌘4" side="right">
+              <button
+                type="button"
+                onClick={() => toggleNotificationCenter()}
+                className="relative w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95 cursor-pointer"
+                aria-label="Notifications"
+              >
+                <Bell className="w-6 h-6" />
+                {unreadNotificationsCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-rose-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center ring-2 ring-[#0066FF] animate-pulse">
+                    {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                  </span>
+                )}
+              </button>
+            </WarmTooltip>
+
+            {/* Settings */}
+            <WarmTooltip content="Settings" shortcut="⌘," side="right">
+              <Link
+                to="/settings"
+                className="w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95"
+                aria-label="Settings"
+              >
+                <SettingsIcon className="w-6 h-6" />
+              </Link>
+            </WarmTooltip>
+
+            {/* Admin link if user is admin */}
+            {user?.role === 'admin' && (
+              <WarmTooltip content="Admin Portal" shortcut="⌘A" side="right">
+                <Link
+                  to="/admin"
+                  className="w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95"
+                  aria-label="Admin Portal"
+                >
+                  <Shield className="w-6 h-6" />
+                </Link>
+              </WarmTooltip>
+            )}
+
+            {/* Circular Daylight / Dark Theme Toggle Button */}
+            <div className="pt-1">
+              <WarmTooltip content="Toggle Theme" side="right">
+                <div>
+                  <ThemeToggle className="!bg-white/20 !border-white/30 !text-white hover:!bg-white/30" />
+                </div>
+              </WarmTooltip>
+            </div>
+          </div>
+
+          {/* Bottom: Logout / Exit */}
+          <div className="flex flex-col items-center">
+            <WarmTooltip content="Sign Out" shortcut="⌥Q" side="right">
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={loggingOut}
+                className="w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95 cursor-pointer"
+                aria-label="Sign Out"
+              >
+                <LogOut className="w-6 h-6" />
+              </button>
+            </WarmTooltip>
+          </div>
+        </nav>
+      </WarmTooltipGroup>
 
       {/* Main Column (Mobile Header + Chat Workspace) */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
@@ -1157,93 +1180,107 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Electric Blue Action Icons in Header matching user reference design */}
-                <div className="flex items-center space-x-1 sm:space-x-2 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => toggleInChatSearch()}
-                    className={`p-2 rounded-xl transition cursor-pointer ${
-                      inChatSearchOpen
-                        ? 'bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400'
-                        : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40'
-                    }`}
-                    title="Search in conversation"
-                  >
-                    <Search className="w-4 h-4" />
-                  </button>
-                  {activeChat.type === 'direct' && activeChat.otherUser && (
-                    <>
+                <WarmTooltipGroup delay={200} warmWindow={300} travel={220}>
+                  <div className="flex items-center space-x-1 sm:space-x-2 shrink-0">
+                    <WarmTooltip content="Search in conversation" shortcut="⌘F" side="bottom">
                       <button
                         type="button"
-                        onClick={() =>
-                          void startCall({
-                            recipientId: activeChat.otherUser!.id,
-                            recipientName: activeChat.otherUser!.displayName || activeChat.otherUser!.username,
-                            recipientAvatar: activeChat.otherUser!.avatarUrl,
-                            chatId: activeChat.id,
-                            callType: 'audio',
-                          })
-                        }
-                        className="p-2 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
-                        title="Voice Call"
+                        onClick={() => toggleInChatSearch()}
+                        className={`p-2 rounded-xl transition cursor-pointer ${
+                          inChatSearchOpen
+                            ? 'bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400'
+                            : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40'
+                        }`}
+                        aria-label="Search in conversation"
                       >
-                        <Phone className="w-4 h-4" />
+                        <Search className="w-4 h-4" />
                       </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          void startCall({
-                            recipientId: activeChat.otherUser!.id,
-                            recipientName: activeChat.otherUser!.displayName || activeChat.otherUser!.username,
-                            recipientAvatar: activeChat.otherUser!.avatarUrl,
-                            chatId: activeChat.id,
-                            callType: 'video',
-                          })
-                        }
-                        className="p-2 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
-                        title="Video Call"
-                      >
-                        <Video className="w-4 h-4" />
-                      </button>
-                    </>
-                  )}
-                  {activeChat.type === 'direct' && activeChat.otherUser && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        void openSafetyNumberModal(
-                          activeChat.otherUser!.id,
-                          activeChat.otherUser!.displayName || activeChat.otherUser!.username,
-                        )
-                      }
-                      className="inline-flex items-center space-x-1 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 text-blue-700 dark:text-blue-300 text-xs font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/60 transition cursor-pointer"
-                      title="End-to-End Encrypted (Click to verify safety number)"
-                    >
-                      <Lock className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                      <span className="hidden sm:inline">E2EE</span>
-                    </button>
-                  )}
-                  {activeChat.type === 'direct' && activeChat.otherUser ? (
-                    <button
-                      onClick={() => handleInspectOtherUser(activeChat.otherUser!.id)}
-                      className="p-2 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
-                      title="View Profile"
-                    >
-                      <Info className="w-4 h-4" />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setShowGroupDrawer(!showGroupDrawer)}
-                      className={`p-2 rounded-xl transition cursor-pointer ${
-                        showGroupDrawer
-                          ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-                          : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40'
-                      }`}
-                      title="Group Details & Members"
-                    >
-                      <Info className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
+                    </WarmTooltip>
+                    {activeChat.type === 'direct' && activeChat.otherUser && (
+                      <>
+                        <WarmTooltip content="Voice Call" side="bottom">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              void startCall({
+                                recipientId: activeChat.otherUser!.id,
+                                recipientName: activeChat.otherUser!.displayName || activeChat.otherUser!.username,
+                                recipientAvatar: activeChat.otherUser!.avatarUrl,
+                                chatId: activeChat.id,
+                                callType: 'audio',
+                              })
+                            }
+                            className="p-2 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
+                            aria-label="Voice Call"
+                          >
+                            <Phone className="w-4 h-4" />
+                          </button>
+                        </WarmTooltip>
+                        <WarmTooltip content="Video Call" side="bottom">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              void startCall({
+                                recipientId: activeChat.otherUser!.id,
+                                recipientName: activeChat.otherUser!.displayName || activeChat.otherUser!.username,
+                                recipientAvatar: activeChat.otherUser!.avatarUrl,
+                                chatId: activeChat.id,
+                                callType: 'video',
+                              })
+                            }
+                            className="p-2 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
+                            aria-label="Video Call"
+                          >
+                            <Video className="w-4 h-4" />
+                          </button>
+                        </WarmTooltip>
+                      </>
+                    )}
+                    {activeChat.type === 'direct' && activeChat.otherUser && (
+                      <WarmTooltip content="Verify Safety Number" side="bottom">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            void openSafetyNumberModal(
+                              activeChat.otherUser!.id,
+                              activeChat.otherUser!.displayName || activeChat.otherUser!.username,
+                            )
+                          }
+                          className="inline-flex items-center space-x-1 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 text-blue-700 dark:text-blue-300 text-xs font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/60 transition cursor-pointer"
+                          aria-label="End-to-End Encrypted (Click to verify safety number)"
+                        >
+                          <Lock className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                          <span className="hidden sm:inline">E2EE</span>
+                        </button>
+                      </WarmTooltip>
+                    )}
+                    {activeChat.type === 'direct' && activeChat.otherUser ? (
+                      <WarmTooltip content="View Profile" side="bottom">
+                        <button
+                          onClick={() => handleInspectOtherUser(activeChat.otherUser!.id)}
+                          className="p-2 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
+                          aria-label="View Profile"
+                        >
+                          <Info className="w-4 h-4" />
+                        </button>
+                      </WarmTooltip>
+                    ) : (
+                      <WarmTooltip content="Group Details & Members" side="bottom">
+                        <button
+                          onClick={() => setShowGroupDrawer(!showGroupDrawer)}
+                          className={`p-2 rounded-xl transition cursor-pointer ${
+                            showGroupDrawer
+                              ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                              : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40'
+                          }`}
+                          aria-label="Group Details & Members"
+                        >
+                          <Info className="w-4 h-4" />
+                        </button>
+                      </WarmTooltip>
+                    )}
+                  </div>
+                </WarmTooltipGroup>
               </div>
 
               {/* In-Chat Search Bar */}
@@ -1802,30 +1839,32 @@ export default function DashboardPage() {
 
                   {/* Desktop & Tablet attachment/emoji buttons (sm:flex) */}
                   <div className="hidden sm:flex items-center space-x-1 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isSending || isUploadingMedia}
-                      className="p-2.5 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition shrink-0 cursor-pointer"
-                      title="Attach file or photo"
-                      aria-label="Attach file or photo"
-                    >
-                      <Paperclip className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                      disabled={isSending || isUploadingMedia}
-                      className={`p-2.5 rounded-xl transition shrink-0 cursor-pointer ${
-                        showEmojiPicker
-                          ? 'bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400'
-                          : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40'
-                      }`}
-                      title="Insert emoji"
-                      aria-label="Insert emoji"
-                    >
-                      <Smile className="w-4 h-4" />
-                    </button>
+                    <WarmTooltip content="Attach File or Media" side="top">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isSending || isUploadingMedia}
+                        className="p-2.5 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition shrink-0 cursor-pointer"
+                        aria-label="Attach file or photo"
+                      >
+                        <Paperclip className="w-4 h-4" />
+                      </button>
+                    </WarmTooltip>
+                    <WarmTooltip content="Insert Emoji" side="top">
+                      <button
+                        type="button"
+                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                        disabled={isSending || isUploadingMedia}
+                        className={`p-2.5 rounded-xl transition shrink-0 cursor-pointer ${
+                          showEmojiPicker
+                            ? 'bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400'
+                            : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40'
+                        }`}
+                        aria-label="Insert emoji"
+                      >
+                        <Smile className="w-4 h-4" />
+                      </button>
+                    </WarmTooltip>
                   </div>
 
                   {/* Auto-growing message textarea */}
@@ -1865,19 +1904,20 @@ export default function DashboardPage() {
                     style={{ minHeight: '44px' }}
                   />
 
-                  <button
-                    type="submit"
-                    disabled={(!messageInput.trim() && !stagedFile) || isSending || isUploadingMedia}
-                    className="p-2.5 rounded-xl bg-[#0066FF] hover:bg-blue-600 disabled:opacity-40 disabled:hover:bg-[#0066FF] text-white shadow-md shadow-blue-500/25 transition touch-target-44 flex items-center justify-center shrink-0 self-end cursor-pointer"
-                    title="Send Message"
-                    aria-label="Send Message"
-                  >
-                    {isUploadingMedia ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Send className="w-4 h-4" />
-                    )}
-                  </button>
+                  <WarmTooltip content="Send Message" shortcut="↵" side="top">
+                    <button
+                      type="submit"
+                      disabled={(!messageInput.trim() && !stagedFile) || isSending || isUploadingMedia}
+                      className="p-2.5 rounded-xl bg-[#0066FF] hover:bg-blue-600 disabled:opacity-40 disabled:hover:bg-[#0066FF] text-white shadow-md shadow-blue-500/25 transition touch-target-44 flex items-center justify-center shrink-0 self-end cursor-pointer"
+                      aria-label="Send Message"
+                    >
+                      {isUploadingMedia ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Send className="w-4 h-4" />
+                      )}
+                    </button>
+                  </WarmTooltip>
                 </form>
               </div>
             </>
