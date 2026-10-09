@@ -689,135 +689,130 @@ export default function DashboardPage() {
           {/* Mobile Menu Button for screens < md */}
           <button
             type="button"
-            onClick={() => setMobileMenuOpen(true)}
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
             className="md:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition touch-target-44 flex items-center justify-center shrink-0"
-            aria-label="Open navigation menu"
+            aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={mobileMenuOpen}
           >
-            <Menu className="w-5 h-5" />
+            {mobileMenuOpen ? (
+              <CloseIcon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            ) : (
+              <Menu className="w-5 h-5" />
+            )}
           </button>
         </div>
 
-        {/* Mobile Slide-in Drawer Menu (< md) */}
+        {/* Mobile Dropdown Menu (< md) - Compact, adjusted, and eliminates useless empty space */}
         {mobileMenuOpen && (
           <>
             <div
-              className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs md:hidden animate-in fade-in duration-200"
+              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-2xs md:hidden animate-in fade-in duration-150"
               onClick={() => setMobileMenuOpen(false)}
               aria-hidden="true"
             />
-            <div className="fixed top-0 right-0 bottom-0 z-50 w-72 max-w-[85vw] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl p-4 flex flex-col justify-between overflow-y-auto md:hidden animate-in slide-in-from-right duration-200 pb-safe">
-              <div>
-                {/* Header row with title & close button */}
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Navigation</span>
-                  <button
-                    type="button"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 touch-target-44 flex items-center justify-center"
-                    aria-label="Close menu"
-                  >
-                    <CloseIcon className="w-5 h-5" />
-                  </button>
-                </div>
-
-                {/* User Profile Card */}
-                <div className="flex items-center space-x-3 p-3 mt-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
-                  <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800 border-2 border-indigo-500/40 flex items-center justify-center text-sm font-bold text-indigo-600 dark:text-indigo-300 shrink-0">
-                    {user?.avatarUrl ? (
-                      <img
-                        src={user.avatarUrl}
-                        alt={user.displayName}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span>{user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}</span>
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-bold text-slate-900 dark:text-white truncate">
-                      {user?.displayName}
-                    </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                      @{user?.username}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Daylight Toggle Row */}
-                <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Theme</span>
-                  <ThemeToggle showLabel={true} />
-                </div>
-
-                {/* Menu Links */}
-                <div className="space-y-1.5 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-                  <Link
-                    to="/contacts"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <Users className="w-4 h-4 text-indigo-500 shrink-0" />
-                      <span>Contacts</span>
-                    </div>
-                    {incomingRequests.length > 0 && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">
-                        {incomingRequests.length}
-                      </span>
-                    )}
-                  </Link>
-
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setShowChannelBrowserModal(true);
-                    }}
-                    className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition text-left"
-                  >
-                    <Compass className="w-4 h-4 text-indigo-500 shrink-0" />
-                    <span>Explore Channels</span>
-                  </button>
-
-                  <Link
-                    to="/profile"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-                  >
-                    <UserIcon className="w-4 h-4 text-indigo-500 shrink-0" />
-                    <span>Profile</span>
-                  </Link>
-
-                  <Link
-                    to="/settings"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-                  >
-                    <SettingsIcon className="w-4 h-4 text-slate-400 shrink-0" />
-                    <span>Settings</span>
-                  </Link>
-
-                  {user?.role === 'admin' && (
-                    <Link
-                      to="/admin"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 transition"
-                    >
-                      <Shield className="w-4 h-4 text-purple-500 shrink-0" />
-                      <span>Admin Portal</span>
-                    </Link>
+            <div className="fixed top-16 right-3 z-50 w-72 max-w-[calc(100vw-24px)] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-2.5 flex flex-col md:hidden animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-150 origin-top-right max-h-[calc(100dvh-5rem)] overflow-y-auto">
+              {/* User Profile Card */}
+              <div className="flex items-center space-x-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
+                <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800 border-2 border-indigo-500/40 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-300 shrink-0">
+                  {user?.avatarUrl ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.displayName}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span>{user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}</span>
                   )}
                 </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                    {user?.displayName}
+                  </p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                    @{user?.username}
+                  </p>
+                </div>
+                {user?.role === 'admin' && (
+                  <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 rounded-md shrink-0">
+                    Admin
+                  </span>
+                )}
+              </div>
+
+              {/* Daylight Theme Toggle Row */}
+              <div className="mt-2 px-2.5 py-2 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-100/80 dark:border-slate-800/80 flex items-center justify-between">
+                <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Theme</span>
+                <ThemeToggle showLabel={true} />
+              </div>
+
+              {/* Menu Links */}
+              <div className="mt-2 pt-1.5 border-t border-slate-100 dark:border-slate-800 space-y-0.5">
+                <Link
+                  to="/contacts"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-[0.99]"
+                >
+                  <div className="flex items-center space-x-2.5">
+                    <Users className="w-4 h-4 text-indigo-500 shrink-0" />
+                    <span>Contacts</span>
+                  </div>
+                  {incomingRequests.length > 0 && (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">
+                      {incomingRequests.length}
+                    </span>
+                  )}
+                </Link>
+
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setShowChannelBrowserModal(true);
+                  }}
+                  className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition text-left active:scale-[0.99]"
+                >
+                  <Compass className="w-4 h-4 text-indigo-500 shrink-0" />
+                  <span>Explore Channels</span>
+                </button>
+
+                <Link
+                  to="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-[0.99]"
+                >
+                  <UserIcon className="w-4 h-4 text-indigo-500 shrink-0" />
+                  <span>Profile</span>
+                </Link>
+
+                <Link
+                  to="/settings"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-[0.99]"
+                >
+                  <SettingsIcon className="w-4 h-4 text-slate-400 shrink-0" />
+                  <span>Settings</span>
+                </Link>
+
+                {user?.role === 'admin' && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 transition active:scale-[0.99]"
+                  >
+                    <Shield className="w-4 h-4 text-purple-500 shrink-0" />
+                    <span>Admin Portal</span>
+                  </Link>
+                )}
               </div>
 
               {/* Sign Out Button */}
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+              <div className="mt-1.5 pt-1.5 border-t border-slate-100 dark:border-slate-800">
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     void handleLogout();
                   }}
                   disabled={loggingOut}
-                  className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition"
+                  className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition active:scale-[0.99]"
                 >
                   <LogOut className="w-4 h-4 shrink-0" />
                   <span>{loggingOut ? 'Signing out...' : 'Sign Out'}</span>
