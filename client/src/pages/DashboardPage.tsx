@@ -41,8 +41,6 @@ import {
   MessageContent,
 } from '@/components/ui/message';
 import WarmTooltip, { WarmTooltipGroup } from '@/components/ui/WarmTooltip';
-import { WireframeGlobeAnimation } from '../components/WireframeGlobeAnimation';
-import { resolveApiUrl } from '../lib/api';
 import {
   MessageSquare,
   LogOut,
@@ -80,10 +78,6 @@ import {
   MessageSquarePlus,
   Menu,
   Pin,
-  Image as ImageIcon,
-  ChevronDown,
-  ChevronUp,
-  Link as LinkIcon,
 } from 'lucide-react';
 
 function formatMessageTime(dateString: string): string {
@@ -174,9 +168,6 @@ export default function DashboardPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showMobileActionsMenu, setShowMobileActionsMenu] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<'all' | 'direct' | 'group' | 'pinned'>('all');
-  const [photosExpanded, setPhotosExpanded] = useState(true);
-  const [filesExpanded, setFilesExpanded] = useState(false);
-  const [linksExpanded, setLinksExpanded] = useState(false);
 
   // Synchronize URL search param `?chat=id` with activeChatId for back navigation
   const urlChatId = searchParams.get('chat');
@@ -561,16 +552,6 @@ export default function DashboardPage() {
       return 0;
     });
 
-  const photoAttachments = currentMessages.flatMap((m) =>
-    (m.attachments || []).filter((a) => a.mimeType?.startsWith('image/')),
-  );
-  const fileAttachments = currentMessages.flatMap((m) =>
-    (m.attachments || []).filter((a) => !a.mimeType?.startsWith('image/')),
-  );
-  const linkMatches = currentMessages.flatMap((m) => {
-    const matches = m.content?.match(/https?:\/\/[^\s]+/g);
-    return matches || [];
-  });
 
   const handleVoiceCall = () => {
     if (!activeChat) return;
@@ -961,123 +942,34 @@ export default function DashboardPage() {
       {/* Real-time offline and reconnect status bar */}
       <OfflineBanner />
 
-        {/* Main Two-Panel Chat Workspace (Floated / Docked rounded cards on desktop) */}
+        {/* Main Two-Panel Minimal Chat Workspace */}
         <div className="flex-1 min-h-0 flex overflow-hidden p-3 gap-3 bg-[#121316]">
-          {/* SLIM LEFT RAIL (Matching Image 1) */}
-          <div className="hidden md:flex flex-col items-center justify-between py-4 px-2 w-16 h-full bg-[#18191E] rounded-3xl border border-[#242630] shrink-0 select-none shadow-sm">
-            {/* Top: Brand Mark & Category Filter Pills */}
-            <div className="flex flex-col items-center space-y-3 w-full">
-              <div
-                onClick={() => setCategoryFilter('all')}
-                className="w-10 h-10 rounded-2xl bg-[#242630] border border-[#30323E] flex items-center justify-center text-[#E2F952] font-black text-lg shadow-sm cursor-pointer hover:scale-105 transition"
-                title="Whhispr Home"
-              >
-                S
-              </div>
-
-              <div className="flex flex-col items-center space-y-2 pt-1 w-full">
-                <button
-                  type="button"
-                  onClick={() => setCategoryFilter('all')}
-                  className={`w-10 h-9 rounded-2xl text-[11px] font-bold transition flex items-center justify-center cursor-pointer ${
-                    categoryFilter === 'all'
-                      ? 'bg-[#2E303D] text-[#E2F952] border border-[#3B3D4D] shadow-xs'
-                      : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#242630]'
-                  }`}
-                  title="All Chats"
-                >
-                  All
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCategoryFilter('direct')}
-                  className={`w-10 h-9 rounded-2xl text-[11px] font-bold transition flex items-center justify-center cursor-pointer ${
-                    categoryFilter === 'direct'
-                      ? 'bg-[#2E303D] text-[#E2F952] border border-[#3B3D4D] shadow-xs'
-                      : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#242630]'
-                  }`}
-                  title="Direct Messages"
-                >
-                  DM
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCategoryFilter('group')}
-                  className={`w-10 h-9 rounded-2xl text-[11px] font-bold transition flex items-center justify-center cursor-pointer ${
-                    categoryFilter === 'group'
-                      ? 'bg-[#2E303D] text-[#E2F952] border border-[#3B3D4D] shadow-xs'
-                      : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#242630]'
-                  }`}
-                  title="Groups & Channels"
-                >
-                  GRP
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCategoryFilter('pinned')}
-                  className={`w-10 h-9 rounded-2xl text-[11px] font-bold transition flex items-center justify-center cursor-pointer ${
-                    categoryFilter === 'pinned'
-                      ? 'bg-[#2E303D] text-[#E2F952] border border-[#3B3D4D] shadow-xs'
-                      : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#242630]'
-                  }`}
-                  title="Pinned Chats"
-                >
-                  <Pin className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowChannelBrowserModal(true)}
-                  className="w-10 h-9 rounded-2xl text-[11px] font-bold text-zinc-400 hover:text-zinc-200 hover:bg-[#242630] transition flex items-center justify-center cursor-pointer"
-                  title="Explore Channels"
-                >
-                  <Compass className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Bottom: Bright lime + button matching Image 1 */}
-            <button
-              type="button"
-              onClick={() => setShowCreateGroupModal(true)}
-              className="w-10 h-10 rounded-full bg-[#E2F952] hover:bg-[#d6ee3c] text-black font-bold flex items-center justify-center transition shadow-md hover:scale-105 active:scale-95 cursor-pointer"
-              title="Create Group or Channel"
-            >
-              <Plus className="w-5 h-5 text-black stroke-[2.5]" />
-            </button>
-          </div>
-
           {/* LEFT PANEL: Chats Sidebar */}
           <aside
             role="region"
             aria-label="Conversations list"
-            className={`w-full md:w-80 lg:w-84 xl:w-88 h-full rounded-3xl border border-[#242630] bg-[#18191E] flex flex-col shrink-0 overflow-hidden shadow-sm ${
+            className={`w-full md:w-84 lg:w-92 xl:w-96 h-full rounded-3xl border border-[#242630] bg-[#18191E] flex flex-col shrink-0 overflow-hidden shadow-sm ${
               activeChat ? 'hidden md:flex' : 'flex'
             }`}
           >
-            {/* Sidebar Top Actions & Search */}
-            <div className="p-3.5 border-b border-slate-200/80 dark:border-[#242630] space-y-2.5">
+            {/* Sidebar Header & Search */}
+            <div className="p-3.5 border-b border-[#242630] space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
-                  {categoryFilter === 'all'
-                    ? 'All Chats'
-                    : categoryFilter === 'direct'
-                    ? 'Direct Messages'
-                    : categoryFilter === 'group'
-                    ? 'Groups & Channels'
-                    : 'Pinned Chats'}
-                </span>
+                <h2 className="text-base font-bold text-zinc-100">
+                  Chats
+                </h2>
                 <div className="flex items-center space-x-1.5">
                   <button
                     onClick={() => setShowCallHistoryModal(true)}
-                    className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#242630] dark:hover:bg-[#2F313E] text-slate-700 dark:text-zinc-200 text-xs font-semibold shadow-xs transition"
+                    className="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-[#242630] hover:bg-[#2F313E] text-zinc-200 text-xs font-semibold shadow-xs transition cursor-pointer"
                     title="View Call History"
                   >
-                    <PhoneCall className="w-3.5 h-3.5 text-[#0066FF] dark:text-[#E2F952]" />
+                    <PhoneCall className="w-3.5 h-3.5 text-[#E2F952]" />
                     <span>Calls</span>
                   </button>
                   <button
                     onClick={() => setShowCreateGroupModal(true)}
-                    className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-[#0066FF] hover:bg-blue-600 dark:bg-[#E2F952] dark:hover:bg-[#d6ee3c] text-white dark:text-black text-xs font-bold shadow-md shadow-blue-500/20 transition cursor-pointer"
+                    className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-[#E2F952] hover:bg-[#d6ee3c] text-black text-xs font-bold shadow-sm transition cursor-pointer"
                     title="Create Group or Channel"
                   >
                     <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -1086,25 +978,51 @@ export default function DashboardPage() {
                 </div>
               </div>
 
+              {/* Search Bar */}
               <div className="relative flex items-center">
-                <Search className="w-4 h-4 text-slate-400 dark:text-zinc-500 absolute left-3.5 top-2.5 pointer-events-none" />
+                <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-2.5 pointer-events-none" />
                 <input
                   type="text"
                   value={chatSearch}
                   onChange={(e) => setChatSearch(e.target.value)}
-                  placeholder="Search..."
+                  placeholder="Search conversations..."
                   aria-label="Search conversations"
-                  className="w-full pl-9 pr-10 sm:pr-14 py-2 bg-slate-100 dark:bg-[#121316] border border-slate-200 dark:border-[#262833] rounded-full text-base sm:text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#8B95F6] transition"
+                  className="w-full pl-9 pr-10 sm:pr-14 py-2 bg-[#121316] border border-[#262833] rounded-full text-base sm:text-xs text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#8B95F6] transition"
                 />
                 <button
                   type="button"
                   onClick={() => setShowGlobalSearch(true)}
                   title="Global Search (⌘K)"
                   aria-label="Global Search"
-                  className="hidden sm:inline-flex absolute right-2.5 px-1.5 py-0.5 rounded bg-slate-200 dark:bg-[#20202E] text-[10px] font-mono font-medium text-slate-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-[#8B95F6] transition"
+                  className="hidden sm:inline-flex absolute right-2.5 px-1.5 py-0.5 rounded bg-[#242630] text-[10px] font-mono font-medium text-zinc-400 hover:text-[#8B95F6] transition"
                 >
                   ⌘K
                 </button>
+              </div>
+
+              {/* Category Filter Tabs */}
+              <div className="flex items-center space-x-1.5 pt-0.5 overflow-x-auto no-scrollbar">
+                {(
+                  [
+                    { id: 'all', label: 'All' },
+                    { id: 'direct', label: 'Direct' },
+                    { id: 'group', label: 'Groups' },
+                    { id: 'pinned', label: 'Pinned' },
+                  ] as const
+                ).map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setCategoryFilter(tab.id)}
+                    className={`px-3 py-1 rounded-full text-xs font-medium transition shrink-0 cursor-pointer ${
+                      categoryFilter === tab.id
+                        ? 'bg-[#2E303D] text-[#E2F952] border border-[#3B3D4D] shadow-xs'
+                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#242630]'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -2144,219 +2062,24 @@ export default function DashboardPage() {
               </div>
             </>
           ) : (
-            /* Empty State occupying the complete space with the wireframe contour globe animation from Image 4 */
-            <div className="hidden md:flex flex-1 w-full h-full items-center justify-center relative overflow-hidden bg-[#060709]">
-              <WireframeGlobeAnimation />
+            /* Minimal Calm Empty State */
+            <div className="hidden md:flex flex-1 flex-col items-center justify-center p-8 text-center select-none bg-[#121316]">
+              <div className="w-16 h-16 rounded-3xl bg-[#18191E] border border-[#242630] flex items-center justify-center text-[#8B95F6] mb-4 shadow-sm">
+                <MessageSquare className="w-8 h-8" />
+              </div>
+              <h3 className="text-base font-semibold text-zinc-100 mb-1.5">
+                Whhispr Messenger
+              </h3>
+              <p className="text-xs text-zinc-500 max-w-xs mb-6 leading-relaxed">
+                Select a conversation from the sidebar to start chatting, or connect with contacts.
+              </p>
+              <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#18191E] border border-[#242630] text-[11px] text-zinc-400">
+                <Lock className="w-3.5 h-3.5 text-[#8B95F6]" />
+                <span>End-to-end encrypted messaging</span>
+              </div>
             </div>
           )}
         </section>
-
-        {/* RIGHT PANEL (Image 1 Style): Members & Files Media Cards on desktop */}
-        {activeChat && (
-          <aside className="hidden xl:flex flex-col w-72 2xl:w-80 h-full gap-3 shrink-0 overflow-y-auto">
-            {/* Card 1: Members */}
-            <div className="rounded-3xl bg-[#18191E] border border-[#242630] p-4.5 shadow-sm">
-              <div className="flex items-center justify-between mb-3.5">
-                <h3 className="text-sm font-bold text-zinc-100">
-                  Members
-                </h3>
-                {activeChat.type !== 'direct' && (
-                  <span className="text-xs text-slate-400 dark:text-zinc-400 font-medium">
-                    {activeGroupDetails?.membersCount || 1}
-                  </span>
-                )}
-              </div>
-
-              <div className="space-y-3">
-                {activeChat.type !== 'direct' && activeGroupDetails?.members ? (
-                  activeGroupDetails.members.map((m) => {
-                    const isMemberOnline = onlineUsers[m.id]?.status === 'online';
-                    const isMe = m.id === user?.id;
-                    return (
-                      <div key={m.id} className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3 min-w-0">
-                          <div className="relative shrink-0">
-                            <Avatar className="w-10 h-10 rounded-full">
-                              <AvatarImage src={m.avatarUrl || ''} />
-                              <AvatarFallback className="bg-slate-200 dark:bg-[#242630] text-slate-700 dark:text-zinc-200 text-xs font-bold">
-                                {m.displayName?.charAt(0) || m.username.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                            {isMemberOnline && (
-                              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#E2F952] border-2 border-white dark:border-[#18191E]" />
-                            )}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-xs font-semibold text-slate-800 dark:text-zinc-200 truncate">
-                              {isMe ? 'You' : m.displayName || m.username}
-                            </p>
-                            <p className="text-[10px] text-slate-400 dark:text-zinc-500 truncate">@{m.username}</p>
-                          </div>
-                        </div>
-                        {m.role === 'admin' ? (
-                          <span className="text-[11px] font-medium text-slate-500 dark:text-zinc-400">Admin</span>
-                        ) : isMe ? (
-                          <span className="text-[11px] font-medium text-slate-400 dark:text-zinc-500">You</span>
-                        ) : null}
-                      </div>
-                    );
-                  })
-                ) : (
-                  <>
-                    {activeChat.otherUser && (
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3 min-w-0">
-                          <div className="relative shrink-0">
-                            <Avatar className="w-10 h-10 rounded-full">
-                              <AvatarImage src={activeChat.otherUser.avatarUrl || ''} />
-                              <AvatarFallback className="bg-slate-200 dark:bg-[#242630] text-slate-700 dark:text-zinc-200 text-xs font-bold">
-                                {activeChat.otherUser.displayName?.charAt(0) || activeChat.otherUser.username.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                            {onlineUsers[activeChat.otherUser.id]?.status === 'online' && (
-                              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#E2F952] border-2 border-white dark:border-[#18191E]" />
-                            )}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-xs font-semibold text-slate-800 dark:text-zinc-200 truncate">
-                              {activeChat.otherUser.displayName || activeChat.otherUser.username}
-                            </p>
-                            <p className="text-[10px] text-slate-400 dark:text-zinc-500 truncate">@{activeChat.otherUser.username}</p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    {user && (
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3 min-w-0">
-                          <div className="relative shrink-0">
-                            <Avatar className="w-10 h-10 rounded-full">
-                              <AvatarImage src={user.avatarUrl || ''} />
-                              <AvatarFallback className="bg-slate-200 dark:bg-[#242630] text-slate-700 dark:text-zinc-200 text-xs font-bold">
-                                {user.displayName?.charAt(0) || user.username.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#E2F952] border-2 border-white dark:border-[#18191E]" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-xs font-semibold text-slate-800 dark:text-zinc-200 truncate">
-                              {user.displayName || user.username}
-                            </p>
-                            <p className="text-[10px] text-slate-400 dark:text-zinc-500 truncate">@{user.username}</p>
-                          </div>
-                        </div>
-                        <span className="text-[11px] font-medium text-slate-400 dark:text-zinc-500">You</span>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Card 2: Files Accordion (Matching Image 1) */}
-            <div className="rounded-3xl bg-[#18191E] border border-[#242630] p-4.5 shadow-sm space-y-3">
-              <h3 className="text-sm font-bold text-zinc-100">
-                Files
-              </h3>
-
-              {/* Photos & Media Section */}
-              <div className="border-b border-slate-100 dark:border-[#242630] pb-3">
-                <button
-                  type="button"
-                  onClick={() => setPhotosExpanded(!photosExpanded)}
-                  className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:text-black dark:hover:text-white transition py-1 cursor-pointer"
-                >
-                  <div className="flex items-center space-x-2.5">
-                    <ImageIcon className="w-4 h-4 text-slate-400 dark:text-zinc-400" />
-                    <span>{photoAttachments.length > 0 ? `${photoAttachments.length} photos` : 'Photos & Media'}</span>
-                  </div>
-                  {photosExpanded ? <ChevronUp className="w-3.5 h-3.5 text-zinc-500" /> : <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />}
-                </button>
-
-                {photosExpanded && (
-                  <div className="mt-2.5 grid grid-cols-2 gap-2">
-                    {photoAttachments.slice(0, 4).map((att, i) => (
-                      <img
-                        key={i}
-                        src={att.storageKey ? resolveApiUrl(att.storageKey) : ''}
-                        alt={att.fileName}
-                        className="w-full h-20 object-cover rounded-xl border border-slate-200 dark:border-[#2B2C38]"
-                      />
-                    ))}
-                    {photoAttachments.length === 0 && (
-                      <div className="col-span-2 py-4 px-3 text-center rounded-xl bg-slate-50 dark:bg-[#14151B] border border-slate-200/60 dark:border-[#242630] text-[11px] text-slate-400 dark:text-zinc-500">
-                        No photos shared yet
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Documents & Files Section */}
-              <div className="border-b border-slate-100 dark:border-[#242630] pb-3">
-                <button
-                  type="button"
-                  onClick={() => setFilesExpanded(!filesExpanded)}
-                  className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:text-black dark:hover:text-white transition py-1 cursor-pointer"
-                >
-                  <div className="flex items-center space-x-2.5">
-                    <FileText className="w-4 h-4 text-slate-400 dark:text-zinc-400" />
-                    <span>{fileAttachments.length > 0 ? `${fileAttachments.length} files` : 'Files & Docs'}</span>
-                  </div>
-                  {filesExpanded ? <ChevronUp className="w-3.5 h-3.5 text-zinc-500" /> : <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />}
-                </button>
-
-                {filesExpanded && (
-                  <div className="mt-2 space-y-1.5">
-                    {fileAttachments.slice(0, 3).map((f, i) => (
-                      <div key={i} className="flex items-center space-x-2 p-1.5 rounded-lg bg-slate-50 dark:bg-[#14151B] text-[11px] text-slate-700 dark:text-zinc-300 truncate">
-                        <FileText className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-400 shrink-0" />
-                        <span className="truncate">{f.fileName}</span>
-                      </div>
-                    ))}
-                    {fileAttachments.length === 0 && (
-                      <p className="text-[11px] text-slate-400 dark:text-zinc-500 italic py-1">No documents shared yet</p>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Shared Links Section */}
-              <div>
-                <button
-                  type="button"
-                  onClick={() => setLinksExpanded(!linksExpanded)}
-                  className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:text-black dark:hover:text-white transition py-1 cursor-pointer"
-                >
-                  <div className="flex items-center space-x-2.5">
-                    <LinkIcon className="w-4 h-4 text-slate-400 dark:text-zinc-400" />
-                    <span>{linkMatches.length > 0 ? `${linkMatches.length} shared links` : 'Shared links'}</span>
-                  </div>
-                  {linksExpanded ? <ChevronUp className="w-3.5 h-3.5 text-zinc-500" /> : <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />}
-                </button>
-
-                {linksExpanded && (
-                  <div className="mt-2 space-y-1.5">
-                    {linkMatches.slice(0, 3).map((l, i) => (
-                      <a
-                        key={i}
-                        href={l}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="block p-1.5 rounded-lg bg-slate-50 dark:bg-[#14151B] text-[11px] text-[#0066FF] dark:text-[#8B95F6] hover:underline truncate"
-                      >
-                        {l}
-                      </a>
-                    ))}
-                    {linkMatches.length === 0 && (
-                      <p className="text-[11px] text-slate-400 dark:text-zinc-500 italic py-1">No links shared yet</p>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          </aside>
-        )}
 
         {/* Group Details Right Drawer */}
         <GroupDetailsDrawer
