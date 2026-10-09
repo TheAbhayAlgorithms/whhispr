@@ -9,7 +9,8 @@ import { UserProfileModal } from '../components/UserProfileModal';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { CreateGroupModal } from '../components/CreateGroupModal';
 import { GroupDetailsDrawer } from '../components/GroupDetailsDrawer';
-import { GlobalSearchModal } from '../components/GlobalSearchModal';
+import { UserSearchModal } from '../components/UserSearchModal';
+import { ContactRequestsModal } from '../components/ContactRequestsModal';
 import { InChatSearchBar } from '../components/InChatSearchBar';
 import { CallModal } from '../components/CallModal';
 import { CallHistoryModal } from '../components/CallHistoryModal';
@@ -230,9 +231,10 @@ export default function DashboardPage() {
   const [deletingMessage, setDeletingMessage] = useState<ChatMessage | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Search State
+  // Search & Contacts Modal State
   const { inChatSearchOpen, toggleInChatSearch } = useSearchStore();
-  const [showGlobalSearch, setShowGlobalSearch] = useState(false);
+  const [showUserSearchModal, setShowUserSearchModal] = useState(false);
+  const [showContactRequestsModal, setShowContactRequestsModal] = useState(false);
 
   // Voice & Video Call State
   const [showCallHistoryModal, setShowCallHistoryModal] = useState(false);
@@ -287,7 +289,7 @@ export default function DashboardPage() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        setShowGlobalSearch((prev) => !prev);
+        setShowUserSearchModal((prev) => !prev);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -384,7 +386,8 @@ export default function DashboardPage() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setShowGlobalSearch(false);
+        setShowUserSearchModal(false);
+        setShowContactRequestsModal(false);
         setShowCreateGroupModal(false);
         setShowCallHistoryModal(false);
         setShowGroupDrawer(false);
@@ -650,19 +653,19 @@ export default function DashboardPage() {
 
           {/* Right: Tools, Theme Toggle, Profile, Sign Out */}
           <div className="flex items-center space-x-1.5 sm:space-x-2.5">
-            {/* Global Search Trigger */}
-            <WarmTooltip content="Search messages & contacts" shortcut="⌘K" side="bottom">
+            {/* User Search Trigger (Directly and only searches users by username) */}
+            <WarmTooltip content="Search users by @username" shortcut="⌘K" side="bottom">
               <button
                 type="button"
-                onClick={() => setShowGlobalSearch(true)}
+                onClick={() => setShowUserSearchModal(true)}
                 className="w-9 h-9 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED] flex items-center justify-center transition cursor-pointer active:scale-95"
-                aria-label="Search"
+                aria-label="Search users by username"
               >
                 <Search className="w-4 h-4" />
               </button>
             </WarmTooltip>
 
-            {/* Contacts Button directly to the right of search button */}
+            {/* Direct Contacts Button */}
             <WarmTooltip content="Contacts" shortcut="⌘2" side="bottom">
               <Link
                 to="/contacts"
@@ -670,13 +673,25 @@ export default function DashboardPage() {
                 aria-label="Contacts"
               >
                 <Users className="w-4 h-4 text-[#20B2AA]" />
-                {incomingRequests.length > 0 && (
-                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[#20B2AA] text-black rounded-full text-[10px] font-bold flex items-center justify-center shadow-xs">
-                    {incomingRequests.length > 9 ? '9+' : incomingRequests.length}
-                  </span>
-                )}
               </Link>
             </WarmTooltip>
+
+            {/* Requests Option: Beside contacts, shown ONLY when there is a request, otherwise not displayed */}
+            {incomingRequests.length > 0 && (
+              <WarmTooltip content={`New Requests (${incomingRequests.length})`} side="bottom">
+                <button
+                  type="button"
+                  onClick={() => setShowContactRequestsModal(true)}
+                  className="relative h-9 px-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-500 flex items-center space-x-1.5 transition cursor-pointer active:scale-95 animate-pulse"
+                  aria-label="New Contact Requests"
+                >
+                  <Clock className="w-4 h-4 text-amber-500" />
+                  <span className="text-xs font-bold text-amber-500">
+                    {incomingRequests.length}
+                  </span>
+                </button>
+              </WarmTooltip>
+            )}
 
             {/* Notifications Bell */}
             <WarmTooltip content="Notifications" shortcut="⌘4" side="bottom">
@@ -844,12 +859,26 @@ export default function DashboardPage() {
                       <Users className="w-4 h-4 text-[#20B2AA] shrink-0" />
                       <span>Contacts</span>
                     </div>
-                    {incomingRequests.length > 0 && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#20B2AA] text-black">
+                  </Link>
+
+                  {incomingRequests.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setShowContactRequestsModal(true);
+                      }}
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 transition active:scale-[0.99]"
+                    >
+                      <div className="flex items-center space-x-2.5">
+                        <Clock className="w-4 h-4 text-amber-400 shrink-0" />
+                        <span>Requests</span>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-black">
                         {incomingRequests.length}
                       </span>
-                    )}
-                  </Link>
+                    </button>
+                  )}
 
 
                   <Link
@@ -954,9 +983,9 @@ export default function DashboardPage() {
                 />
                 <button
                   type="button"
-                  onClick={() => setShowGlobalSearch(true)}
-                  title="Global Search (⌘K)"
-                  aria-label="Global Search"
+                  onClick={() => setShowUserSearchModal(true)}
+                  title="Search Users by @username (⌘K)"
+                  aria-label="Search Users"
                   className="hidden sm:inline-flex absolute right-2.5 px-1.5 py-0.5 rounded bg-[#202222] border border-[#2D3030] text-[10px] font-mono font-medium text-[#9EA3A3] hover:text-[#20B2AA] transition"
                 >
                   ⌘K
@@ -2264,10 +2293,16 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
-      {/* Global Spotlight Search Modal */}
-      <GlobalSearchModal
-        isOpen={showGlobalSearch}
-        onClose={() => setShowGlobalSearch(false)}
+      {/* User Search by Username Modal */}
+      <UserSearchModal
+        isOpen={showUserSearchModal}
+        onClose={() => setShowUserSearchModal(false)}
+      />
+
+      {/* Incoming Contact Requests Modal */}
+      <ContactRequestsModal
+        isOpen={showContactRequestsModal}
+        onClose={() => setShowContactRequestsModal(false)}
       />
 
       {/* WebRTC Active Call Overlay */}
