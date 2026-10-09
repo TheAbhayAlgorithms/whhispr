@@ -32,8 +32,8 @@ body {
 }
 
 .dark body {
-  background-color: #000000;
-  color: #ffffff;
+  background-color: #121316;
+  color: #f1f2f6;
 }
 
 /* Ensure mobile input elements never trigger iOS automatic zoom by maintaining at least 16px font size */

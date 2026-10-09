@@ -41,6 +41,8 @@ import {
   MessageContent,
 } from '@/components/ui/message';
 import WarmTooltip, { WarmTooltipGroup } from '@/components/ui/WarmTooltip';
+import { WireframeGlobeAnimation } from '../components/WireframeGlobeAnimation';
+import { resolveApiUrl } from '../lib/api';
 import {
   MessageSquare,
   LogOut,
@@ -54,7 +56,6 @@ import {
   CheckCheck,
   Sparkles,
   Smile,
-  Info,
   Hash,
   Compass,
   Plus,
@@ -80,6 +81,11 @@ import {
   AlertTriangle,
   MessageSquarePlus,
   Menu,
+  Pin,
+  Image as ImageIcon,
+  ChevronDown,
+  ChevronUp,
+  Link as LinkIcon,
 } from 'lucide-react';
 
 function formatMessageTime(dateString: string): string {
@@ -153,6 +159,8 @@ export default function DashboardPage() {
     editMessage,
     deleteMessage,
     setupSocketListeners,
+    togglePinChat,
+    isChatPinned,
   } = useChatStore();
 
   const { incomingRequests, fetchRequests } = useContactStore();
@@ -167,6 +175,10 @@ export default function DashboardPage() {
   const [showGroupDrawer, setShowGroupDrawer] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showMobileActionsMenu, setShowMobileActionsMenu] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState<'all' | 'direct' | 'group' | 'pinned'>('all');
+  const [photosExpanded, setPhotosExpanded] = useState(true);
+  const [filesExpanded, setFilesExpanded] = useState(false);
+  const [linksExpanded, setLinksExpanded] = useState(false);
 
   // Synchronize URL search param `?chat=id` with activeChatId for back navigation
   const urlChatId = searchParams.get('chat');
@@ -531,19 +543,90 @@ export default function DashboardPage() {
     }
   };
 
-  const filteredChats = chatsList.filter((chat) => {
-    if (!chatSearch.trim()) return true;
-    const query = chatSearch.toLowerCase();
-    const nameMatch = chat.name?.toLowerCase().includes(query);
-    const userMatch = chat.otherUser?.username.toLowerCase().includes(query);
-    return nameMatch || userMatch;
+  const filteredChats = chatsList
+    .filter((chat) => {
+      if (categoryFilter === 'direct' && chat.type !== 'direct') return false;
+      if (categoryFilter === 'group' && chat.type !== 'group' && chat.type !== 'channel') return false;
+      if (categoryFilter === 'pinned' && !isChatPinned(chat.id)) return false;
+
+      if (!chatSearch.trim()) return true;
+      const query = chatSearch.toLowerCase();
+      const nameMatch = chat.name?.toLowerCase().includes(query);
+      const userMatch = chat.otherUser?.username.toLowerCase().includes(query);
+      return Boolean(nameMatch || userMatch);
+    })
+    .sort((a, b) => {
+      const aPinned = isChatPinned(a.id);
+      const bPinned = isChatPinned(b.id);
+      if (aPinned && !bPinned) return -1;
+      if (!aPinned && bPinned) return 1;
+      return 0;
+    });
+
+  const photoAttachments = currentMessages.flatMap((m) =>
+    (m.attachments || []).filter((a) => a.mimeType?.startsWith('image/')),
+  );
+  const fileAttachments = currentMessages.flatMap((m) =>
+    (m.attachments || []).filter((a) => !a.mimeType?.startsWith('image/')),
+  );
+  const linkMatches = currentMessages.flatMap((m) => {
+    const matches = m.content?.match(/https?:\/\/[^\s]+/g);
+    return matches || [];
   });
 
+  const handleVoiceCall = () => {
+    if (!activeChat) return;
+    if (activeChat.type === 'direct' && activeChat.otherUser) {
+      void startCall({
+        recipientId: activeChat.otherUser.id,
+        recipientName: activeChat.otherUser.displayName || activeChat.otherUser.username,
+        recipientAvatar: activeChat.otherUser.avatarUrl,
+        chatId: activeChat.id,
+        callType: 'audio',
+      });
+    } else if (activeGroupDetails?.members && activeGroupDetails.members.length > 0) {
+      const target = activeGroupDetails.members.find((m) => m.id !== user?.id) || activeGroupDetails.members[0];
+      if (target) {
+        void startCall({
+          recipientId: target.id,
+          recipientName: activeChat.name || target.displayName || target.username,
+          recipientAvatar: activeChat.avatarUrl || target.avatarUrl,
+          chatId: activeChat.id,
+          callType: 'audio',
+        });
+      }
+    }
+  };
+
+  const handleVideoCall = () => {
+    if (!activeChat) return;
+    if (activeChat.type === 'direct' && activeChat.otherUser) {
+      void startCall({
+        recipientId: activeChat.otherUser.id,
+        recipientName: activeChat.otherUser.displayName || activeChat.otherUser.username,
+        recipientAvatar: activeChat.otherUser.avatarUrl,
+        chatId: activeChat.id,
+        callType: 'video',
+      });
+    } else if (activeGroupDetails?.members && activeGroupDetails.members.length > 0) {
+      const target = activeGroupDetails.members.find((m) => m.id !== user?.id) || activeGroupDetails.members[0];
+      if (target) {
+        void startCall({
+          recipientId: target.id,
+          recipientName: activeChat.name || target.displayName || target.username,
+          recipientAvatar: activeChat.avatarUrl || target.avatarUrl,
+          chatId: activeChat.id,
+          callType: 'video',
+        });
+      }
+    }
+  };
+
   return (
-    <div className="h-screen h-dvh bg-slate-100 dark:bg-black text-slate-900 dark:text-slate-100 flex flex-col overflow-hidden transition-colors duration-200">
+    <div className="h-screen h-dvh bg-slate-100 dark:bg-[#121316] text-slate-900 dark:text-slate-100 flex flex-col overflow-hidden transition-colors duration-200">
       {/* Top Navbar Only */}
       <WarmTooltipGroup delay={200} warmWindow={300} travel={220} lean={0}>
-        <header className="h-16 w-full border-b border-slate-200/80 dark:border-[#1E1E2A] bg-white/95 dark:bg-[#0D0D14]/95 backdrop-blur-md px-3 sm:px-5 lg:px-6 flex items-center justify-between shrink-0 z-30 select-none shadow-xs">
+        <header className="h-16 w-full border-b border-slate-200/80 dark:border-[#242630] bg-white/95 dark:bg-[#18191E]/95 backdrop-blur-md px-3 sm:px-5 lg:px-6 flex items-center justify-between shrink-0 z-30 select-none shadow-xs">
           {/* Left: Brand & Status */}
           <div className="flex items-center space-x-3 shrink-0 min-w-0">
             <button
@@ -908,200 +991,315 @@ export default function DashboardPage() {
       <OfflineBanner />
 
         {/* Main Two-Panel Chat Workspace (Floated / Docked rounded cards on desktop) */}
-        <div className="flex-1 flex overflow-hidden p-0 md:p-3 md:gap-3 bg-slate-100 dark:bg-black">
+        <div className="flex-1 flex overflow-hidden p-0 md:p-3 md:gap-3 bg-slate-100 dark:bg-[#121316]">
+          {/* SLIM LEFT RAIL (Matching Image 1) */}
+          <div className="hidden md:flex flex-col items-center justify-between py-4 px-2 w-16 bg-white dark:bg-[#18191E] md:rounded-3xl border border-slate-200/80 dark:border-[#242630] shrink-0 select-none shadow-sm md:shadow-md">
+            {/* Top: Brand Mark & Category Filter Pills */}
+            <div className="flex flex-col items-center space-y-3 w-full">
+              <div
+                onClick={() => setCategoryFilter('all')}
+                className="w-10 h-10 rounded-2xl bg-[#0066FF] dark:bg-[#242630] border border-blue-400/20 dark:border-[#30323E] flex items-center justify-center text-white dark:text-[#E2F952] font-black text-lg shadow-sm cursor-pointer hover:scale-105 transition"
+                title="Whhispr Home"
+              >
+                S
+              </div>
+
+              <div className="flex flex-col items-center space-y-2 pt-1 w-full">
+                <button
+                  type="button"
+                  onClick={() => setCategoryFilter('all')}
+                  className={`w-10 h-9 rounded-2xl text-[11px] font-bold transition flex items-center justify-center cursor-pointer ${
+                    categoryFilter === 'all'
+                      ? 'bg-blue-50 dark:bg-[#2E303D] text-[#0066FF] dark:text-[#E2F952] border border-blue-200 dark:border-[#3B3D4D] shadow-xs'
+                      : 'text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-[#242630]'
+                  }`}
+                  title="All Chats"
+                >
+                  All
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCategoryFilter('direct')}
+                  className={`w-10 h-9 rounded-2xl text-[11px] font-bold transition flex items-center justify-center cursor-pointer ${
+                    categoryFilter === 'direct'
+                      ? 'bg-blue-50 dark:bg-[#2E303D] text-[#0066FF] dark:text-[#E2F952] border border-blue-200 dark:border-[#3B3D4D] shadow-xs'
+                      : 'text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-[#242630]'
+                  }`}
+                  title="Direct Messages"
+                >
+                  DM
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCategoryFilter('group')}
+                  className={`w-10 h-9 rounded-2xl text-[11px] font-bold transition flex items-center justify-center cursor-pointer ${
+                    categoryFilter === 'group'
+                      ? 'bg-blue-50 dark:bg-[#2E303D] text-[#0066FF] dark:text-[#E2F952] border border-blue-200 dark:border-[#3B3D4D] shadow-xs'
+                      : 'text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-[#242630]'
+                  }`}
+                  title="Groups & Channels"
+                >
+                  GRP
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCategoryFilter('pinned')}
+                  className={`w-10 h-9 rounded-2xl text-[11px] font-bold transition flex items-center justify-center cursor-pointer ${
+                    categoryFilter === 'pinned'
+                      ? 'bg-blue-50 dark:bg-[#2E303D] text-[#0066FF] dark:text-[#E2F952] border border-blue-200 dark:border-[#3B3D4D] shadow-xs'
+                      : 'text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-[#242630]'
+                  }`}
+                  title="Pinned Chats"
+                >
+                  <Pin className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowChannelBrowserModal(true)}
+                  className="w-10 h-9 rounded-2xl text-[11px] font-bold text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-[#242630] transition flex items-center justify-center cursor-pointer"
+                  title="Explore Channels"
+                >
+                  <Compass className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Bottom: Bright lime + button matching Image 1 */}
+            <button
+              type="button"
+              onClick={() => setShowCreateGroupModal(true)}
+              className="w-10 h-10 rounded-full bg-[#E2F952] hover:bg-[#d6ee3c] text-black font-bold flex items-center justify-center transition shadow-md hover:scale-105 active:scale-95 cursor-pointer"
+              title="Create Group or Channel"
+            >
+              <Plus className="w-5 h-5 text-black stroke-[2.5]" />
+            </button>
+          </div>
+
           {/* LEFT PANEL: Chats Sidebar */}
           <aside
             role="region"
             aria-label="Conversations list"
-            className={`w-full md:w-80 lg:w-96 md:rounded-2xl lg:rounded-3xl border border-slate-200/80 dark:border-[#1E1E2A] bg-white dark:bg-[#0D0D14] flex flex-col shrink-0 overflow-hidden shadow-sm md:shadow-xl ${
+            className={`w-full md:w-80 lg:w-88 xl:w-92 md:rounded-3xl border border-slate-200/80 dark:border-[#242630] bg-white dark:bg-[#18191E] flex flex-col shrink-0 overflow-hidden shadow-sm md:shadow-xl ${
               activeChat ? 'hidden md:flex' : 'flex'
             }`}
           >
             {/* Sidebar Top Actions & Search */}
-            <div className="p-3.5 border-b border-slate-200/80 dark:border-[#1E1E2A] space-y-2.5">
+            <div className="p-3.5 border-b border-slate-200/80 dark:border-[#242630] space-y-2.5">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
-                  Groups & Chats
+                  {categoryFilter === 'all'
+                    ? 'All Chats'
+                    : categoryFilter === 'direct'
+                    ? 'Direct Messages'
+                    : categoryFilter === 'group'
+                    ? 'Groups & Channels'
+                    : 'Pinned Chats'}
                 </span>
                 <div className="flex items-center space-x-1.5">
                   <button
                     onClick={() => setShowCallHistoryModal(true)}
-                    className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-[#161622] dark:hover:bg-[#1E1E2C] text-blue-600 dark:text-blue-400 text-xs font-semibold shadow-xs transition"
+                    className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#242630] dark:hover:bg-[#2F313E] text-slate-700 dark:text-zinc-200 text-xs font-semibold shadow-xs transition"
                     title="View Call History"
                   >
-                    <PhoneCall className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                    <PhoneCall className="w-3.5 h-3.5 text-[#0066FF] dark:text-[#E2F952]" />
                     <span>Calls</span>
                   </button>
                   <button
                     onClick={() => setShowCreateGroupModal(true)}
-                    className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-[#0066FF] hover:bg-blue-600 text-white text-xs font-semibold shadow-md shadow-blue-500/20 transition cursor-pointer"
+                    className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-[#0066FF] hover:bg-blue-600 dark:bg-[#E2F952] dark:hover:bg-[#d6ee3c] text-white dark:text-black text-xs font-bold shadow-md shadow-blue-500/20 transition cursor-pointer"
                     title="Create Group or Channel"
                   >
-                    <Plus className="w-3.5 h-3.5" />
+                    <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                     <span>New</span>
                   </button>
                 </div>
               </div>
 
               <div className="relative flex items-center">
-                <Search className="w-4 h-4 text-slate-400 dark:text-zinc-500 absolute left-3 top-2.5 pointer-events-none" />
+                <Search className="w-4 h-4 text-slate-400 dark:text-zinc-500 absolute left-3.5 top-2.5 pointer-events-none" />
                 <input
                   type="text"
                   value={chatSearch}
                   onChange={(e) => setChatSearch(e.target.value)}
                   placeholder="Search..."
                   aria-label="Search conversations"
-                  className="w-full pl-9 pr-10 sm:pr-14 py-2 bg-slate-100 dark:bg-[#161622] border border-slate-200 dark:border-[#222232] rounded-xl text-base sm:text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#0066FF] transition"
+                  className="w-full pl-9 pr-10 sm:pr-14 py-2 bg-slate-100 dark:bg-[#121316] border border-slate-200 dark:border-[#262833] rounded-full text-base sm:text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#8B95F6] transition"
                 />
                 <button
                   type="button"
                   onClick={() => setShowGlobalSearch(true)}
                   title="Global Search (⌘K)"
                   aria-label="Global Search"
-                  className="hidden sm:inline-flex absolute right-2 px-1.5 py-0.5 rounded bg-slate-200 dark:bg-[#20202E] text-[10px] font-mono font-medium text-slate-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 transition"
+                  className="hidden sm:inline-flex absolute right-2.5 px-1.5 py-0.5 rounded bg-slate-200 dark:bg-[#20202E] text-[10px] font-mono font-medium text-slate-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-[#8B95F6] transition"
                 >
                   ⌘K
                 </button>
               </div>
             </div>
 
-          {/* Chats Scroll List */}
-          <div
-            className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-[#161622]"
-            role="list"
-            aria-label="Chat conversations"
-          >
-            {isLoadingChats && chatsList.length === 0 ? (
-              <ChatListSkeleton count={7} />
-            ) : filteredChats.length === 0 ? (
-              <div className="py-8 px-4">
-                {chatSearch ? (
-                  <EmptyState
-                    icon={<Search className="w-7 h-7" />}
-                    title="No chats match search"
-                    description={`No conversations found matching "${chatSearch}". Try searching for another keyword.`}
-                    actionText="Clear Filter"
-                    onAction={() => setChatSearch('')}
-                  />
-                ) : (
-                  <EmptyState
-                    icon={<MessageSquarePlus className="w-7 h-7" />}
-                    title="No active chats yet"
-                    description="Connect with contacts or explore public channels to begin chatting securely on Whhispr!"
-                    actionText="Find Contacts"
-                    actionIcon={<Users className="w-4 h-4" />}
-                    onAction={() => navigate('/contacts')}
-                  />
-                )}
-              </div>
-            ) : (
-              filteredChats.map((chat: Chat) => {
-                const isSelected = chat.id === activeChatId;
-                const isUserOnline =
-                  chat.otherUser && onlineUsers[chat.otherUser.id]?.status === 'online';
+            {/* Chats Scroll List with distinct spaces between each chat card matching Image 1 */}
+            <div
+              className="flex-1 overflow-y-auto p-3 space-y-2.5"
+              role="list"
+              aria-label="Chat conversations"
+            >
+              {isLoadingChats && chatsList.length === 0 ? (
+                <ChatListSkeleton count={7} />
+              ) : filteredChats.length === 0 ? (
+                <div className="py-8 px-4">
+                  {chatSearch ? (
+                    <EmptyState
+                      icon={<Search className="w-7 h-7" />}
+                      title="No chats match search"
+                      description={`No conversations found matching "${chatSearch}". Try searching for another keyword.`}
+                      actionText="Clear Filter"
+                      onAction={() => setChatSearch('')}
+                    />
+                  ) : (
+                    <EmptyState
+                      icon={<MessageSquarePlus className="w-7 h-7" />}
+                      title="No active chats yet"
+                      description="Connect with contacts or explore public channels to begin chatting securely on Whhispr!"
+                      actionText="Find Contacts"
+                      actionIcon={<Users className="w-4 h-4" />}
+                      onAction={() => navigate('/contacts')}
+                    />
+                  )}
+                </div>
+              ) : (
+                filteredChats.map((chat: Chat) => {
+                  const isSelected = chat.id === activeChatId;
+                  const isUserOnline =
+                    chat.otherUser && onlineUsers[chat.otherUser.id]?.status === 'online';
+                  const isPinned = isChatPinned(chat.id);
 
-                return (
-                  <button
-                    key={chat.id}
-                    onClick={() => void handleSelectChat(chat.id)}
-                    className={`w-full text-left p-3 sm:p-3.5 flex items-start space-x-3 transition-colors cursor-pointer ${
-                      isSelected
-                        ? 'bg-blue-50/80 dark:bg-blue-600/15 border-l-4 border-[#0066FF]'
-                        : 'hover:bg-slate-50 dark:hover:bg-[#14141E]'
-                    }`}
-                  >
-                    {/* Avatar Icon */}
-                    <div className="relative shrink-0">
-                      {chat.type === 'channel' ? (
-                        <div className="w-12 h-12 sm:w-11 sm:h-11 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-lg shadow-xs">
-                          <Hash className="w-5 h-5" />
-                        </div>
-                      ) : chat.type === 'group' ? (
-                        <div className="w-12 h-12 sm:w-11 sm:h-11 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-base shadow-xs">
-                          <Users className="w-5 h-5" />
-                        </div>
-                      ) : chat.avatarUrl ? (
-                        <img
-                          src={chat.avatarUrl}
-                          alt={chat.name || 'Chat'}
-                          className="w-12 h-12 sm:w-11 sm:h-11 rounded-2xl object-cover border border-slate-200 dark:border-[#222232]"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 sm:w-11 sm:h-11 rounded-2xl bg-[#0066FF] flex items-center justify-center text-white font-bold text-base shadow-sm shadow-blue-500/20">
-                          {chat.name ? chat.name.charAt(0).toUpperCase() : 'C'}
-                        </div>
-                      )}
-                      {chat.type === 'direct' && isUserOnline && (
-                        <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white dark:border-[#0D0D14]" />
-                      )}
-                    </div>
-
-                    {/* Chat Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-1.5 truncate">
-                          {chat.type === 'channel' && <Hash className="w-3.5 h-3.5 text-blue-500 shrink-0" />}
-                          <h3 className="font-semibold text-xs text-slate-900 dark:text-white truncate">
-                            {chat.name || 'Conversation'}
-                          </h3>
-                        </div>
-                        {chat.lastMessage && (
-                          <span className="text-[10px] text-slate-400 dark:text-zinc-500 shrink-0 ml-1">
-                            {formatMessageTime(chat.lastMessage.createdAt)}
-                          </span>
+                  return (
+                    <div
+                      key={chat.id}
+                      onClick={() => void handleSelectChat(chat.id)}
+                      className={`w-full text-left p-3 rounded-2xl flex items-center space-x-3.5 transition-all cursor-pointer relative group ${
+                        isSelected
+                          ? 'bg-blue-50/80 dark:bg-[#252734] border border-[#0066FF]/40 dark:border-[#8B95F6]/40 shadow-md ring-1 ring-[#0066FF]/20 dark:ring-[#8B95F6]/25'
+                          : 'bg-slate-50 dark:bg-[#1C1D23] hover:bg-slate-100 dark:hover:bg-[#25262E] border border-slate-200/60 dark:border-[#282935]/70 hover:border-slate-300 dark:hover:border-[#383A4A]'
+                      }`}
+                    >
+                      {/* Avatar Icon with Real-Time Online Dot marked directly on profile */}
+                      <div className="relative shrink-0">
+                        {chat.type === 'channel' ? (
+                          <div className="w-12 h-12 rounded-full bg-blue-500/10 dark:bg-[#242632] border border-blue-500/20 dark:border-[#303240] text-blue-600 dark:text-[#8B95F6] flex items-center justify-center font-bold text-base shadow-xs">
+                            <Hash className="w-5 h-5" />
+                          </div>
+                        ) : chat.type === 'group' ? (
+                          <div className="w-12 h-12 rounded-full bg-blue-500/10 dark:bg-[#242632] border border-blue-500/20 dark:border-[#303240] text-blue-600 dark:text-[#E2F952] flex items-center justify-center font-bold text-base shadow-xs">
+                            <Users className="w-5 h-5" />
+                          </div>
+                        ) : chat.avatarUrl ? (
+                          <img
+                            src={chat.avatarUrl}
+                            alt={chat.name || 'Chat'}
+                            className="w-12 h-12 rounded-full object-cover border border-slate-200 dark:border-[#2E303E]"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-[#0066FF] dark:bg-[#2E3140] border border-blue-400/20 dark:border-[#3B3E52] flex items-center justify-center text-white dark:text-zinc-100 font-bold text-base shadow-xs">
+                            {chat.name ? chat.name.charAt(0).toUpperCase() : 'C'}
+                          </div>
+                        )}
+                        {/* Real-time Online Dot marked on the profile as in Image 1 */}
+                        {chat.type === 'direct' && isUserOnline && (
+                          <span
+                            title="Online"
+                            className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#E2F952] border-2 border-white dark:border-[#1C1D23] shadow-xs"
+                          />
                         )}
                       </div>
 
-                      <div className="flex items-center justify-between mt-1">
-                        <p className="text-xs text-slate-500 dark:text-zinc-400 truncate pr-2">
-                          {(typingUsers[chat.id] || []).filter(
-                            (name) => name !== user?.username && name !== user?.displayName,
-                          ).length > 0 ? (
-                            <span className="text-blue-600 dark:text-blue-400 font-semibold animate-pulse">
-                              typing...
-                            </span>
-                          ) : chat.lastMessage?.content ? (
-                            chat.lastMessage.content.startsWith('{') &&
-                            chat.lastMessage.content.includes('"e2ee":true') ? (
-                              '🔒 Encrypted message'
+                      {/* Chat Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-0.5">
+                          <div className="flex items-center space-x-1.5 truncate">
+                            {chat.type === 'channel' && <Hash className="w-3.5 h-3.5 text-blue-500 shrink-0" />}
+                            <h3 className="font-semibold text-xs sm:text-sm text-slate-900 dark:text-zinc-100 truncate">
+                              {chat.name || 'Conversation'}
+                            </h3>
+                          </div>
+                          <div className="flex items-center space-x-1.5 shrink-0 ml-1">
+                            {isPinned && (
+                              <span title="Pinned">
+                                <Pin className="w-3.5 h-3.5 text-[#0066FF] dark:text-[#E2F952] fill-current shrink-0" />
+                              </span>
+                            )}
+                            {chat.lastMessage && (
+                              <span className="text-[10px] text-slate-400 dark:text-zinc-500">
+                                {formatMessageTime(chat.lastMessage.createdAt)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Subtitle preview without offline text clutter */}
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs text-slate-500 dark:text-zinc-400 truncate pr-2">
+                            {(typingUsers[chat.id] || []).filter(
+                              (name) => name !== user?.username && name !== user?.displayName,
+                            ).length > 0 ? (
+                              <span className="text-blue-600 dark:text-[#8B95F6] font-semibold animate-pulse">
+                                typing...
+                              </span>
+                            ) : chat.lastMessage?.content ? (
+                              chat.lastMessage.content.startsWith('{') &&
+                              chat.lastMessage.content.includes('"e2ee":true') ? (
+                                '🔒 Encrypted message'
+                              ) : (
+                                chat.lastMessage.content
+                              )
                             ) : (
-                              chat.lastMessage.content
-                            )
-                          ) : (
-                            <span className="italic text-slate-400 dark:text-zinc-500">No messages yet</span>
-                          )}
-                        </p>
-                        <div className="flex items-center space-x-1 shrink-0">
-                          {chat.lastMessage && chat.lastMessage.senderId === user?.id && (
-                            <CheckCheck className="w-3.5 h-3.5 text-[#0066FF]" />
-                          )}
-                          {chat.unreadCount > 0 && (
-                            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-[#0066FF] text-white shrink-0 shadow-xs">
-                              {chat.unreadCount}
-                            </span>
-                          )}
+                              <span className="italic text-slate-400 dark:text-zinc-500">No messages yet</span>
+                            )}
+                          </p>
+
+                          <div className="flex items-center space-x-1 shrink-0">
+                            {chat.lastMessage && chat.lastMessage.senderId === user?.id && (
+                              <CheckCheck className="w-3.5 h-3.5 text-[#0066FF] dark:text-[#8B95F6]" />
+                            )}
+                            {chat.unreadCount > 0 && (
+                              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-[#0066FF] dark:bg-[#E2F952] text-white dark:text-black shrink-0 shadow-xs">
+                                {chat.unreadCount}
+                              </span>
+                            )}
+                            {/* Pin / Unpin quick toggle on card */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                togglePinChat(chat.id);
+                              }}
+                              className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-[#2C2E3C] text-slate-400 dark:text-zinc-400 hover:text-[#0066FF] dark:hover:text-[#E2F952] transition cursor-pointer"
+                              title={isPinned ? 'Unpin chat' : 'Pin chat'}
+                            >
+                              <Pin className={`w-3.5 h-3.5 ${isPinned ? 'fill-current text-[#0066FF] dark:text-[#E2F952]' : ''}`} />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </button>
-                );
-              })
-            )}
-          </div>
-        </aside>
+                  );
+                })
+              )}
+            </div>
+          </aside>
 
         {/* RIGHT PANEL: Active Conversation View (Floated dark card on desktop) */}
         <section
           role="region"
           aria-label="Active conversation"
-          className={`flex-1 flex flex-col md:rounded-2xl lg:rounded-3xl border border-slate-200/80 dark:border-[#1E1E2A] bg-white dark:bg-[#0D0D14] overflow-hidden shadow-sm md:shadow-xl ${
+          className={`flex-1 flex flex-col md:rounded-3xl border border-slate-200/80 dark:border-[#242630] bg-white dark:bg-[#18191E] overflow-hidden shadow-sm md:shadow-xl ${
             activeChat ? 'flex' : 'hidden md:flex'
           }`}
         >
           {activeChat ? (
             <>
               {/* Active Chat Header */}
-              <div className="h-14 sm:h-16 border-b border-slate-200/80 dark:border-[#1E1E2A] bg-white/95 dark:bg-[#0D0D14]/95 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between shrink-0">
+              <div className="h-14 sm:h-16 border-b border-slate-200/80 dark:border-[#242630] bg-white/95 dark:bg-[#18191E]/95 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between shrink-0">
                 <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
                   {/* Mobile Back Button to conversation list */}
                   <button
@@ -1180,15 +1378,7 @@ export default function DashboardPage() {
                         <>
                           <span>@{activeChat.otherUser.username}</span>
                           <span>&bull;</span>
-                          {onlineUsers[activeChat.otherUser.id]?.status === 'online' ? (
-                            <span className="text-emerald-500 font-medium">Online</span>
-                          ) : (
-                            <span className="text-slate-400 dark:text-zinc-500">
-                              {onlineUsers[activeChat.otherUser.id]?.lastSeen
-                                ? `Offline • Last seen ${formatMessageTime(onlineUsers[activeChat.otherUser.id]!.lastSeen!)}`
-                                : 'Offline'}
-                            </span>
-                          )}
+                          <span className="text-slate-400 dark:text-zinc-400">Encrypted workspace</span>
                         </>
                       ) : (
                         <span>Direct Chat</span>
@@ -1197,63 +1387,86 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                {/* Electric Blue Action Icons in Header matching user reference design */}
+                {/* Shady & Circular Action Buttons in Header matching Image 1 */}
                 <WarmTooltipGroup delay={200} warmWindow={300} travel={220}>
-                  <div className="flex items-center space-x-1 sm:space-x-2 shrink-0">
+                  <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
                     <WarmTooltip content="Search in conversation" shortcut="⌘F" side="bottom">
                       <button
                         type="button"
                         onClick={() => toggleInChatSearch()}
-                        className={`p-2 rounded-xl transition cursor-pointer ${
+                        className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition shadow-xs cursor-pointer ${
                           inChatSearchOpen
-                            ? 'bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400'
-                            : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40'
+                            ? 'bg-blue-100 dark:bg-[#2F3140] text-blue-600 dark:text-[#8B95F6]'
+                            : 'bg-slate-100 dark:bg-[#242630] hover:bg-slate-200 dark:hover:bg-[#2F3140] text-slate-600 dark:text-zinc-300'
                         }`}
                         aria-label="Search in conversation"
                       >
                         <Search className="w-4 h-4" />
                       </button>
                     </WarmTooltip>
-                    {activeChat.type === 'direct' && activeChat.otherUser && (
-                      <>
-                        <WarmTooltip content="Voice Call" side="bottom">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              void startCall({
-                                recipientId: activeChat.otherUser!.id,
-                                recipientName: activeChat.otherUser!.displayName || activeChat.otherUser!.username,
-                                recipientAvatar: activeChat.otherUser!.avatarUrl,
-                                chatId: activeChat.id,
-                                callType: 'audio',
-                              })
-                            }
-                            className="p-2 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
-                            aria-label="Voice Call"
-                          >
-                            <Phone className="w-4 h-4" />
-                          </button>
-                        </WarmTooltip>
-                        <WarmTooltip content="Video Call" side="bottom">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              void startCall({
-                                recipientId: activeChat.otherUser!.id,
-                                recipientName: activeChat.otherUser!.displayName || activeChat.otherUser!.username,
-                                recipientAvatar: activeChat.otherUser!.avatarUrl,
-                                chatId: activeChat.id,
-                                callType: 'video',
-                              })
-                            }
-                            className="p-2 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
-                            aria-label="Video Call"
-                          >
-                            <Video className="w-4 h-4" />
-                          </button>
-                        </WarmTooltip>
-                      </>
-                    )}
+
+                    {/* Circular Voice Call Button matching Image 1 */}
+                    <WarmTooltip content="Voice Call" side="bottom">
+                      <button
+                        type="button"
+                        onClick={handleVoiceCall}
+                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 dark:bg-[#242630] hover:bg-slate-200 dark:hover:bg-[#2F3140] text-[#0066FF] dark:text-[#E2F952] flex items-center justify-center transition shadow-xs cursor-pointer"
+                        aria-label="Voice Call"
+                      >
+                        <Phone className="w-4 h-4" />
+                      </button>
+                    </WarmTooltip>
+
+                    {/* Circular Video Call Button matching Image 1 */}
+                    <WarmTooltip content="Video Call" side="bottom">
+                      <button
+                        type="button"
+                        onClick={handleVideoCall}
+                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 dark:bg-[#242630] hover:bg-slate-200 dark:hover:bg-[#2F3140] text-slate-700 dark:text-zinc-200 hover:text-black dark:hover:text-white flex items-center justify-center transition shadow-xs cursor-pointer"
+                        aria-label="Video Call"
+                      >
+                        <Video className="w-4 h-4" />
+                      </button>
+                    </WarmTooltip>
+
+                    {/* Circular Pin Chat Button matching Image 1 */}
+                    <WarmTooltip content={isChatPinned(activeChat.id) ? 'Unpin chat' : 'Pin chat'} side="bottom">
+                      <button
+                        type="button"
+                        onClick={() => togglePinChat(activeChat.id)}
+                        className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition shadow-xs cursor-pointer ${
+                          isChatPinned(activeChat.id)
+                            ? 'bg-blue-50 dark:bg-[#2E313D] text-[#0066FF] dark:text-[#E2F952]'
+                            : 'bg-slate-100 dark:bg-[#242630] hover:bg-slate-200 dark:hover:bg-[#2F3140] text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200'
+                        }`}
+                        aria-label="Pin Chat"
+                      >
+                        <Pin className={`w-4 h-4 ${isChatPinned(activeChat.id) ? 'fill-current' : ''}`} />
+                      </button>
+                    </WarmTooltip>
+
+                    {/* Circular Members & Details Button matching Image 1 */}
+                    <WarmTooltip content="Members & Info" side="bottom">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (activeChat.type === 'direct' && activeChat.otherUser) {
+                            void handleInspectOtherUser(activeChat.otherUser.id);
+                          } else {
+                            setShowGroupDrawer(!showGroupDrawer);
+                          }
+                        }}
+                        className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition shadow-xs cursor-pointer ${
+                          showGroupDrawer
+                            ? 'bg-blue-50 dark:bg-[#2E313D] text-[#0066FF] dark:text-[#8B95F6]'
+                            : 'bg-slate-100 dark:bg-[#242630] hover:bg-slate-200 dark:hover:bg-[#2F3140] text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                        aria-label="Members & Details"
+                      >
+                        <Users className="w-4 h-4" />
+                      </button>
+                    </WarmTooltip>
+
                     {activeChat.type === 'direct' && activeChat.otherUser && (
                       <WarmTooltip content="Verify Safety Number" side="bottom">
                         <button
@@ -1264,36 +1477,11 @@ export default function DashboardPage() {
                               activeChat.otherUser!.displayName || activeChat.otherUser!.username,
                             )
                           }
-                          className="inline-flex items-center space-x-1 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 text-blue-700 dark:text-blue-300 text-xs font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/60 transition cursor-pointer"
+                          className="hidden sm:inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-full bg-blue-50 dark:bg-[#20222C] border border-blue-200 dark:border-[#2D2F3C] text-blue-700 dark:text-blue-300 text-xs font-semibold hover:bg-blue-100 dark:hover:bg-[#292B38] transition cursor-pointer"
                           aria-label="End-to-End Encrypted (Click to verify safety number)"
                         >
-                          <Lock className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                          <span className="hidden sm:inline">E2EE</span>
-                        </button>
-                      </WarmTooltip>
-                    )}
-                    {activeChat.type === 'direct' && activeChat.otherUser ? (
-                      <WarmTooltip content="View Profile" side="bottom">
-                        <button
-                          onClick={() => handleInspectOtherUser(activeChat.otherUser!.id)}
-                          className="p-2 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
-                          aria-label="View Profile"
-                        >
-                          <Info className="w-4 h-4" />
-                        </button>
-                      </WarmTooltip>
-                    ) : (
-                      <WarmTooltip content="Group Details & Members" side="bottom">
-                        <button
-                          onClick={() => setShowGroupDrawer(!showGroupDrawer)}
-                          className={`p-2 rounded-xl transition cursor-pointer ${
-                            showGroupDrawer
-                              ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-                              : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40'
-                          }`}
-                          aria-label="Group Details & Members"
-                        >
-                          <Info className="w-4 h-4" />
+                          <Lock className="w-3.5 h-3.5 text-[#0066FF] dark:text-[#8B95F6]" />
+                          <span>E2EE</span>
                         </button>
                       </WarmTooltip>
                     )}
@@ -1913,12 +2101,10 @@ export default function DashboardPage() {
                       editingMessage
                         ? 'Editing message... (Enter to save, Esc to cancel)'
                         : activeChat.type === 'channel'
-                        ? `Message #${activeChat.name}...`
-                        : activeChat.type === 'group'
-                        ? `Message ${activeChat.name}...`
-                        : 'Type a message... (Press Enter to send)'
+                        ? `Write a message in #${activeChat.name}...`
+                        : 'Write a message...'
                     }
-                    className="flex-1 px-3 sm:px-4 py-2.5 bg-slate-100 dark:bg-[#161622] border border-slate-200 dark:border-[#222232] rounded-xl text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#0066FF] transition resize-none max-h-32 overflow-y-auto leading-relaxed"
+                    className="flex-1 px-3 sm:px-4 py-2.5 bg-slate-100 dark:bg-[#14151B] border border-slate-200 dark:border-[#262833] rounded-2xl text-base sm:text-sm text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#8B95F6] transition resize-none max-h-32 overflow-y-auto leading-relaxed"
                     style={{ minHeight: '44px' }}
                   />
 
@@ -1926,13 +2112,13 @@ export default function DashboardPage() {
                     <button
                       type="submit"
                       disabled={(!messageInput.trim() && !stagedFile) || isSending || isUploadingMedia}
-                      className="p-2.5 rounded-xl bg-[#0066FF] hover:bg-blue-600 disabled:opacity-40 disabled:hover:bg-[#0066FF] text-white shadow-md shadow-blue-500/25 transition touch-target-44 flex items-center justify-center shrink-0 self-end cursor-pointer"
+                      className="p-2.5 rounded-full bg-[#0066FF] hover:bg-blue-600 dark:bg-[#E2F952] dark:hover:bg-[#d6ee3c] disabled:opacity-40 text-white dark:text-black shadow-md shadow-blue-500/25 transition touch-target-44 flex items-center justify-center shrink-0 self-end cursor-pointer"
                       aria-label="Send Message"
                     >
                       {isUploadingMedia ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-4 h-4 animate-spin text-white dark:text-black" />
                       ) : (
-                        <Send className="w-4 h-4" />
+                        <Send className="w-4 h-4 text-white dark:text-black" />
                       )}
                     </button>
                   </WarmTooltip>
@@ -1940,37 +2126,219 @@ export default function DashboardPage() {
               </div>
             </>
           ) : (
-            /* Empty State when no chat is selected (Tablet & Desktop only; hidden on mobile) */
-            <div className="hidden md:flex flex-1 flex-col items-center justify-center p-8 text-center">
-              <div className="w-16 h-16 rounded-3xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-4 shadow-lg shadow-blue-500/10">
-                <MessageSquare className="w-8 h-8" />
-              </div>
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">
-                Your Whhispr Hub
-              </h2>
-              <p className="text-sm text-slate-500 dark:text-zinc-400 max-w-sm mb-6 leading-relaxed">
-                Select a conversation on the left, start a new group or channel, or share media with
-                friends.
-              </p>
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={() => setShowCreateGroupModal(true)}
-                  className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-[#0066FF] hover:bg-blue-600 text-white text-xs font-semibold shadow-md shadow-blue-500/20 transition cursor-pointer"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Create Group / Channel</span>
-                </button>
-                <button
-                  onClick={() => setShowChannelBrowserModal(true)}
-                  className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-[#161622] dark:hover:bg-[#1E1E2C] text-blue-600 dark:text-blue-400 text-xs font-semibold transition cursor-pointer"
-                >
-                  <Compass className="w-4 h-4" />
-                  <span>Explore Channels</span>
-                </button>
-              </div>
+            /* Empty State occupying the complete space with the wireframe contour globe animation from Image 4 */
+            <div className="hidden md:flex flex-1 flex-col items-center justify-center relative overflow-hidden bg-slate-900/5 dark:bg-[#121316] md:rounded-3xl border border-slate-200/80 dark:border-[#242630]">
+              <WireframeGlobeAnimation />
             </div>
           )}
         </section>
+
+        {/* RIGHT PANEL (Image 1 Style): Members & Files Media Cards on desktop */}
+        {activeChat && (
+          <aside className="hidden xl:flex flex-col w-72 2xl:w-80 gap-3 shrink-0 overflow-y-auto">
+            {/* Card 1: Members */}
+            <div className="rounded-3xl bg-white dark:bg-[#18191E] border border-slate-200/80 dark:border-[#242630] p-4.5 shadow-sm">
+              <div className="flex items-center justify-between mb-3.5">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">
+                  Members
+                </h3>
+                {activeChat.type !== 'direct' && (
+                  <span className="text-xs text-slate-400 dark:text-zinc-400 font-medium">
+                    {activeGroupDetails?.membersCount || 1}
+                  </span>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                {activeChat.type !== 'direct' && activeGroupDetails?.members ? (
+                  activeGroupDetails.members.map((m) => {
+                    const isMemberOnline = onlineUsers[m.id]?.status === 'online';
+                    const isMe = m.id === user?.id;
+                    return (
+                      <div key={m.id} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3 min-w-0">
+                          <div className="relative shrink-0">
+                            <Avatar className="w-10 h-10 rounded-full">
+                              <AvatarImage src={m.avatarUrl || ''} />
+                              <AvatarFallback className="bg-slate-200 dark:bg-[#242630] text-slate-700 dark:text-zinc-200 text-xs font-bold">
+                                {m.displayName?.charAt(0) || m.username.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            {isMemberOnline && (
+                              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#E2F952] border-2 border-white dark:border-[#18191E]" />
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-semibold text-slate-800 dark:text-zinc-200 truncate">
+                              {isMe ? 'You' : m.displayName || m.username}
+                            </p>
+                            <p className="text-[10px] text-slate-400 dark:text-zinc-500 truncate">@{m.username}</p>
+                          </div>
+                        </div>
+                        {m.role === 'admin' ? (
+                          <span className="text-[11px] font-medium text-slate-500 dark:text-zinc-400">Admin</span>
+                        ) : isMe ? (
+                          <span className="text-[11px] font-medium text-slate-400 dark:text-zinc-500">You</span>
+                        ) : null}
+                      </div>
+                    );
+                  })
+                ) : (
+                  <>
+                    {activeChat.otherUser && (
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3 min-w-0">
+                          <div className="relative shrink-0">
+                            <Avatar className="w-10 h-10 rounded-full">
+                              <AvatarImage src={activeChat.otherUser.avatarUrl || ''} />
+                              <AvatarFallback className="bg-slate-200 dark:bg-[#242630] text-slate-700 dark:text-zinc-200 text-xs font-bold">
+                                {activeChat.otherUser.displayName?.charAt(0) || activeChat.otherUser.username.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            {onlineUsers[activeChat.otherUser.id]?.status === 'online' && (
+                              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#E2F952] border-2 border-white dark:border-[#18191E]" />
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-semibold text-slate-800 dark:text-zinc-200 truncate">
+                              {activeChat.otherUser.displayName || activeChat.otherUser.username}
+                            </p>
+                            <p className="text-[10px] text-slate-400 dark:text-zinc-500 truncate">@{activeChat.otherUser.username}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {user && (
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3 min-w-0">
+                          <div className="relative shrink-0">
+                            <Avatar className="w-10 h-10 rounded-full">
+                              <AvatarImage src={user.avatarUrl || ''} />
+                              <AvatarFallback className="bg-slate-200 dark:bg-[#242630] text-slate-700 dark:text-zinc-200 text-xs font-bold">
+                                {user.displayName?.charAt(0) || user.username.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#E2F952] border-2 border-white dark:border-[#18191E]" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-semibold text-slate-800 dark:text-zinc-200 truncate">
+                              {user.displayName || user.username}
+                            </p>
+                            <p className="text-[10px] text-slate-400 dark:text-zinc-500 truncate">@{user.username}</p>
+                          </div>
+                        </div>
+                        <span className="text-[11px] font-medium text-slate-400 dark:text-zinc-500">You</span>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Card 2: Files Accordion (Matching Image 1) */}
+            <div className="rounded-3xl bg-white dark:bg-[#18191E] border border-slate-200/80 dark:border-[#242630] p-4.5 shadow-sm space-y-3">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">
+                Files
+              </h3>
+
+              {/* Photos & Media Section */}
+              <div className="border-b border-slate-100 dark:border-[#242630] pb-3">
+                <button
+                  type="button"
+                  onClick={() => setPhotosExpanded(!photosExpanded)}
+                  className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:text-black dark:hover:text-white transition py-1 cursor-pointer"
+                >
+                  <div className="flex items-center space-x-2.5">
+                    <ImageIcon className="w-4 h-4 text-slate-400 dark:text-zinc-400" />
+                    <span>{photoAttachments.length > 0 ? `${photoAttachments.length} photos` : 'Photos & Media'}</span>
+                  </div>
+                  {photosExpanded ? <ChevronUp className="w-3.5 h-3.5 text-zinc-500" /> : <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />}
+                </button>
+
+                {photosExpanded && (
+                  <div className="mt-2.5 grid grid-cols-2 gap-2">
+                    {photoAttachments.slice(0, 4).map((att, i) => (
+                      <img
+                        key={i}
+                        src={att.storageKey ? resolveApiUrl(att.storageKey) : ''}
+                        alt={att.fileName}
+                        className="w-full h-20 object-cover rounded-xl border border-slate-200 dark:border-[#2B2C38]"
+                      />
+                    ))}
+                    {photoAttachments.length === 0 && (
+                      <div className="col-span-2 py-4 px-3 text-center rounded-xl bg-slate-50 dark:bg-[#14151B] border border-slate-200/60 dark:border-[#242630] text-[11px] text-slate-400 dark:text-zinc-500">
+                        No photos shared yet
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Documents & Files Section */}
+              <div className="border-b border-slate-100 dark:border-[#242630] pb-3">
+                <button
+                  type="button"
+                  onClick={() => setFilesExpanded(!filesExpanded)}
+                  className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:text-black dark:hover:text-white transition py-1 cursor-pointer"
+                >
+                  <div className="flex items-center space-x-2.5">
+                    <FileText className="w-4 h-4 text-slate-400 dark:text-zinc-400" />
+                    <span>{fileAttachments.length > 0 ? `${fileAttachments.length} files` : 'Files & Docs'}</span>
+                  </div>
+                  {filesExpanded ? <ChevronUp className="w-3.5 h-3.5 text-zinc-500" /> : <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />}
+                </button>
+
+                {filesExpanded && (
+                  <div className="mt-2 space-y-1.5">
+                    {fileAttachments.slice(0, 3).map((f, i) => (
+                      <div key={i} className="flex items-center space-x-2 p-1.5 rounded-lg bg-slate-50 dark:bg-[#14151B] text-[11px] text-slate-700 dark:text-zinc-300 truncate">
+                        <FileText className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-400 shrink-0" />
+                        <span className="truncate">{f.fileName}</span>
+                      </div>
+                    ))}
+                    {fileAttachments.length === 0 && (
+                      <p className="text-[11px] text-slate-400 dark:text-zinc-500 italic py-1">No documents shared yet</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Shared Links Section */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setLinksExpanded(!linksExpanded)}
+                  className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:text-black dark:hover:text-white transition py-1 cursor-pointer"
+                >
+                  <div className="flex items-center space-x-2.5">
+                    <LinkIcon className="w-4 h-4 text-slate-400 dark:text-zinc-400" />
+                    <span>{linkMatches.length > 0 ? `${linkMatches.length} shared links` : 'Shared links'}</span>
+                  </div>
+                  {linksExpanded ? <ChevronUp className="w-3.5 h-3.5 text-zinc-500" /> : <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />}
+                </button>
+
+                {linksExpanded && (
+                  <div className="mt-2 space-y-1.5">
+                    {linkMatches.slice(0, 3).map((l, i) => (
+                      <a
+                        key={i}
+                        href={l}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block p-1.5 rounded-lg bg-slate-50 dark:bg-[#14151B] text-[11px] text-[#0066FF] dark:text-[#8B95F6] hover:underline truncate"
+                      >
+                        {l}
+                      </a>
+                    ))}
+                    {linkMatches.length === 0 && (
+                      <p className="text-[11px] text-slate-400 dark:text-zinc-500 italic py-1">No links shared yet</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </aside>
+        )}
 
         {/* Group Details Right Drawer */}
         <GroupDetailsDrawer

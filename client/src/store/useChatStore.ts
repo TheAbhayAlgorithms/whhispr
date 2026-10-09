@@ -99,7 +99,20 @@ interface ChatStoreState {
   ) => Promise<void>;
   leaveGroup: (chatId: string) => Promise<void>;
   clearActiveGroupDetails: () => void;
+  pinnedChatIds: string[];
+  togglePinChat: (chatId: string) => void;
+  isChatPinned: (chatId: string) => boolean;
 }
+
+const getInitialPinnedChats = (): string[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem('whhispr_pinned_chats');
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
 
 export const useChatStore = create<ChatStoreState>((set, get) => ({
   chats: [],
@@ -118,6 +131,19 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
   typingUsers: {},
   replyingTo: null,
   editingMessage: null,
+  pinnedChatIds: getInitialPinnedChats(),
+
+  togglePinChat: (chatId: string) => {
+    const current = get().pinnedChatIds;
+    const next = current.includes(chatId)
+      ? current.filter((id) => id !== chatId)
+      : [chatId, ...current];
+    try {
+      localStorage.setItem('whhispr_pinned_chats', JSON.stringify(next));
+    } catch {}
+    set({ pinnedChatIds: next });
+  },
+  isChatPinned: (chatId: string) => get().pinnedChatIds.includes(chatId),
 
   setReplyingTo: (msg: ChatMessage | null) => set({ replyingTo: msg, editingMessage: null }),
   setEditingMessage: (msg: ChatMessage | null) => set({ editingMessage: msg, replyingTo: null }),
