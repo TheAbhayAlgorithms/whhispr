@@ -11,6 +11,7 @@ import { CreateGroupModal } from '../components/CreateGroupModal';
 import { GroupDetailsDrawer } from '../components/GroupDetailsDrawer';
 import { UserSearchModal } from '../components/UserSearchModal';
 import { ContactRequestsModal } from '../components/ContactRequestsModal';
+import { ContactsDropdown } from '../components/ContactsDropdown';
 import { InChatSearchBar } from '../components/InChatSearchBar';
 import { CallModal } from '../components/CallModal';
 import { CallHistoryModal } from '../components/CallHistoryModal';
@@ -235,6 +236,16 @@ export default function DashboardPage() {
   const { inChatSearchOpen, toggleInChatSearch } = useSearchStore();
   const [showUserSearchModal, setShowUserSearchModal] = useState(false);
   const [showContactRequestsModal, setShowContactRequestsModal] = useState(false);
+  const [showContactsDropdown, setShowContactsDropdown] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get('openContacts') === 'true') {
+      setShowContactsDropdown(true);
+      const next = new URLSearchParams(searchParams);
+      next.delete('openContacts');
+      setSearchParams(next, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // Voice & Video Call State
   const [showCallHistoryModal, setShowCallHistoryModal] = useState(false);
@@ -290,6 +301,10 @@ export default function DashboardPage() {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setShowUserSearchModal((prev) => !prev);
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === '2') {
+        e.preventDefault();
+        setShowContactsDropdown((prev) => !prev);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -388,6 +403,7 @@ export default function DashboardPage() {
       if (e.key === 'Escape') {
         setShowUserSearchModal(false);
         setShowContactRequestsModal(false);
+        setShowContactsDropdown(false);
         setShowCreateGroupModal(false);
         setShowCallHistoryModal(false);
         setShowGroupDrawer(false);
@@ -665,16 +681,30 @@ export default function DashboardPage() {
               </button>
             </WarmTooltip>
 
-            {/* Direct Contacts Button */}
-            <WarmTooltip content="Contacts" shortcut="⌘2" side="bottom">
-              <Link
-                to="/contacts"
-                className="relative w-9 h-9 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED] flex items-center justify-center transition cursor-pointer active:scale-95"
-                aria-label="Contacts"
-              >
-                <Users className="w-4 h-4 text-[#20B2AA]" />
-              </Link>
-            </WarmTooltip>
+            {/* Direct Contacts Button with Drop box */}
+            <div className="relative">
+              <WarmTooltip content="Contacts" shortcut="⌘2" side="bottom">
+                <button
+                  type="button"
+                  onClick={() => setShowContactsDropdown((prev) => !prev)}
+                  className={`relative w-9 h-9 rounded-xl border transition cursor-pointer active:scale-95 flex items-center justify-center ${
+                    showContactsDropdown
+                      ? 'bg-[#20B2AA]/20 border-[#20B2AA] text-[#20B2AA]'
+                      : 'bg-[#202222] hover:bg-[#262828] border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED]'
+                  }`}
+                  aria-label="Contacts"
+                >
+                  <Users className="w-4 h-4 text-[#20B2AA]" />
+                </button>
+              </WarmTooltip>
+
+              {/* Contacts Dropbox Panel */}
+              <ContactsDropdown
+                isOpen={showContactsDropdown}
+                onClose={() => setShowContactsDropdown(false)}
+                onOpenSearchModal={() => setShowUserSearchModal(true)}
+              />
+            </div>
 
             {/* Requests Option: Beside contacts, shown ONLY when there is a request, otherwise not displayed */}
             {incomingRequests.length > 0 && (
@@ -850,16 +880,19 @@ export default function DashboardPage() {
                     <span>Calls</span>
                   </button>
 
-                  <Link
-                    to="/contacts"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-[#EDEDED] hover:bg-[#202222] transition active:scale-[0.99]"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setShowContactsDropdown(true);
+                    }}
+                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-[#EDEDED] hover:bg-[#202222] transition active:scale-[0.99] text-left cursor-pointer"
                   >
                     <div className="flex items-center space-x-2.5">
                       <Users className="w-4 h-4 text-[#20B2AA] shrink-0" />
                       <span>Contacts</span>
                     </div>
-                  </Link>
+                  </button>
 
                   {incomingRequests.length > 0 && (
                     <button

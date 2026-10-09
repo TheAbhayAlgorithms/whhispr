@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuthStore } from '../store/useAuthStore';
 import { useProfileStore } from '../store/useProfileStore';
 import {
   ArrowLeft,
@@ -8,34 +9,36 @@ import {
   Save,
   CheckCircle2,
   AlertCircle,
+  User,
   Shield,
   Eye,
-  User,
 } from 'lucide-react';
-
 import { ThemeToggle } from '../components/ThemeToggle';
 
 export default function ProfilePage() {
-  const { profile, fetchMyProfile, updateProfile, uploadAvatar, removeAvatar, isLoading } =
-    useProfileStore();
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user } = useAuthStore();
+  const {
+    profile,
+    isLoading,
+    fetchMyProfile,
+    updateProfile,
+    uploadAvatar,
+    removeAvatar,
+  } = useProfileStore();
 
   const [displayName, setDisplayName] = useState('');
   const [bio, setBio] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
-  const [lastSeenVisibility, setLastSeenVisibility] = useState<'everyone' | 'contacts' | 'nobody'>(
-    'contacts',
-  );
-  const [avatarVisibility, setAvatarVisibility] = useState<'everyone' | 'contacts' | 'nobody'>(
-    'everyone',
-  );
+  const [lastSeenVisibility, setLastSeenVisibility] = useState<'everyone' | 'contacts' | 'nobody'>('everyone');
+  const [avatarVisibility, setAvatarVisibility] = useState<'everyone' | 'contacts' | 'nobody'>('everyone');
   const [addMePolicy, setAddMePolicy] = useState<'everyone' | 'contacts' | 'nobody'>('everyone');
 
-  const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     void fetchMyProfile();
@@ -46,34 +49,36 @@ export default function ProfilePage() {
       setDisplayName(profile.displayName || '');
       setBio(profile.bio || '');
       setStatusMessage(profile.statusMessage || '');
-      setLastSeenVisibility(profile.lastSeenVisibility || 'contacts');
+      setLastSeenVisibility(profile.lastSeenVisibility || 'everyone');
       setAvatarVisibility(profile.avatarVisibility || 'everyone');
       setAddMePolicy(profile.addMePolicy || 'everyone');
+    } else if (user) {
+      setDisplayName(user.displayName || '');
     }
-  }, [profile]);
+  }, [profile, user]);
 
   const handleAvatarSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      setError('Please select an image file (PNG, JPG, WEBP, GIF).');
+      setError('Please select an image file (PNG, JPG, WebP).');
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setError('File size exceeds the 5MB limit.');
+      setError('Avatar image size must be less than 5 MB.');
       return;
     }
 
-    setError(null);
     setUploadingAvatar(true);
+    setError(null);
     try {
       await uploadAvatar(file);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Avatar upload failed';
+      const msg = err instanceof Error ? err.message : 'Failed to upload photo';
       setError(msg);
     } finally {
       setUploadingAvatar(false);
@@ -82,14 +87,16 @@ export default function ProfilePage() {
   };
 
   const handleRemoveAvatar = async () => {
-    setError(null);
+    if (!confirm('Are you sure you want to remove your profile photo?')) return;
+
     setUploadingAvatar(true);
+    setError(null);
     try {
       await removeAvatar();
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to remove avatar';
+      const msg = err instanceof Error ? err.message : 'Failed to remove photo';
       setError(msg);
     } finally {
       setUploadingAvatar(false);
@@ -126,20 +133,20 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-200">
+    <div className="min-h-screen bg-[#F9F9F8] dark:bg-[#191A1A] text-[#191A1A] dark:text-[#EDEDED] flex flex-col transition-colors duration-200">
       {/* Header */}
-      <header className="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/60 backdrop-blur-md sticky top-0 z-50 pt-safe">
+      <header className="border-b border-[#E5E5E3] dark:border-[#2C2E2E] bg-white/80 dark:bg-[#141515]/80 backdrop-blur-md sticky top-0 z-50 pt-safe">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Link
               to="/"
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition active:scale-95"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#F3F3F2] dark:bg-[#202222] hover:bg-[#ECECEB] dark:hover:bg-[#262828] border border-[#E5E5E3] dark:border-[#2D3030] flex items-center justify-center text-[#737878] dark:text-[#9EA3A3] hover:text-[#191A1A] dark:hover:text-[#EDEDED] transition active:scale-95"
               title="Back to Dashboard"
               aria-label="Back to Dashboard"
             >
               <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
-            <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+            <h1 className="text-base sm:text-lg font-bold text-[#191A1A] dark:text-[#EDEDED] tracking-tight">
               Edit Profile
             </h1>
           </div>
@@ -160,7 +167,7 @@ export default function ProfilePage() {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 w-full">
         {error && (
-          <div className="mb-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-start space-x-3 text-rose-700 dark:text-rose-300 text-sm">
+          <div className="mb-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-start space-x-3 text-rose-600 dark:text-rose-400 text-sm">
             <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-500 mt-0.5" />
             <span>{error}</span>
           </div>
@@ -168,15 +175,15 @@ export default function ProfilePage() {
 
         <form onSubmit={handleSave} className="space-y-6 sm:space-y-8">
           {/* Avatar Section */}
-          <div className="p-4 sm:p-6 rounded-3xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800/80 shadow-md dark:shadow-xl">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4 sm:mb-6 flex items-center space-x-2">
-              <User className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+          <div className="p-4 sm:p-6 rounded-3xl bg-white dark:bg-[#141515] border border-[#E5E5E3] dark:border-[#2C2E2E] shadow-xs">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#737878] dark:text-[#9EA3A3] mb-4 sm:mb-6 flex items-center space-x-2">
+              <User className="w-4 h-4 text-[#20B2AA]" />
               <span>Profile Photo</span>
             </h2>
 
             <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left space-y-4 sm:space-y-0 sm:space-x-6">
               <div className="relative group shrink-0">
-                <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-blue-500/40 flex items-center justify-center text-2xl font-bold text-blue-600 dark:text-blue-300 shadow-xl">
+                <div className="w-24 h-24 rounded-full overflow-hidden bg-[#E6F7F6] dark:bg-[#202222] border-2 border-[#20B2AA]/40 flex items-center justify-center text-2xl font-bold text-[#20B2AA] shadow-xs">
                   {profile?.avatarUrl ? (
                     <img
                       src={profile.avatarUrl}
@@ -189,8 +196,8 @@ export default function ProfilePage() {
                 </div>
 
                 {uploadingAvatar && (
-                  <div className="absolute inset-0 rounded-full bg-slate-950/70 backdrop-blur-xs flex items-center justify-center">
-                    <div className="w-6 h-6 rounded-full border-2 border-blue-400 border-t-transparent animate-spin" />
+                  <div className="absolute inset-0 rounded-full bg-black/60 backdrop-blur-xs flex items-center justify-center">
+                    <div className="w-6 h-6 rounded-full border-2 border-[#20B2AA] border-t-transparent animate-spin" />
                   </div>
                 )}
               </div>
@@ -209,9 +216,9 @@ export default function ProfilePage() {
                     type="button"
                     disabled={uploadingAvatar}
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white shadow-lg shadow-blue-600/20 transition disabled:opacity-50"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-[#20B2AA] hover:bg-[#1CA099] text-xs font-semibold text-black shadow-md shadow-[#20B2AA]/20 transition disabled:opacity-50 cursor-pointer active:scale-95"
                   >
-                    <Camera className="w-4 h-4" />
+                    <Camera className="w-4 h-4 text-black" />
                     <span>Upload New Photo</span>
                   </button>
 
@@ -220,14 +227,14 @@ export default function ProfilePage() {
                       type="button"
                       disabled={uploadingAvatar}
                       onClick={handleRemoveAvatar}
-                      className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 dark:bg-slate-800 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 dark:hover:border-rose-500/30 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 transition"
+                      className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-[#F3F3F2] hover:bg-rose-50 hover:text-rose-600 dark:bg-[#202222] dark:hover:bg-rose-500/10 dark:hover:text-rose-400 border border-[#E5E5E3] dark:border-[#2D3030] text-xs font-medium text-[#737878] dark:text-[#9EA3A3] transition cursor-pointer"
                     >
                       <Trash2 className="w-4 h-4" />
                       <span>Remove</span>
                     </button>
                   )}
                 </div>
-                <p className="text-xs text-slate-500 text-center sm:text-left">
+                <p className="text-xs text-[#737878] dark:text-[#9EA3A3] text-center sm:text-left">
                   Recommended: Square JPG, PNG, or WebP. Maximum size: 5 MB.
                 </p>
               </div>
@@ -235,16 +242,16 @@ export default function ProfilePage() {
           </div>
 
           {/* Profile Details */}
-          <div className="p-4 sm:p-6 rounded-3xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800/80 shadow-md dark:shadow-xl space-y-5">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 flex items-center space-x-2">
-              <Shield className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+          <div className="p-4 sm:p-6 rounded-3xl bg-white dark:bg-[#141515] border border-[#E5E5E3] dark:border-[#2C2E2E] shadow-xs space-y-5">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#737878] dark:text-[#9EA3A3] mb-2 flex items-center space-x-2">
+              <Shield className="w-4 h-4 text-[#20B2AA]" />
               <span>Personal Information</span>
             </h2>
 
             <div>
               <label
                 htmlFor="displayName"
-                className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5"
+                className="block text-xs font-semibold uppercase tracking-wider text-[#737878] dark:text-[#9EA3A3] mb-1.5"
               >
                 Display Name
               </label>
@@ -256,7 +263,7 @@ export default function ProfilePage() {
                 onChange={(e) => setDisplayName(e.target.value)}
                 maxLength={60}
                 placeholder="Your full name or alias"
-                className="block w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base sm:text-sm transition"
+                className="block w-full px-3.5 py-2.5 bg-[#F9F9F8] dark:bg-[#191A1A] border border-[#E5E5E3] dark:border-[#2D3030] rounded-xl text-[#191A1A] dark:text-[#EDEDED] placeholder-[#737878] dark:placeholder-[#9EA3A3] focus:outline-none focus:border-[#20B2AA] focus:ring-1 focus:ring-[#20B2AA] text-base sm:text-sm transition"
               />
             </div>
 
@@ -264,11 +271,11 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between mb-1.5">
                 <label
                   htmlFor="statusMessage"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300"
+                  className="block text-xs font-semibold uppercase tracking-wider text-[#737878] dark:text-[#9EA3A3]"
                 >
                   Status Message
                 </label>
-                <span className="text-[11px] text-slate-400 dark:text-slate-500">{statusMessage.length}/140</span>
+                <span className="text-[11px] text-[#737878] dark:text-[#9EA3A3]">{statusMessage.length}/140</span>
               </div>
               <input
                 id="statusMessage"
@@ -277,7 +284,7 @@ export default function ProfilePage() {
                 onChange={(e) => setStatusMessage(e.target.value)}
                 maxLength={140}
                 placeholder="What's on your mind? (e.g., Coding 💻, In a meeting 📵)"
-                className="block w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base sm:text-sm transition"
+                className="block w-full px-3.5 py-2.5 bg-[#F9F9F8] dark:bg-[#191A1A] border border-[#E5E5E3] dark:border-[#2D3030] rounded-xl text-[#191A1A] dark:text-[#EDEDED] placeholder-[#737878] dark:placeholder-[#9EA3A3] focus:outline-none focus:border-[#20B2AA] focus:ring-1 focus:ring-[#20B2AA] text-base sm:text-sm transition"
               />
             </div>
 
@@ -285,11 +292,11 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between mb-1.5">
                 <label
                   htmlFor="bio"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300"
+                  className="block text-xs font-semibold uppercase tracking-wider text-[#737878] dark:text-[#9EA3A3]"
                 >
                   About / Bio
                 </label>
-                <span className="text-[11px] text-slate-400 dark:text-slate-500">{bio.length}/500</span>
+                <span className="text-[11px] text-[#737878] dark:text-[#9EA3A3]">{bio.length}/500</span>
               </div>
               <textarea
                 id="bio"
@@ -298,15 +305,15 @@ export default function ProfilePage() {
                 onChange={(e) => setBio(e.target.value)}
                 maxLength={500}
                 placeholder="Share a short bio about what you do or your interests..."
-                className="block w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base sm:text-sm transition resize-none"
+                className="block w-full px-3.5 py-2.5 bg-[#F9F9F8] dark:bg-[#191A1A] border border-[#E5E5E3] dark:border-[#2D3030] rounded-xl text-[#191A1A] dark:text-[#EDEDED] placeholder-[#737878] dark:placeholder-[#9EA3A3] focus:outline-none focus:border-[#20B2AA] focus:ring-1 focus:ring-[#20B2AA] text-base sm:text-sm transition resize-none"
               />
             </div>
           </div>
 
           {/* Privacy Settings */}
-          <div className="p-4 sm:p-6 rounded-3xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800/80 shadow-md dark:shadow-xl space-y-5">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 flex items-center space-x-2">
-              <Eye className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+          <div className="p-4 sm:p-6 rounded-3xl bg-white dark:bg-[#141515] border border-[#E5E5E3] dark:border-[#2C2E2E] shadow-xs space-y-5">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#737878] dark:text-[#9EA3A3] mb-2 flex items-center space-x-2">
+              <Eye className="w-4 h-4 text-[#20B2AA]" />
               <span>Privacy & Visibility</span>
             </h2>
 
@@ -314,7 +321,7 @@ export default function ProfilePage() {
               <div>
                 <label
                   htmlFor="lastSeenVisibility"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5"
+                  className="block text-xs font-semibold uppercase tracking-wider text-[#737878] dark:text-[#9EA3A3] mb-1.5"
                 >
                   Last Seen
                 </label>
@@ -324,7 +331,7 @@ export default function ProfilePage() {
                   onChange={(e) =>
                     setLastSeenVisibility(e.target.value as 'everyone' | 'contacts' | 'nobody')
                   }
-                  className="block w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-base sm:text-sm"
+                  className="block w-full px-3 py-2.5 bg-[#F9F9F8] dark:bg-[#191A1A] border border-[#E5E5E3] dark:border-[#2D3030] rounded-xl text-[#191A1A] dark:text-[#EDEDED] focus:outline-none focus:border-[#20B2AA] text-base sm:text-sm"
                 >
                   <option value="everyone">Everyone</option>
                   <option value="contacts">My Contacts</option>
@@ -335,7 +342,7 @@ export default function ProfilePage() {
               <div>
                 <label
                   htmlFor="avatarVisibility"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5"
+                  className="block text-xs font-semibold uppercase tracking-wider text-[#737878] dark:text-[#9EA3A3] mb-1.5"
                 >
                   Profile Photo
                 </label>
@@ -345,7 +352,7 @@ export default function ProfilePage() {
                   onChange={(e) =>
                     setAvatarVisibility(e.target.value as 'everyone' | 'contacts' | 'nobody')
                   }
-                  className="block w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-base sm:text-sm"
+                  className="block w-full px-3 py-2.5 bg-[#F9F9F8] dark:bg-[#191A1A] border border-[#E5E5E3] dark:border-[#2D3030] rounded-xl text-[#191A1A] dark:text-[#EDEDED] focus:outline-none focus:border-[#20B2AA] text-base sm:text-sm"
                 >
                   <option value="everyone">Everyone</option>
                   <option value="contacts">My Contacts</option>
@@ -356,7 +363,7 @@ export default function ProfilePage() {
               <div className="sm:col-span-2 md:col-span-1">
                 <label
                   htmlFor="addMePolicy"
-                  className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5"
+                  className="block text-xs font-semibold uppercase tracking-wider text-[#737878] dark:text-[#9EA3A3] mb-1.5"
                 >
                   Who Can Add Me
                 </label>
@@ -366,7 +373,7 @@ export default function ProfilePage() {
                   onChange={(e) =>
                     setAddMePolicy(e.target.value as 'everyone' | 'contacts' | 'nobody')
                   }
-                  className="block w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-base sm:text-sm"
+                  className="block w-full px-3 py-2.5 bg-[#F9F9F8] dark:bg-[#191A1A] border border-[#E5E5E3] dark:border-[#2D3030] rounded-xl text-[#191A1A] dark:text-[#EDEDED] focus:outline-none focus:border-[#20B2AA] text-base sm:text-sm"
                 >
                   <option value="everyone">Everyone</option>
                   <option value="contacts">Friends of Friends</option>
@@ -381,13 +388,13 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={saving || isLoading}
-              className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-sm font-semibold text-white shadow-xl shadow-blue-600/30 transition disabled:opacity-50"
+              className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-6 py-3 rounded-2xl bg-[#20B2AA] hover:bg-[#1CA099] text-sm font-semibold text-black shadow-md shadow-[#20B2AA]/20 transition disabled:opacity-50 cursor-pointer active:scale-95"
             >
               {saving ? (
-                <div className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                <div className="w-5 h-5 rounded-full border-2 border-black border-t-transparent animate-spin" />
               ) : (
                 <>
-                  <Save className="w-4 h-4" />
+                  <Save className="w-4 h-4 text-black" />
                   <span>Save Changes</span>
                 </>
               )}

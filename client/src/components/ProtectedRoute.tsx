@@ -13,11 +13,11 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-100">
-        <div className="w-12 h-12 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center animate-pulse mb-4">
-          <Activity className="w-6 h-6 text-blue-400 animate-spin" />
+      <div className="min-h-screen bg-[#F9F9F8] dark:bg-[#191A1A] flex flex-col items-center justify-center text-[#191A1A] dark:text-[#EDEDED] transition-colors duration-200">
+        <div className="w-12 h-12 rounded-2xl bg-[#20B2AA]/15 border border-[#20B2AA]/30 flex items-center justify-center animate-pulse mb-4">
+          <Activity className="w-6 h-6 text-[#20B2AA] animate-spin" />
         </div>
-        <p className="text-sm font-medium text-slate-400">Authenticating session...</p>
+        <p className="text-sm font-medium text-[#737878] dark:text-[#9EA3A3]">Authenticating session...</p>
       </div>
     );
   }

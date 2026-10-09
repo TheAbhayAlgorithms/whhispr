@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useContactStore } from '../store/useContactStore';
 import { useChatStore } from '../store/useChatStore';
 import { useSocketStore } from '../store/useSocketStore';
-import { ThemeToggle } from '../components/ThemeToggle';
 import { ContactCardsSkeleton } from '../components/Skeletons';
 import { UserSearchModal } from '../components/UserSearchModal';
 import {
@@ -146,19 +145,6 @@ export default function ContactsPage() {
             >
               <Search className="w-4 h-4 text-[#20B2AA]" />
             </button>
-
-            {/* Daylight / Dark Theme Toggle Button */}
-            <ThemeToggle />
-
-            {/* Back to Chats */}
-            <Link
-              to="/"
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#F3F3F2] dark:bg-[#202222] hover:bg-[#ECECEB] dark:hover:bg-[#262828] text-[#737878] dark:text-[#9EA3A3] hover:text-[#191A1A] dark:hover:text-[#EDEDED] border border-[#E5E5E3] dark:border-[#2D3030] flex items-center justify-center transition active:scale-95"
-              title="Back to Chats"
-              aria-label="Back to Chats"
-            >
-              <MessageSquare className="w-4 h-4" />
-            </Link>
           </div>
         </div>
       </header>

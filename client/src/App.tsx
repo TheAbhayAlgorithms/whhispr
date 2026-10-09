@@ -9,7 +9,6 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 // Lazy-loaded page components for optimal initial bundle load time
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
-const ContactsPage = lazy(() => import('./pages/ContactsPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
@@ -20,10 +19,10 @@ const VerifyEmailPage = lazy(() => import('./pages/VerifyEmailPage'));
 
 function PageLoadingFallback() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div className="min-h-screen flex items-center justify-center bg-[#F9F9F8] dark:bg-[#191A1A] transition-colors">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-10 h-10 border-4 border-[#0066FF] border-t-transparent rounded-full animate-spin" />
-        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Loading Whhispr...</span>
+        <div className="w-10 h-10 border-4 border-[#20B2AA] border-t-transparent rounded-full animate-spin" />
+        <span className="text-sm font-medium text-[#737878] dark:text-[#9EA3A3]">Loading Whhispr...</span>
       </div>
     </div>
   );
@@ -71,11 +70,7 @@ export default function App() {
             />
             <Route
               path="/contacts"
-              element={
-                <ProtectedRoute>
-                  <ContactsPage />
-                </ProtectedRoute>
-              }
+              element={<Navigate to="/?openContacts=true" replace />}
             />
             <Route
               path="/settings"
