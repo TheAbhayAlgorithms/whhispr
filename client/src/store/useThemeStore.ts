@@ -37,24 +37,16 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
 
   initTheme: () => {
     if (typeof window !== 'undefined') {
-      let savedTheme: Theme = 'dark';
       try {
-        const stored = localStorage.getItem('beacon_theme') as Theme | null;
-        if (stored === 'dark' || stored === 'light') {
-          savedTheme = stored;
-        } else {
-          savedTheme = 'dark';
+        const stored = localStorage.getItem('beacon_theme');
+        if (!stored || stored === 'light') {
+          localStorage.setItem('beacon_theme', 'dark');
         }
       } catch {
-        savedTheme = 'dark';
+        // ignore
       }
-
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-      set({ theme: savedTheme });
+      document.documentElement.classList.add('dark');
+      set({ theme: 'dark' });
     }
   },
 }));

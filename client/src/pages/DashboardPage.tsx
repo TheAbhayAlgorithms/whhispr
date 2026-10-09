@@ -48,7 +48,6 @@ import {
   LogOut,
   User as UserIcon,
   Users,
-  Radio,
   Send,
   Bell,
   Search,
@@ -163,7 +162,7 @@ export default function DashboardPage() {
   } = useChatStore();
 
   const { incomingRequests, fetchRequests } = useContactStore();
-  const { status: socketStatus, onlineUsers } = useSocketStore();
+  const { onlineUsers } = useSocketStore();
   const { fetchUserProfile, viewingProfile, clearViewingProfile } = useProfileStore();
 
   const [messageInput, setMessageInput] = useState('');
@@ -622,11 +621,11 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="h-screen h-dvh bg-slate-100 dark:bg-[#121316] text-slate-900 dark:text-slate-100 flex flex-col overflow-hidden transition-colors duration-200">
+    <div className="h-screen h-dvh bg-[#121316] text-[#f1f2f6] flex flex-col overflow-hidden transition-colors duration-200">
       {/* Top Navbar Only */}
       <WarmTooltipGroup delay={200} warmWindow={300} travel={220} lean={0}>
-        <header className="h-16 w-full border-b border-slate-200/80 dark:border-[#242630] bg-white/95 dark:bg-[#18191E]/95 backdrop-blur-md px-3 sm:px-5 lg:px-6 flex items-center justify-between shrink-0 z-30 select-none shadow-xs">
-          {/* Left: Brand & Status */}
+        <header className="h-14 sm:h-16 w-full border-b border-[#242630] bg-[#18191E] px-3 sm:px-5 lg:px-6 flex items-center justify-between shrink-0 z-30 select-none shadow-xs">
+          {/* Left: Brand */}
           <div className="flex items-center space-x-3 shrink-0 min-w-0">
             <button
               type="button"
@@ -638,41 +637,14 @@ export default function DashboardPage() {
                 <MessageSquare className="w-5 h-5 fill-current" />
               </div>
               <div className="flex flex-col text-left">
-                <span className="text-base font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
+                <span className="text-base font-bold tracking-tight text-white leading-tight">
                   Whhispr
                 </span>
-                <span className="text-[10px] font-medium text-slate-400 dark:text-zinc-500 hidden sm:inline">
+                <span className="text-[10px] font-medium text-zinc-500 hidden sm:inline">
                   Secure Messaging
                 </span>
               </div>
             </button>
-
-            {/* Real-time Socket Connection Badge */}
-            {socketStatus === 'connected' ? (
-              <span
-                title="Socket Connected (Live)"
-                className="hidden sm:inline-flex text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-medium items-center shrink-0"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse shrink-0" />
-                <span>Live</span>
-              </span>
-            ) : socketStatus === 'connecting' ? (
-              <span
-                title="Socket Connecting..."
-                className="hidden sm:inline-flex text-[11px] px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-medium items-center shrink-0"
-              >
-                <Radio className="w-3 h-3 mr-1 animate-spin text-amber-500 shrink-0" />
-                <span>Connecting...</span>
-              </span>
-            ) : (
-              <span
-                title="Socket Disconnected (Offline)"
-                className="hidden sm:inline-flex text-[11px] px-2.5 py-0.5 rounded-full bg-slate-500/10 text-slate-500 dark:text-slate-400 border border-slate-500/20 font-medium items-center shrink-0"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5 shrink-0" />
-                <span>Offline</span>
-              </span>
-            )}
           </div>
 
           {/* Center: Main Navigation Links (Desktop/Tablet md+) */}
@@ -990,14 +962,14 @@ export default function DashboardPage() {
       <OfflineBanner />
 
         {/* Main Two-Panel Chat Workspace (Floated / Docked rounded cards on desktop) */}
-        <div className="flex-1 flex overflow-hidden p-0 md:p-3 md:gap-3 bg-slate-100 dark:bg-[#121316]">
+        <div className="flex-1 min-h-0 flex overflow-hidden p-3 gap-3 bg-[#121316]">
           {/* SLIM LEFT RAIL (Matching Image 1) */}
-          <div className="hidden md:flex flex-col items-center justify-between py-4 px-2 w-16 bg-white dark:bg-[#18191E] md:rounded-3xl border border-slate-200/80 dark:border-[#242630] shrink-0 select-none shadow-sm md:shadow-md">
+          <div className="hidden md:flex flex-col items-center justify-between py-4 px-2 w-16 h-full bg-[#18191E] rounded-3xl border border-[#242630] shrink-0 select-none shadow-sm">
             {/* Top: Brand Mark & Category Filter Pills */}
             <div className="flex flex-col items-center space-y-3 w-full">
               <div
                 onClick={() => setCategoryFilter('all')}
-                className="w-10 h-10 rounded-2xl bg-[#0066FF] dark:bg-[#242630] border border-blue-400/20 dark:border-[#30323E] flex items-center justify-center text-white dark:text-[#E2F952] font-black text-lg shadow-sm cursor-pointer hover:scale-105 transition"
+                className="w-10 h-10 rounded-2xl bg-[#242630] border border-[#30323E] flex items-center justify-center text-[#E2F952] font-black text-lg shadow-sm cursor-pointer hover:scale-105 transition"
                 title="Whhispr Home"
               >
                 S
@@ -1009,8 +981,8 @@ export default function DashboardPage() {
                   onClick={() => setCategoryFilter('all')}
                   className={`w-10 h-9 rounded-2xl text-[11px] font-bold transition flex items-center justify-center cursor-pointer ${
                     categoryFilter === 'all'
-                      ? 'bg-blue-50 dark:bg-[#2E303D] text-[#0066FF] dark:text-[#E2F952] border border-blue-200 dark:border-[#3B3D4D] shadow-xs'
-                      : 'text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-[#242630]'
+                      ? 'bg-[#2E303D] text-[#E2F952] border border-[#3B3D4D] shadow-xs'
+                      : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#242630]'
                   }`}
                   title="All Chats"
                 >
@@ -1021,8 +993,8 @@ export default function DashboardPage() {
                   onClick={() => setCategoryFilter('direct')}
                   className={`w-10 h-9 rounded-2xl text-[11px] font-bold transition flex items-center justify-center cursor-pointer ${
                     categoryFilter === 'direct'
-                      ? 'bg-blue-50 dark:bg-[#2E303D] text-[#0066FF] dark:text-[#E2F952] border border-blue-200 dark:border-[#3B3D4D] shadow-xs'
-                      : 'text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-[#242630]'
+                      ? 'bg-[#2E303D] text-[#E2F952] border border-[#3B3D4D] shadow-xs'
+                      : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#242630]'
                   }`}
                   title="Direct Messages"
                 >
@@ -1033,8 +1005,8 @@ export default function DashboardPage() {
                   onClick={() => setCategoryFilter('group')}
                   className={`w-10 h-9 rounded-2xl text-[11px] font-bold transition flex items-center justify-center cursor-pointer ${
                     categoryFilter === 'group'
-                      ? 'bg-blue-50 dark:bg-[#2E303D] text-[#0066FF] dark:text-[#E2F952] border border-blue-200 dark:border-[#3B3D4D] shadow-xs'
-                      : 'text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-[#242630]'
+                      ? 'bg-[#2E303D] text-[#E2F952] border border-[#3B3D4D] shadow-xs'
+                      : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#242630]'
                   }`}
                   title="Groups & Channels"
                 >
@@ -1045,8 +1017,8 @@ export default function DashboardPage() {
                   onClick={() => setCategoryFilter('pinned')}
                   className={`w-10 h-9 rounded-2xl text-[11px] font-bold transition flex items-center justify-center cursor-pointer ${
                     categoryFilter === 'pinned'
-                      ? 'bg-blue-50 dark:bg-[#2E303D] text-[#0066FF] dark:text-[#E2F952] border border-blue-200 dark:border-[#3B3D4D] shadow-xs'
-                      : 'text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-[#242630]'
+                      ? 'bg-[#2E303D] text-[#E2F952] border border-[#3B3D4D] shadow-xs'
+                      : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#242630]'
                   }`}
                   title="Pinned Chats"
                 >
@@ -1055,7 +1027,7 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={() => setShowChannelBrowserModal(true)}
-                  className="w-10 h-9 rounded-2xl text-[11px] font-bold text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-[#242630] transition flex items-center justify-center cursor-pointer"
+                  className="w-10 h-9 rounded-2xl text-[11px] font-bold text-zinc-400 hover:text-zinc-200 hover:bg-[#242630] transition flex items-center justify-center cursor-pointer"
                   title="Explore Channels"
                 >
                   <Compass className="w-4 h-4" />
@@ -1078,7 +1050,7 @@ export default function DashboardPage() {
           <aside
             role="region"
             aria-label="Conversations list"
-            className={`w-full md:w-80 lg:w-88 xl:w-92 md:rounded-3xl border border-slate-200/80 dark:border-[#242630] bg-white dark:bg-[#18191E] flex flex-col shrink-0 overflow-hidden shadow-sm md:shadow-xl ${
+            className={`w-full md:w-80 lg:w-84 xl:w-88 h-full rounded-3xl border border-[#242630] bg-[#18191E] flex flex-col shrink-0 overflow-hidden shadow-sm ${
               activeChat ? 'hidden md:flex' : 'flex'
             }`}
           >
@@ -1291,49 +1263,49 @@ export default function DashboardPage() {
         <section
           role="region"
           aria-label="Active conversation"
-          className={`flex-1 flex flex-col md:rounded-3xl border border-slate-200/80 dark:border-[#242630] bg-white dark:bg-[#18191E] overflow-hidden shadow-sm md:shadow-xl ${
+          className={`flex-1 h-full min-w-0 flex flex-col rounded-3xl border border-[#242630] bg-[#18191E] overflow-hidden shadow-sm ${
             activeChat ? 'flex' : 'hidden md:flex'
           }`}
         >
           {activeChat ? (
             <>
               {/* Active Chat Header */}
-              <div className="h-14 sm:h-16 border-b border-slate-200/80 dark:border-[#242630] bg-white/95 dark:bg-[#18191E]/95 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between shrink-0">
+              <div className="h-14 sm:h-16 border-b border-[#242630] bg-[#18191E] px-3 sm:px-6 flex items-center justify-between shrink-0">
                 <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
                   {/* Mobile Back Button to conversation list */}
                   <button
                     type="button"
                     onClick={() => void handleSelectChat(null)}
-                    className="md:hidden p-2 -ml-1 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#161622] transition touch-target-44 flex items-center justify-center shrink-0 cursor-pointer"
+                    className="md:hidden p-2 -ml-1 rounded-xl text-zinc-300 hover:bg-[#242630] transition touch-target-44 flex items-center justify-center shrink-0 cursor-pointer"
                     aria-label="Back to conversations list"
                   >
-                    <ArrowLeft className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    <ArrowLeft className="w-5 h-5 text-[#8B95F6]" />
                   </button>
 
                   <div className="relative shrink-0">
                     {activeChat.type === 'channel' ? (
-                      <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold shadow-xs">
+                      <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-[#8B95F6] flex items-center justify-center font-bold shadow-xs">
                         <Hash className="w-5 h-5" />
                       </div>
                     ) : activeChat.type === 'group' ? (
-                      <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold shadow-xs">
+                      <div className="w-10 h-10 rounded-xl bg-[#242632] border border-[#303240] text-[#E2F952] flex items-center justify-center font-bold shadow-xs">
                         <Users className="w-5 h-5" />
                       </div>
                     ) : activeChat.avatarUrl ? (
                       <img
                         src={activeChat.avatarUrl}
                         alt={activeChat.name || ''}
-                        className="w-10 h-10 rounded-xl object-cover border border-slate-200 dark:border-[#222232]"
+                        className="w-10 h-10 rounded-xl object-cover border border-[#2E303E]"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-xl bg-[#0066FF] flex items-center justify-center text-white font-bold text-sm shadow-xs">
+                      <div className="w-10 h-10 rounded-xl bg-[#2E3140] border border-[#3B3E52] flex items-center justify-center text-zinc-100 font-bold text-sm shadow-xs">
                         {activeChat.name ? activeChat.name.charAt(0).toUpperCase() : 'C'}
                       </div>
                     )}
                     {activeChat.type === 'direct' &&
                       activeChat.otherUser &&
                       onlineUsers[activeChat.otherUser.id]?.status === 'online' && (
-                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white dark:border-[#0D0D14]" />
+                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#E2F952] border-2 border-[#18191E]" />
                       )}
                   </div>
 
@@ -1395,8 +1367,8 @@ export default function DashboardPage() {
                         onClick={() => toggleInChatSearch()}
                         className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition shadow-xs cursor-pointer ${
                           inChatSearchOpen
-                            ? 'bg-blue-100 dark:bg-[#2F3140] text-blue-600 dark:text-[#8B95F6]'
-                            : 'bg-slate-100 dark:bg-[#242630] hover:bg-slate-200 dark:hover:bg-[#2F3140] text-slate-600 dark:text-zinc-300'
+                            ? 'bg-[#2F3140] text-[#8B95F6]'
+                            : 'bg-[#242630] hover:bg-[#2F3140] text-zinc-300'
                         }`}
                         aria-label="Search in conversation"
                       >
@@ -1409,7 +1381,7 @@ export default function DashboardPage() {
                       <button
                         type="button"
                         onClick={handleVoiceCall}
-                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 dark:bg-[#242630] hover:bg-slate-200 dark:hover:bg-[#2F3140] text-[#0066FF] dark:text-[#E2F952] flex items-center justify-center transition shadow-xs cursor-pointer"
+                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#242630] hover:bg-[#2F3140] text-[#E2F952] flex items-center justify-center transition shadow-xs cursor-pointer"
                         aria-label="Voice Call"
                       >
                         <Phone className="w-4 h-4" />
@@ -1421,7 +1393,7 @@ export default function DashboardPage() {
                       <button
                         type="button"
                         onClick={handleVideoCall}
-                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 dark:bg-[#242630] hover:bg-slate-200 dark:hover:bg-[#2F3140] text-slate-700 dark:text-zinc-200 hover:text-black dark:hover:text-white flex items-center justify-center transition shadow-xs cursor-pointer"
+                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#242630] hover:bg-[#2F3140] text-zinc-200 hover:text-white flex items-center justify-center transition shadow-xs cursor-pointer"
                         aria-label="Video Call"
                       >
                         <Video className="w-4 h-4" />
@@ -1435,8 +1407,8 @@ export default function DashboardPage() {
                         onClick={() => togglePinChat(activeChat.id)}
                         className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition shadow-xs cursor-pointer ${
                           isChatPinned(activeChat.id)
-                            ? 'bg-blue-50 dark:bg-[#2E313D] text-[#0066FF] dark:text-[#E2F952]'
-                            : 'bg-slate-100 dark:bg-[#242630] hover:bg-slate-200 dark:hover:bg-[#2F3140] text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200'
+                            ? 'bg-[#2E313D] text-[#E2F952]'
+                            : 'bg-[#242630] hover:bg-[#2F3140] text-zinc-400 hover:text-zinc-200'
                         }`}
                         aria-label="Pin Chat"
                       >
@@ -1457,8 +1429,8 @@ export default function DashboardPage() {
                         }}
                         className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition shadow-xs cursor-pointer ${
                           showGroupDrawer
-                            ? 'bg-blue-50 dark:bg-[#2E313D] text-[#0066FF] dark:text-[#8B95F6]'
-                            : 'bg-slate-100 dark:bg-[#242630] hover:bg-slate-200 dark:hover:bg-[#2F3140] text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-[#2E313D] text-[#8B95F6]'
+                            : 'bg-[#242630] hover:bg-[#2F3140] text-zinc-300 hover:text-white'
                         }`}
                         aria-label="Members & Details"
                       >
@@ -1476,10 +1448,10 @@ export default function DashboardPage() {
                               activeChat.otherUser!.displayName || activeChat.otherUser!.username,
                             )
                           }
-                          className="hidden sm:inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-full bg-blue-50 dark:bg-[#20222C] border border-blue-200 dark:border-[#2D2F3C] text-blue-700 dark:text-blue-300 text-xs font-semibold hover:bg-blue-100 dark:hover:bg-[#292B38] transition cursor-pointer"
+                          className="hidden sm:inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-full bg-[#20222C] border border-[#2D2F3C] text-blue-300 text-xs font-semibold hover:bg-[#292B38] transition cursor-pointer"
                           aria-label="End-to-End Encrypted (Click to verify safety number)"
                         >
-                          <Lock className="w-3.5 h-3.5 text-[#0066FF] dark:text-[#8B95F6]" />
+                          <Lock className="w-3.5 h-3.5 text-[#8B95F6]" />
                           <span>E2EE</span>
                         </button>
                       </WarmTooltip>
@@ -2173,7 +2145,7 @@ export default function DashboardPage() {
             </>
           ) : (
             /* Empty State occupying the complete space with the wireframe contour globe animation from Image 4 */
-            <div className="hidden md:flex flex-1 flex-col items-center justify-center relative overflow-hidden bg-slate-900/5 dark:bg-[#121316] md:rounded-3xl border border-slate-200/80 dark:border-[#242630]">
+            <div className="hidden md:flex flex-1 w-full h-full items-center justify-center relative overflow-hidden bg-[#060709]">
               <WireframeGlobeAnimation />
             </div>
           )}
@@ -2181,11 +2153,11 @@ export default function DashboardPage() {
 
         {/* RIGHT PANEL (Image 1 Style): Members & Files Media Cards on desktop */}
         {activeChat && (
-          <aside className="hidden xl:flex flex-col w-72 2xl:w-80 gap-3 shrink-0 overflow-y-auto">
+          <aside className="hidden xl:flex flex-col w-72 2xl:w-80 h-full gap-3 shrink-0 overflow-y-auto">
             {/* Card 1: Members */}
-            <div className="rounded-3xl bg-white dark:bg-[#18191E] border border-slate-200/80 dark:border-[#242630] p-4.5 shadow-sm">
+            <div className="rounded-3xl bg-[#18191E] border border-[#242630] p-4.5 shadow-sm">
               <div className="flex items-center justify-between mb-3.5">
-                <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">
+                <h3 className="text-sm font-bold text-zinc-100">
                   Members
                 </h3>
                 {activeChat.type !== 'direct' && (
@@ -2282,8 +2254,8 @@ export default function DashboardPage() {
             </div>
 
             {/* Card 2: Files Accordion (Matching Image 1) */}
-            <div className="rounded-3xl bg-white dark:bg-[#18191E] border border-slate-200/80 dark:border-[#242630] p-4.5 shadow-sm space-y-3">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100">
+            <div className="rounded-3xl bg-[#18191E] border border-[#242630] p-4.5 shadow-sm space-y-3">
+              <h3 className="text-sm font-bold text-zinc-100">
                 Files
               </h3>
 

@@ -12,14 +12,16 @@ export const WireframeGlobeAnimation: React.FC<WireframeGlobeProps> = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0, isHovered: false });
-  const [dimensions, setDimensions] = useState({ width: 600, height: 600 });
+  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
 
   useEffect(() => {
     const updateSize = () => {
       if (containerRef.current) {
         const { clientWidth, clientHeight } = containerRef.current;
-        const size = Math.min(Math.max(clientWidth, 320), Math.max(clientHeight, 320));
-        setDimensions({ width: size, height: size });
+        setDimensions({
+          width: Math.max(clientWidth, 320),
+          height: Math.max(clientHeight, 320)
+        });
       }
     };
 
@@ -37,6 +39,15 @@ export const WireframeGlobeAnimation: React.FC<WireframeGlobeProps> = ({
     let animationFrameId: number;
     let time = 0;
 
+    // Ambient floating star/quantum particle field
+    const particles = Array.from({ length: 48 }, () => ({
+      x: (Math.random() - 0.5) * 2,
+      y: (Math.random() - 0.5) * 2,
+      size: Math.random() * 1.5 + 0.5,
+      alpha: Math.random() * 0.5 + 0.2,
+      speed: Math.random() * 0.002 + 0.001
+    }));
+
     const render = () => {
       time += 0.015;
 
@@ -48,96 +59,141 @@ export const WireframeGlobeAnimation: React.FC<WireframeGlobeProps> = ({
       const width = dimensions.width;
       const height = dimensions.height;
 
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
+      if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+      }
+
       ctx.resetTransform();
       ctx.scale(dpr, dpr);
 
-      ctx.clearRect(0, 0, width, height);
+      // Deep dark void clear
+      ctx.fillStyle = '#060709';
+      ctx.fillRect(0, 0, width, height);
+
+      // Subtle ambient quantum atmosphere gradient
+      const atmosphere = ctx.createRadialGradient(
+        width / 2,
+        height / 2,
+        0,
+        width / 2,
+        height / 2,
+        Math.max(width, height) * 0.55
+      );
+      atmosphere.addColorStop(0, 'rgba(139, 149, 246, 0.09)');
+      atmosphere.addColorStop(0.4, 'rgba(18, 20, 28, 0.5)');
+      atmosphere.addColorStop(0.85, 'rgba(6, 7, 9, 0.98)');
+      ctx.fillStyle = atmosphere;
+      ctx.fillRect(0, 0, width, height);
 
       const centerX = width / 2;
       const centerY = height / 2;
-      const radius = Math.min(width, height) * 0.36;
+      const radius = Math.min(width, height) * 0.39;
 
-      // Rotation angles driven by auto-rotation and mouse position
-      const rotX = mouseRef.current.y * 0.75 + Math.sin(time * 0.4) * 0.12;
-      const rotY = time * 0.35 + mouseRef.current.x * 1.2;
+      // Draw subtle drifting quantum particles in background
+      particles.forEach((p) => {
+        p.y -= p.speed;
+        if (p.y < -1) p.y = 1;
+        const px = centerX + p.x * (width * 0.45) + mouseRef.current.x * 15;
+        const py = centerY + p.y * (height * 0.45) + mouseRef.current.y * 15;
+        ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha * 0.4})`;
+        ctx.beginPath();
+        ctx.arc(px, py, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Rotation angles driven by auto-rotation and interactive cursor tilt
+      const rotX = mouseRef.current.y * 0.75 + Math.sin(time * 0.35) * 0.12;
+      const rotY = time * 0.32 + mouseRef.current.x * 1.25;
+
+      const cosRx = Math.cos(rotX);
+      const sinRx = Math.sin(rotX);
 
       // Render dual hemispheres (Upper Dome & Lower Bowl) matching Image 4
       const drawHemisphere = (isUpper: boolean) => {
-        const ringCount = 28;
-        const pointsPerRing = 120;
+        const ringCount = 30;
+        const pointsPerRing = 130;
 
         for (let r = 0; r < ringCount; r++) {
           const tRing = r / (ringCount - 1); // 0 (equator gap edge) to 1 (pole)
-          // Latitude angle: from near equator (0.12 rad) to near pole (1.45 rad)
-          const phi = 0.14 + tRing * 1.35;
+          const phi = 0.12 + tRing * 1.38;
           const ringY = Math.sin(phi) * radius * (isUpper ? -1 : 1);
           const ringR = Math.cos(phi) * radius;
 
-          // Gap separation offset
-          const gapOffset = (isUpper ? -1 : 1) * (radius * 0.18 + Math.sin(time * 1.2) * 4);
+          // Gap separation offset between upper dome and lower bowl
+          const gapOffset = (isUpper ? -1 : 1) * (radius * 0.17 + Math.sin(time * 1.2) * 4);
 
-          ctx.beginPath();
-          let firstPoint: { x: number; y: number } | null = null;
+          // Determine ring accent color (crisp silver white, vibrant lime, or periwinkle)
+          const isPoleRing = tRing > 0.88;
+          const isAccentRing = r % 7 === 0;
+
+          // Projected points buffer for this ring
+          const pts: Array<{ x: number; y: number; z: number }> = [];
 
           for (let p = 0; p <= pointsPerRing; p++) {
             const theta = (p / pointsPerRing) * Math.PI * 2;
 
-            // Undulating topographical landscape wave distortion matching Image 4
+            // Undulating topographical landscape wave harmonics
             const waveFreq1 = 3;
             const waveFreq2 = 5;
-            const wave1 = Math.sin(theta * waveFreq1 + time * 1.5 + r * 0.25) * 8;
+            const wave1 = Math.sin(theta * waveFreq1 + time * 1.4 + r * 0.22) * 9;
             const wave2 = Math.cos(theta * waveFreq2 - time * 0.8 + (isUpper ? 1 : -1)) * 5;
             const cursorInfluence =
-              Math.sin(theta + mouseRef.current.x * 2) * Math.cos(phi + mouseRef.current.y * 2) * 12;
+              Math.sin(theta + mouseRef.current.x * 2) * Math.cos(phi + mouseRef.current.y * 2) * 14;
 
             const localRadius = ringR + wave1 + wave2 + cursorInfluence;
-            const localY = ringY + gapOffset + Math.sin(theta * 2 + time) * 3;
+            const localY = ringY + gapOffset + Math.sin(theta * 2 + time * 1.1) * 3;
 
             // 3D coordinates on sphere
             const x3d = localRadius * Math.cos(theta + rotY);
             const z3d = localRadius * Math.sin(theta + rotY);
-            let y3d = localY;
+            const y3d = localY;
 
             // Rotate around X axis (pitch)
-            const cosRx = Math.cos(rotX);
-            const sinRx = Math.sin(rotX);
             const yRot = y3d * cosRx - z3d * sinRx;
             const zRot = y3d * sinRx + z3d * cosRx;
 
             // 3D perspective projection
-            const fov = radius * 2.8;
+            const fov = radius * 3.0;
             const scale = fov / (fov + zRot);
             const projX = centerX + x3d * scale;
             const projY = centerY + yRot * scale;
 
-            if (p === 0) {
-              ctx.moveTo(projX, projY);
-              firstPoint = { x: projX, y: projY };
+            pts.push({ x: projX, y: projY, z: zRot });
+          }
+
+          // Draw ring in segments with front-facing luminosity and crisp contrast
+          for (let p = 0; p < pts.length - 1; p++) {
+            const p1 = pts[p];
+            const p2 = pts[p + 1];
+            const avgZ = (p1.z + p2.z) / 2;
+            const isFront = avgZ > -radius * 0.1;
+
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+
+            if (isPoleRing) {
+              // Radiant lime pole cap
+              ctx.strokeStyle = isFront
+                ? 'rgba(226, 249, 82, 0.98)'
+                : 'rgba(226, 249, 82, 0.35)';
+              ctx.lineWidth = isFront ? 1.9 : 1.1;
+            } else if (isAccentRing) {
+              // Periwinkle contour accent
+              ctx.strokeStyle = isFront
+                ? 'rgba(139, 149, 246, 0.92)'
+                : 'rgba(139, 149, 246, 0.3)';
+              ctx.lineWidth = isFront ? 1.7 : 1.0;
             } else {
-              ctx.lineTo(projX, projY);
+              // Crisp high-visibility silver / white contour
+              const baseAlpha = isFront ? 0.95 : 0.22;
+              ctx.strokeStyle = `rgba(255, 255, 255, ${baseAlpha})`;
+              ctx.lineWidth = isFront ? 1.5 : 0.9;
             }
+
+            ctx.stroke();
           }
-
-          if (firstPoint) {
-            ctx.lineTo(firstPoint.x, firstPoint.y);
-          }
-
-          // Dynamic line color opacity with subtle depth fading and gradient
-          const depthAlpha = 0.25 + (1 - tRing) * 0.65;
-          const isPoleGlow = tRing > 0.82;
-
-          // Shady periwinkle / soft glow color styling matching Image 2 & 4
-          if (isPoleGlow) {
-            ctx.strokeStyle = `rgba(226, 249, 82, ${depthAlpha * 0.85})`; // Subtle lime accent
-            ctx.lineWidth = 1.25;
-          } else {
-            ctx.strokeStyle = `rgba(215, 225, 255, ${depthAlpha * 0.72})`;
-            ctx.lineWidth = 0.95 + (1 - tRing) * 0.4;
-          }
-
-          ctx.stroke();
         }
       };
 
@@ -176,30 +232,12 @@ export const WireframeGlobeAnimation: React.FC<WireframeGlobeProps> = ({
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className={`relative w-full h-full flex flex-col items-center justify-center overflow-hidden cursor-crosshair select-none ${className}`}
+      className={`relative w-full h-full flex items-center justify-center overflow-hidden cursor-crosshair select-none bg-[#060709] ${className}`}
     >
-      {/* Background radial atmosphere glow matching Image 2 */}
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(139,149,246,0.08)_0%,rgba(22,23,27,0)_65%)]" />
-
-      {/* Responsive Canvas */}
       <canvas
         ref={canvasRef}
-        style={{ width: dimensions.width, height: dimensions.height }}
-        className="relative z-10 transition-transform duration-300 ease-out"
+        className="w-full h-full block"
       />
-
-      {/* Floating subtle badge beneath sphere */}
-      <div className="relative z-20 mt-2 flex flex-col items-center text-center px-4 max-w-sm pointer-events-none">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#1F2028]/80 border border-[#2B2C37] shadow-lg backdrop-blur-md mb-2">
-          <span className="w-2 h-2 rounded-full bg-[#E2F952] animate-pulse" />
-          <span className="text-[11px] font-semibold tracking-wide text-zinc-300">
-            Interactive Quantum Space
-          </span>
-        </div>
-        <p className="text-xs text-zinc-400 leading-relaxed">
-          Hover to rotate sphere • Select any conversation from the list to begin chatting
-        </p>
-      </div>
     </div>
   );
 };
