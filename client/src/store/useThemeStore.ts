@@ -10,8 +10,8 @@ interface ThemeState {
 }
 
 export const useThemeStore = create<ThemeState>((set, get) => ({
-  // Default to light theme as requested
-  theme: 'light',
+  // Default to shady dark theme matching reference
+  theme: 'dark',
 
   setTheme: (theme: Theme) => {
     if (typeof window !== 'undefined') {
@@ -37,17 +37,16 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
 
   initTheme: () => {
     if (typeof window !== 'undefined') {
-      let savedTheme: Theme = 'light';
+      let savedTheme: Theme = 'dark';
       try {
         const stored = localStorage.getItem('beacon_theme') as Theme | null;
         if (stored === 'dark' || stored === 'light') {
           savedTheme = stored;
         } else {
-          // Default is light
-          savedTheme = 'light';
+          savedTheme = 'dark';
         }
       } catch {
-        savedTheme = 'light';
+        savedTheme = 'dark';
       }
 
       if (savedTheme === 'dark') {

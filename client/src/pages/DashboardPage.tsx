@@ -54,7 +54,6 @@ import {
   Search,
   Check,
   CheckCheck,
-  Sparkles,
   Smile,
   Hash,
   Compass,
@@ -1514,12 +1513,54 @@ export default function DashboardPage() {
                 {isLoadingMessages && currentMessages.length === 0 ? (
                   <MessagesSkeleton count={7} />
                 ) : currentMessages.length === 0 ? (
-                  <div className="py-16 text-center max-w-sm mx-auto">
-                    <EmptyState
-                      icon={<Sparkles className="w-8 h-8" />}
-                      title="Beginning of this conversation"
-                      description="Send a message or share an attachment to begin chatting in this encrypted workspace."
-                    />
+                  <div className="max-w-2xl mx-auto space-y-4 py-2">
+                    {/* Featured Scenery Banner matching Image 1 */}
+                    <div className="relative rounded-2xl overflow-hidden border border-[#2B2D3A] shadow-lg max-h-56 bg-[#1C1D24]">
+                      <img
+                        src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80"
+                        alt="Workspace banner"
+                        className="w-full h-48 sm:h-56 object-cover opacity-90 hover:opacity-100 transition"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#18191E] via-transparent to-transparent" />
+                      <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
+                        <span className="text-xs font-semibold text-zinc-200 drop-shadow-md">
+                          {activeChat.name || 'ICG Chat'} • General Discussion
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Date separator badge */}
+                    <div className="flex items-center justify-center my-3">
+                      <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-[#22242D] border border-[#2B2C37] text-zinc-400 shadow-xs">
+                        Today
+                      </span>
+                    </div>
+
+                    {/* System message notice */}
+                    <div className="text-center text-xs text-zinc-400 py-1 flex items-center justify-center space-x-1.5">
+                      <span>&rarr;</span>
+                      <span className="font-semibold text-zinc-300">{activeChat.name || 'Host'}</span>
+                      <span>initialized this encrypted conversation</span>
+                    </div>
+
+                    {/* Call Invite Banner matching Image 1 */}
+                    <div className="mx-auto my-3 w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-[#1C1D24] border border-[#2B2D3A] shadow-md">
+                      <div className="flex items-center space-x-3 min-w-0">
+                        <div className="w-9 h-9 rounded-full bg-[#242632] flex items-center justify-center text-[#E2F952] shrink-0">
+                          <Phone className="w-4 h-4" />
+                        </div>
+                        <p className="text-xs text-zinc-300 truncate">
+                          <span className="font-semibold text-zinc-100">{activeChat.name || 'Richard Wilson'}</span> started a video call
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleVideoCall}
+                        className="px-4 py-1.5 rounded-full bg-[#E2F952] hover:bg-[#d6ee3c] text-black text-xs font-bold transition shadow-xs cursor-pointer shrink-0 ml-2"
+                      >
+                        Join
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   currentMessages.map((msg, index) => {
@@ -1552,7 +1593,7 @@ export default function DashboardPage() {
                       >
                         {showDateDivider && (
                           <div className="flex items-center justify-center my-4">
-                            <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 shadow-2xs">
+                            <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-[#22242D] border border-[#2B2C37] text-zinc-400 shadow-2xs">
                               {formatDateHeader(msg.createdAt)}
                             </span>
                           </div>
@@ -1561,17 +1602,22 @@ export default function DashboardPage() {
                         <Message align={isMe ? 'end' : 'start'} className="transition-all">
                           <MessageAvatar>
                             {isLastInSenderSequence ? (
-                              <Avatar size="md">
-                                <AvatarImage
-                                  src={isMe ? user?.avatarUrl || undefined : msg.sender.avatarUrl || undefined}
-                                  alt={isMe ? user?.displayName || 'Me' : msg.sender.displayName || 'User'}
-                                />
-                                <AvatarFallback>
-                                  {isMe
-                                    ? (user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U')
-                                    : (msg.sender.displayName ? msg.sender.displayName.charAt(0).toUpperCase() : 'U')}
-                                </AvatarFallback>
-                              </Avatar>
+                              <div className="relative">
+                                <Avatar size="md">
+                                  <AvatarImage
+                                    src={isMe ? user?.avatarUrl || undefined : msg.sender.avatarUrl || undefined}
+                                    alt={isMe ? user?.displayName || 'Me' : msg.sender.displayName || 'User'}
+                                  />
+                                  <AvatarFallback>
+                                    {isMe
+                                      ? (user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U')
+                                      : (msg.sender.displayName ? msg.sender.displayName.charAt(0).toUpperCase() : 'U')}
+                                  </AvatarFallback>
+                                </Avatar>
+                                {onlineUsers[msg.sender.id]?.status === 'online' && (
+                                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#E2F952] border-2 border-[#18191E]" />
+                                )}
+                              </div>
                             ) : (
                               <div className="h-8 w-8 sm:h-9 sm:w-9 shrink-0" />
                             )}
