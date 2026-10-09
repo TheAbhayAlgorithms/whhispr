@@ -540,183 +540,44 @@ export default function DashboardPage() {
   });
 
   return (
-    <div className="h-screen h-dvh bg-slate-100 dark:bg-black text-slate-900 dark:text-slate-100 flex flex-col md:flex-row overflow-hidden transition-colors duration-200">
-      {/* Desktop Vertical Navigation Rail (Electric Blue #0066FF matching user reference design) */}
-      <WarmTooltipGroup delay={250} warmWindow={350} travel={260} lean={2}>
-        <nav
-          aria-label="Platform navigation"
-          className="hidden md:flex w-20 flex-col items-center justify-between py-5 bg-[#0066FF] text-white shrink-0 z-30 shadow-2xl select-none"
-        >
-          {/* Top: User Avatar */}
-          <div className="flex flex-col items-center space-y-2">
-            <WarmTooltip content={user?.displayName || 'Your Profile'} shortcut="⌘P" side="right">
-              <button
-                type="button"
-                onClick={() => user && fetchUserProfile(user.id)}
-                className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/80 hover:border-white shadow-lg transition active:scale-95 cursor-pointer shrink-0"
-                aria-label={`${user?.displayName} (@${user?.username})`}
-              >
-                {user?.avatarUrl ? (
-                  <img src={user.avatarUrl} alt={user.displayName} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-blue-700 text-white font-bold flex items-center justify-center text-sm">
-                    {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
-                  </div>
-                )}
-              </button>
-            </WarmTooltip>
-
-            {/* Socket live indicator dot */}
-            <span
-              title={socketStatus === 'connected' ? 'Connected (Live)' : socketStatus}
-              className={`w-2.5 h-2.5 rounded-full ring-2 ring-[#0066FF] ${
-                socketStatus === 'connected'
-                  ? 'bg-emerald-400 animate-pulse'
-                  : socketStatus === 'connecting'
-                  ? 'bg-amber-400 animate-ping'
-                  : 'bg-slate-300'
-              }`}
-            />
-          </div>
-
-          {/* Middle: Navigation Action Icons */}
-          <div className="flex flex-col items-center space-y-3.5">
-            {/* Active Chats Button (Highlighted in White Pill matching user screenshot) */}
-            <WarmTooltip content="Conversations" shortcut="⌘1" side="right">
-              <button
-                type="button"
-                onClick={() => void handleSelectChat(null)}
-                className="relative w-12 h-12 rounded-2xl bg-white text-[#0066FF] shadow-lg flex items-center justify-center transition active:scale-95 cursor-pointer"
-                aria-label="Conversations"
-              >
-                <MessageSquare className="w-6 h-6 fill-current" />
-              </button>
-            </WarmTooltip>
-
-            {/* Contacts */}
-            <WarmTooltip content="Contacts" shortcut="⌘2" side="right">
-              <Link
-                to="/contacts"
-                className="relative w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95"
-                aria-label="Contacts"
-              >
-                <Users className="w-6 h-6" />
-                {incomingRequests.length > 0 && (
-                  <span className="absolute top-1.5 right-1.5 px-1 min-w-[16px] h-4 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900 flex items-center justify-center ring-2 ring-[#0066FF]">
-                    {incomingRequests.length}
-                  </span>
-                )}
-              </Link>
-            </WarmTooltip>
-
-            {/* Explore Channels */}
-            <WarmTooltip content="Explore Channels" shortcut="⌘3" side="right">
-              <button
-                type="button"
-                onClick={() => setShowChannelBrowserModal(true)}
-                className="w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95 cursor-pointer"
-                aria-label="Explore Channels"
-              >
-                <Compass className="w-6 h-6" />
-              </button>
-            </WarmTooltip>
-
-            {/* Notifications */}
-            <WarmTooltip content="Notifications" shortcut="⌘4" side="right">
-              <button
-                type="button"
-                onClick={() => toggleNotificationCenter()}
-                className="relative w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95 cursor-pointer"
-                aria-label="Notifications"
-              >
-                <Bell className="w-6 h-6" />
-                {unreadNotificationsCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-rose-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center ring-2 ring-[#0066FF] animate-pulse">
-                    {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
-                  </span>
-                )}
-              </button>
-            </WarmTooltip>
-
-            {/* Settings */}
-            <WarmTooltip content="Settings" shortcut="⌘," side="right">
-              <Link
-                to="/settings"
-                className="w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95"
-                aria-label="Settings"
-              >
-                <SettingsIcon className="w-6 h-6" />
-              </Link>
-            </WarmTooltip>
-
-            {/* Admin link if user is admin */}
-            {user?.role === 'admin' && (
-              <WarmTooltip content="Admin Portal" shortcut="⌘A" side="right">
-                <Link
-                  to="/admin"
-                  className="w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95"
-                  aria-label="Admin Portal"
-                >
-                  <Shield className="w-6 h-6" />
-                </Link>
-              </WarmTooltip>
-            )}
-
-            {/* Circular Daylight / Dark Theme Toggle Button */}
-            <div className="pt-1">
-              <WarmTooltip content="Toggle Theme" side="right">
-                <div>
-                  <ThemeToggle className="!bg-white/20 !border-white/30 !text-white hover:!bg-white/30" />
-                </div>
-              </WarmTooltip>
-            </div>
-          </div>
-
-          {/* Bottom: Logout / Exit */}
-          <div className="flex flex-col items-center">
-            <WarmTooltip content="Sign Out" shortcut="⌥Q" side="right">
-              <button
-                type="button"
-                onClick={handleLogout}
-                disabled={loggingOut}
-                className="w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95 cursor-pointer"
-                aria-label="Sign Out"
-              >
-                <LogOut className="w-6 h-6" />
-              </button>
-            </WarmTooltip>
-          </div>
-        </nav>
-      </WarmTooltipGroup>
-
-      {/* Main Column (Mobile Header + Chat Workspace) */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Real-time offline and reconnect status bar */}
-        <OfflineBanner />
-
-        {/* Top Navbar for Mobile (< md) */}
-        <header className="md:hidden h-14 border-b border-slate-200 dark:border-[#1E1E2A] bg-white/90 dark:bg-[#0D0D14]/90 backdrop-blur-md px-3 flex items-center justify-between shrink-0 z-20 sticky top-0">
-          <div className="flex items-center space-x-2 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-[#0066FF] flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
-              <MessageSquare className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-base font-bold tracking-tight text-slate-900 dark:text-white truncate">
-              Whhispr
-            </span>
+    <div className="h-screen h-dvh bg-slate-100 dark:bg-black text-slate-900 dark:text-slate-100 flex flex-col overflow-hidden transition-colors duration-200">
+      {/* Top Navbar Only */}
+      <WarmTooltipGroup delay={200} warmWindow={300} travel={220} lean={0}>
+        <header className="h-16 w-full border-b border-slate-200/80 dark:border-[#1E1E2A] bg-white/95 dark:bg-[#0D0D14]/95 backdrop-blur-md px-3 sm:px-5 lg:px-6 flex items-center justify-between shrink-0 z-30 select-none shadow-xs">
+          {/* Left: Brand & Status */}
+          <div className="flex items-center space-x-3 shrink-0 min-w-0">
+            <button
+              type="button"
+              onClick={() => void handleSelectChat(null)}
+              className="flex items-center space-x-2.5 group cursor-pointer focus:outline-none"
+              aria-label="Whhispr Home"
+            >
+              <div className="w-10 h-10 rounded-2xl bg-[#0066FF] flex items-center justify-center text-white shadow-md shadow-blue-500/25 group-hover:scale-105 active:scale-95 transition shrink-0">
+                <MessageSquare className="w-5 h-5 fill-current" />
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="text-base font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
+                  Whhispr
+                </span>
+                <span className="text-[10px] font-medium text-slate-400 dark:text-zinc-500 hidden sm:inline">
+                  Secure Messaging
+                </span>
+              </div>
+            </button>
 
             {/* Real-time Socket Connection Badge */}
             {socketStatus === 'connected' ? (
               <span
                 title="Socket Connected (Live)"
-                className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-medium flex items-center shrink-0"
+                className="hidden sm:inline-flex text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-medium items-center shrink-0"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse shrink-0" />
                 <span>Live</span>
               </span>
             ) : socketStatus === 'connecting' ? (
               <span
                 title="Socket Connecting..."
-                className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-medium flex items-center shrink-0"
+                className="hidden sm:inline-flex text-[11px] px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-medium items-center shrink-0"
               >
                 <Radio className="w-3 h-3 mr-1 animate-spin text-amber-500 shrink-0" />
                 <span>Connecting...</span>
@@ -724,44 +585,186 @@ export default function DashboardPage() {
             ) : (
               <span
                 title="Socket Disconnected (Offline)"
-                className="text-[11px] px-2 py-0.5 rounded-full bg-slate-500/10 text-slate-500 dark:text-slate-400 border border-slate-500/20 font-medium flex items-center shrink-0"
+                className="hidden sm:inline-flex text-[11px] px-2.5 py-0.5 rounded-full bg-slate-500/10 text-slate-500 dark:text-slate-400 border border-slate-500/20 font-medium items-center shrink-0"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1 shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5 shrink-0" />
                 <span>Offline</span>
               </span>
             )}
           </div>
 
-          <div className="flex items-center space-x-1.5">
+          {/* Center: Main Navigation Links (Desktop/Tablet md+) */}
+          <nav aria-label="Main Navigation" className="hidden md:flex items-center space-x-1 lg:space-x-2">
+            {/* Chats Pill */}
+            <WarmTooltip content="Conversations" shortcut="⌘1" side="bottom">
+              <button
+                type="button"
+                onClick={() => void handleSelectChat(null)}
+                className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer active:scale-95 ${
+                  !activeChat
+                    ? 'bg-blue-50 dark:bg-blue-950/50 text-[#0066FF] dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/50 shadow-xs'
+                    : 'text-slate-600 dark:text-zinc-300 hover:text-[#0066FF] dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-[#161622]'
+                }`}
+                aria-label="Conversations"
+              >
+                <MessageSquare className="w-4 h-4 fill-current" />
+                <span>Chats</span>
+              </button>
+            </WarmTooltip>
+
+            {/* Calls */}
+            <WarmTooltip content="Call History" side="bottom">
+              <button
+                type="button"
+                onClick={() => setShowCallHistoryModal(true)}
+                className="flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-300 hover:text-[#0066FF] dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-[#161622] transition cursor-pointer active:scale-95"
+                aria-label="Call History"
+              >
+                <PhoneCall className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <span>Calls</span>
+              </button>
+            </WarmTooltip>
+
+            {/* Contacts */}
+            <WarmTooltip content="Contacts" shortcut="⌘2" side="bottom">
+              <Link
+                to="/contacts"
+                className="relative flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-300 hover:text-[#0066FF] dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-[#161622] transition active:scale-95"
+                aria-label="Contacts"
+              >
+                <Users className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <span>Contacts</span>
+                {incomingRequests.length > 0 && (
+                  <span className="px-1.5 min-w-[16px] h-4 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900 flex items-center justify-center">
+                    {incomingRequests.length}
+                  </span>
+                )}
+              </Link>
+            </WarmTooltip>
+
+            {/* Explore Channels */}
+            <WarmTooltip content="Explore Channels" shortcut="⌘3" side="bottom">
+              <button
+                type="button"
+                onClick={() => setShowChannelBrowserModal(true)}
+                className="flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-300 hover:text-[#0066FF] dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-[#161622] transition cursor-pointer active:scale-95"
+                aria-label="Explore Channels"
+              >
+                <Compass className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <span>Explore</span>
+              </button>
+            </WarmTooltip>
+          </nav>
+
+          {/* Right: Tools, Theme Toggle, Profile, Sign Out */}
+          <div className="flex items-center space-x-1.5 sm:space-x-2.5">
+            {/* Global Search Trigger */}
+            <WarmTooltip content="Search messages & contacts" shortcut="⌘K" side="bottom">
+              <button
+                type="button"
+                onClick={() => setShowGlobalSearch(true)}
+                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#161622] dark:hover:bg-[#1E1E2C] border border-slate-200 dark:border-[#222232] text-blue-600 dark:text-blue-400 flex items-center justify-center transition cursor-pointer active:scale-95"
+                aria-label="Search"
+              >
+                <Search className="w-4 h-4" />
+              </button>
+            </WarmTooltip>
+
+            {/* Notifications Bell */}
+            <WarmTooltip content="Notifications" shortcut="⌘4" side="bottom">
+              <button
+                type="button"
+                onClick={() => toggleNotificationCenter()}
+                className="relative w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#161622] dark:hover:bg-[#1E1E2C] border border-slate-200 dark:border-[#222232] text-blue-600 dark:text-blue-400 flex items-center justify-center transition cursor-pointer active:scale-95"
+                aria-label="Notifications"
+              >
+                <Bell className="w-4 h-4" />
+                {unreadNotificationsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-rose-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center animate-pulse shadow-xs">
+                    {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                  </span>
+                )}
+              </button>
+            </WarmTooltip>
+
+            {/* Settings Link (Desktop) */}
+            <div className="hidden sm:block">
+              <WarmTooltip content="Settings" shortcut="⌘," side="bottom">
+                <Link
+                  to="/settings"
+                  className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#161622] dark:hover:bg-[#1E1E2C] border border-slate-200 dark:border-[#222232] text-slate-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 flex items-center justify-center transition active:scale-95"
+                  aria-label="Settings"
+                >
+                  <SettingsIcon className="w-4 h-4" />
+                </Link>
+              </WarmTooltip>
+            </div>
+
+            {/* Admin Portal (if admin) */}
+            {user?.role === 'admin' && (
+              <div className="hidden sm:block">
+                <WarmTooltip content="Admin Portal" shortcut="⌘A" side="bottom">
+                  <Link
+                    to="/admin"
+                    className="w-9 h-9 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/40 border border-blue-200 dark:border-blue-800/60 text-blue-600 dark:text-blue-400 flex items-center justify-center transition active:scale-95"
+                    aria-label="Admin Portal"
+                  >
+                    <Shield className="w-4 h-4" />
+                  </Link>
+                </WarmTooltip>
+              </div>
+            )}
+
             {/* Daylight / Dark Theme Toggle Button */}
-            <ThemeToggle size="sm" />
+            <WarmTooltip content="Toggle Theme" side="bottom">
+              <div>
+                <ThemeToggle size="sm" />
+              </div>
+            </WarmTooltip>
 
-            {/* In-App Notifications Bell */}
-            <button
-              type="button"
-              onClick={() => toggleNotificationCenter()}
-              className="relative w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-[#161622] dark:hover:bg-[#1E1E2C] border border-slate-200 dark:border-[#222232] text-slate-700 dark:text-slate-300 transition cursor-pointer flex items-center justify-center shrink-0 active:scale-95"
-              title="Notifications"
-              aria-label="Notifications"
-            >
-              <Bell className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              {unreadNotificationsCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-rose-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center animate-pulse shadow-xs">
-                  {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
-                </span>
-              )}
-            </button>
+            {/* User Profile Avatar with socket live indicator */}
+            <WarmTooltip content={user?.displayName || 'Your Profile'} shortcut="⌘P" side="bottom">
+              <button
+                type="button"
+                onClick={() => user && fetchUserProfile(user.id)}
+                className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-blue-500/40 hover:border-blue-500 shadow-sm transition active:scale-95 cursor-pointer shrink-0"
+                aria-label={`${user?.displayName} (@${user?.username})`}
+              >
+                {user?.avatarUrl ? (
+                  <img src={user.avatarUrl} alt={user.displayName} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-[#0066FF] text-white font-bold flex items-center justify-center text-xs">
+                    {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                )}
+              </button>
+            </WarmTooltip>
 
-            {/* Mobile Menu Button for screens < md */}
+            {/* Sign Out (Desktop) */}
+            <div className="hidden sm:block">
+              <WarmTooltip content="Sign Out" shortcut="⌥Q" side="bottom">
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                  className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-rose-50 dark:bg-[#161622] dark:hover:bg-rose-950/30 border border-slate-200 dark:border-[#222232] text-slate-500 hover:text-rose-600 dark:text-zinc-400 dark:hover:text-rose-400 flex items-center justify-center transition active:scale-95 cursor-pointer"
+                  aria-label="Sign Out"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </WarmTooltip>
+            </div>
+
+            {/* Mobile Menu Dropdown Toggle (< md) */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen((prev) => !prev)}
-              className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-[#161622] dark:hover:bg-[#1E1E2C] border border-slate-200 dark:border-[#222232] text-slate-700 dark:text-slate-300 transition flex items-center justify-center shrink-0 active:scale-95"
+              className="md:hidden w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#161622] dark:hover:bg-[#1E1E2C] border border-slate-200 dark:border-[#222232] text-blue-600 dark:text-blue-400 transition flex items-center justify-center shrink-0 active:scale-95"
               aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? (
-                <CloseIcon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <CloseIcon className="w-4 h-4" />
               ) : (
                 <Menu className="w-4 h-4" />
               )}
@@ -776,7 +779,7 @@ export default function DashboardPage() {
                 onClick={() => setMobileMenuOpen(false)}
                 aria-hidden="true"
               />
-              <div className="fixed top-14 right-3 z-50 w-72 max-w-[calc(100vw-24px)] bg-white dark:bg-[#0D0D14] border border-slate-200 dark:border-[#1E1E2A] rounded-2xl shadow-2xl p-2.5 flex flex-col md:hidden animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-150 origin-top-right max-h-[calc(100dvh-4.5rem)] overflow-y-auto">
+              <div className="fixed top-16 right-3 z-50 w-72 max-w-[calc(100vw-24px)] bg-white dark:bg-[#0D0D14] border border-slate-200 dark:border-[#1E1E2A] rounded-2xl shadow-2xl p-2.5 flex flex-col md:hidden animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-150 origin-top-right max-h-[calc(100dvh-4.5rem)] overflow-y-auto">
                 {/* User Profile Card */}
                 <div className="flex items-center space-x-2.5 p-2 rounded-xl bg-slate-50 dark:bg-[#161622] border border-slate-100 dark:border-[#222232]">
                   <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-200 dark:bg-[#1E1E2C] border-2 border-blue-500/40 flex items-center justify-center text-xs font-bold text-blue-600 dark:text-blue-300 shrink-0">
@@ -813,6 +816,17 @@ export default function DashboardPage() {
 
                 {/* Menu Links */}
                 <div className="mt-2 pt-1.5 border-t border-slate-100 dark:border-[#1E1E2A] space-y-0.5">
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setShowCallHistoryModal(true);
+                    }}
+                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#161622] transition text-left active:scale-[0.99]"
+                  >
+                    <PhoneCall className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                    <span>Calls</span>
+                  </button>
+
                   <Link
                     to="/contacts"
                     onClick={() => setMobileMenuOpen(false)}
@@ -888,6 +902,10 @@ export default function DashboardPage() {
             </>
           )}
         </header>
+      </WarmTooltipGroup>
+
+      {/* Real-time offline and reconnect status bar */}
+      <OfflineBanner />
 
         {/* Main Two-Panel Chat Workspace (Floated / Docked rounded cards on desktop) */}
         <div className="flex-1 flex overflow-hidden p-0 md:p-3 md:gap-3 bg-slate-100 dark:bg-black">
@@ -1969,74 +1987,13 @@ export default function DashboardPage() {
         <button
           type="button"
           onClick={() => setShowCreateGroupModal(true)}
-          className="md:hidden fixed right-4 bottom-20 z-20 w-13 h-13 rounded-full bg-[#0066FF] hover:bg-blue-600 text-white shadow-xl shadow-blue-600/30 flex items-center justify-center touch-target-44 hover:scale-105 active:scale-95 transition"
+          className="md:hidden fixed right-4 bottom-6 z-20 w-13 h-13 rounded-full bg-[#0066FF] hover:bg-blue-600 text-white shadow-xl shadow-blue-600/30 flex items-center justify-center touch-target-44 hover:scale-105 active:scale-95 transition"
           aria-label="New Conversation or Group"
           title="New Conversation or Group"
         >
           <Plus className="w-6 h-6" />
         </button>
       )}
-
-      {/* Mobile Bottom Tab Bar (shown when conversations list is visible) */}
-      {!activeChat && (
-        <nav
-          className="md:hidden border-t border-slate-200 dark:border-[#1E1E2A] bg-white/95 dark:bg-[#0D0D14]/95 backdrop-blur-md pb-safe shrink-0 z-20"
-          aria-label="Mobile Navigation"
-        >
-          <div className="grid grid-cols-5 h-14">
-            <button
-              type="button"
-              className="flex flex-col items-center justify-center text-blue-600 dark:text-blue-400 touch-target-44"
-              aria-label="Chats"
-            >
-              <MessageSquare className="w-5 h-5" />
-              <span className="text-[10px] font-semibold mt-0.5">Chats</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowCallHistoryModal(true)}
-              className="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 touch-target-44"
-              aria-label="Calls"
-            >
-              <PhoneCall className="w-5 h-5" />
-              <span className="text-[10px] font-semibold mt-0.5">Calls</span>
-            </button>
-            <Link
-              to="/contacts"
-              className="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 relative touch-target-44"
-              aria-label="Contacts"
-            >
-              <div className="relative">
-                <Users className="w-5 h-5" />
-                {incomingRequests.length > 0 && (
-                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-amber-500 text-white rounded-full text-[9px] font-bold flex items-center justify-center animate-pulse">
-                    {incomingRequests.length}
-                  </span>
-                )}
-              </div>
-              <span className="text-[10px] font-semibold mt-0.5">Contacts</span>
-            </Link>
-            <button
-              type="button"
-              onClick={() => setShowChannelBrowserModal(true)}
-              className="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 touch-target-44"
-              aria-label="Explore Channels"
-            >
-              <Compass className="w-5 h-5" />
-              <span className="text-[10px] font-semibold mt-0.5">Explore</span>
-            </button>
-            <Link
-              to="/profile"
-              className="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 touch-target-44"
-              aria-label="Profile"
-            >
-              <UserIcon className="w-5 h-5" />
-              <span className="text-[10px] font-semibold mt-0.5">Profile</span>
-            </Link>
-          </div>
-        </nav>
-      )}
-      </div>
 
       {/* Lightbox Image Preview Modal */}
       {lightboxImageUrl && (
