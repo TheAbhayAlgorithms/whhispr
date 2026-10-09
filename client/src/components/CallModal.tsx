@@ -84,19 +84,19 @@ export function CallModal() {
   const isVideo = session.callType === 'video';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-2 sm:p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-2 sm:p-4 animate-in fade-in duration-200">
       {/* Hidden audio element for pure voice calls */}
       <audio ref={remoteAudioRef} autoPlay />
 
-      <div className="relative w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col min-h-[380px] sm:min-h-[520px] max-h-[92vh]">
+      <div className="relative w-full max-w-4xl bg-[#141515] border border-[#2C2E2E] rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col min-h-[380px] sm:min-h-[520px] max-h-[92vh]">
         {/* Top Status Header */}
-        <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-b from-black/60 to-transparent">
+        <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-b from-[#141515]/80 to-transparent">
           <div className="flex items-center space-x-3">
             <span className="flex h-3 w-3 relative">
               <span
                 className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
                   session.status === 'connected'
-                    ? 'bg-emerald-400'
+                    ? 'bg-[#20B2AA]'
                     : session.status === 'ended'
                       ? 'bg-rose-400'
                       : 'bg-amber-400'
@@ -105,7 +105,7 @@ export function CallModal() {
               <span
                 className={`relative inline-flex rounded-full h-3 w-3 ${
                   session.status === 'connected'
-                    ? 'bg-emerald-500'
+                    ? 'bg-[#20B2AA]'
                     : session.status === 'ended'
                       ? 'bg-rose-500'
                       : 'bg-amber-500'
@@ -113,10 +113,10 @@ export function CallModal() {
               />
             </span>
             <div className="text-left">
-              <h4 className="text-sm font-semibold text-white drop-shadow-sm">
+              <h4 className="text-sm font-semibold text-[#EDEDED] drop-shadow-sm">
                 {session.isInitiator ? session.recipientName : session.callerName}
               </h4>
-              <p className="text-xs text-slate-300 drop-shadow-sm">
+              <p className="text-xs text-[#9EA3A3] drop-shadow-sm">
                 {session.status === 'connected'
                   ? `In Call • ${formatDuration(elapsed)}`
                   : session.status === 'outgoing'
@@ -129,14 +129,14 @@ export function CallModal() {
           </div>
 
           <div className="flex items-center space-x-2">
-            <span className="px-3 py-1 rounded-full text-[11px] font-medium tracking-wide uppercase bg-slate-800/80 border border-slate-700/80 text-blue-300">
+            <span className="px-3 py-1 rounded-full text-[11px] font-medium tracking-wide uppercase bg-[#202222] border border-[#2D3030] text-[#20B2AA]">
               {session.callType} Call
             </span>
           </div>
         </div>
 
         {/* Central Content Canvas */}
-        <div className="relative flex-1 flex items-center justify-center overflow-hidden bg-slate-950">
+        <div className="relative flex-1 flex items-center justify-center overflow-hidden bg-[#191A1A]">
           {/* STATE 1: Connected Video Call */}
           {session.status === 'connected' && isVideo ? (
             <div className="relative w-full h-full flex items-center justify-center bg-black">
@@ -149,7 +149,7 @@ export function CallModal() {
               />
 
               {/* Local Video PiP (Floating Top Right) */}
-              <div className="absolute top-16 sm:top-20 right-3 sm:right-6 w-28 h-20 sm:w-48 sm:h-32 md:w-56 md:h-36 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border-2 border-blue-500/60 bg-slate-900 z-10 transition-all duration-300">
+              <div className="absolute top-16 sm:top-20 right-3 sm:right-6 w-28 h-20 sm:w-48 sm:h-32 md:w-56 md:h-36 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border-2 border-[#20B2AA]/60 bg-[#141515] z-10 transition-all duration-300">
                 <video
                   ref={localVideoRef}
                   autoPlay
@@ -157,7 +157,7 @@ export function CallModal() {
                   muted
                   className="w-full h-full object-cover transform -scale-x-100"
                 />
-                <div className="absolute bottom-1 sm:bottom-2 left-1 sm:left-2 px-1.5 sm:px-2 py-0.5 rounded bg-black/60 backdrop-blur-sm text-[9px] sm:text-[10px] text-white font-medium">
+                <div className="absolute bottom-1 sm:bottom-2 left-1 sm:left-2 px-1.5 sm:px-2 py-0.5 rounded bg-black/70 backdrop-blur-sm text-[9px] sm:text-[10px] text-[#EDEDED] font-medium">
                   You {isMuted ? '• Muted' : ''}
                 </div>
               </div>
@@ -168,8 +168,8 @@ export function CallModal() {
           {session.status === 'connected' && !isVideo ? (
             <div className="flex flex-col items-center justify-center p-8 space-y-6">
               <div className="relative">
-                <div className="absolute -inset-4 rounded-full bg-blue-500/20 animate-pulse blur-xl" />
-                <div className="relative w-28 h-28 rounded-full border-4 border-blue-500/50 overflow-hidden shadow-2xl flex items-center justify-center bg-blue-600">
+                <div className="absolute -inset-4 rounded-full bg-[#20B2AA]/20 animate-pulse blur-xl" />
+                <div className="relative w-28 h-28 rounded-full border-4 border-[#20B2AA]/50 overflow-hidden shadow-2xl flex items-center justify-center bg-[#202222]">
                   {(session.isInitiator ? session.recipientAvatar : session.callerAvatar) ? (
                     <img
                       src={(session.isInitiator ? session.recipientAvatar : session.callerAvatar)!}
@@ -177,15 +177,15 @@ export function CallModal() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <User className="w-12 h-12 text-white" />
+                    <User className="w-12 h-12 text-[#20B2AA]" />
                   )}
                 </div>
               </div>
               <div className="text-center">
-                <h3 className="text-xl font-bold text-white mb-1">
+                <h3 className="text-xl font-bold text-[#EDEDED] mb-1">
                   {session.isInitiator ? session.recipientName : session.callerName}
                 </h3>
-                <p className="text-sm font-mono text-emerald-400 font-semibold tracking-wider">
+                <p className="text-sm font-mono text-[#20B2AA] font-semibold tracking-wider">
                   {formatDuration(elapsed)}
                 </p>
               </div>
@@ -196,8 +196,8 @@ export function CallModal() {
           {session.status === 'outgoing' ? (
             <div className="flex flex-col items-center justify-center p-8 space-y-6">
               <div className="relative">
-                <div className="absolute -inset-6 rounded-full bg-blue-500/20 animate-ping duration-1000" />
-                <div className="relative w-28 h-28 rounded-full border-4 border-blue-500/40 overflow-hidden shadow-2xl flex items-center justify-center bg-blue-600">
+                <div className="absolute -inset-6 rounded-full bg-[#20B2AA]/20 animate-ping duration-1000" />
+                <div className="relative w-28 h-28 rounded-full border-4 border-[#20B2AA]/40 overflow-hidden shadow-2xl flex items-center justify-center bg-[#202222]">
                   {session.recipientAvatar ? (
                     <img
                       src={session.recipientAvatar}
@@ -205,13 +205,13 @@ export function CallModal() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <User className="w-12 h-12 text-white" />
+                    <User className="w-12 h-12 text-[#20B2AA]" />
                   )}
                 </div>
               </div>
               <div className="text-center">
-                <h3 className="text-xl font-bold text-white mb-1">{session.recipientName}</h3>
-                <p className="text-sm text-slate-400">Ringing...</p>
+                <h3 className="text-xl font-bold text-[#EDEDED] mb-1">{session.recipientName}</h3>
+                <p className="text-sm text-[#9EA3A3]">Ringing...</p>
               </div>
             </div>
           ) : null}
@@ -220,8 +220,8 @@ export function CallModal() {
           {session.status === 'incoming' ? (
             <div className="flex flex-col items-center justify-center p-8 space-y-6">
               <div className="relative">
-                <div className="absolute -inset-6 rounded-full bg-emerald-500/25 animate-ping duration-1000" />
-                <div className="relative w-28 h-28 rounded-full border-4 border-emerald-500/50 overflow-hidden shadow-2xl flex items-center justify-center bg-blue-600">
+                <div className="absolute -inset-6 rounded-full bg-[#20B2AA]/25 animate-ping duration-1000" />
+                <div className="relative w-28 h-28 rounded-full border-4 border-[#20B2AA]/50 overflow-hidden shadow-2xl flex items-center justify-center bg-[#202222]">
                   {session.callerAvatar ? (
                     <img
                       src={session.callerAvatar}
@@ -229,17 +229,17 @@ export function CallModal() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <User className="w-12 h-12 text-white" />
+                    <User className="w-12 h-12 text-[#20B2AA]" />
                   )}
                 </div>
               </div>
               <div className="text-center">
-                <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-blue-950/60 border border-blue-700/60 text-blue-300 text-xs font-semibold mb-3">
+                <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#1D2B29] border border-[#25423E] text-[#20B2AA] text-xs font-semibold mb-3">
                   <Sparkles className="w-3 h-3" />
                   <span>Incoming {session.callType} Call</span>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-1">{session.callerName}</h3>
-                <p className="text-xs text-slate-400">wants to connect with you</p>
+                <h3 className="text-2xl font-bold text-[#EDEDED] mb-1">{session.callerName}</h3>
+                <p className="text-xs text-[#9EA3A3]">wants to connect with you</p>
               </div>
             </div>
           ) : null}
@@ -250,8 +250,8 @@ export function CallModal() {
               <div className="w-16 h-16 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center">
                 <PhoneOff className="w-8 h-8" />
               </div>
-              <h3 className="text-lg font-bold text-white">Call Ended</h3>
-              <p className="text-xs text-slate-400">
+              <h3 className="text-lg font-bold text-[#EDEDED]">Call Ended</h3>
+              <p className="text-xs text-[#9EA3A3]">
                 Duration: {formatDuration(session.duration)}
               </p>
             </div>
@@ -259,12 +259,12 @@ export function CallModal() {
         </div>
 
         {/* Bottom Floating Control Dock */}
-        <div className="px-3 sm:px-6 py-3 sm:py-5 bg-slate-900/90 border-t border-slate-800/80 flex items-center justify-center space-x-3 sm:space-x-4 pb-safe">
+        <div className="px-3 sm:px-6 py-3 sm:py-5 bg-[#141515] border-t border-[#2C2E2E] flex items-center justify-center space-x-3 sm:space-x-4 pb-safe">
           {session.status === 'incoming' ? (
             <div className="flex items-center space-x-4 sm:space-x-6">
               <button
                 onClick={() => rejectCall('declined')}
-                className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/30 transition transform hover:scale-105 active:scale-95"
+                className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/30 transition transform hover:scale-105 active:scale-95 cursor-pointer"
                 title="Decline Call"
               >
                 <PhoneOff className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -272,7 +272,7 @@ export function CallModal() {
 
               <button
                 onClick={() => acceptCall('audio')}
-                className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30 transition transform hover:scale-105 active:scale-95"
+                className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#20B2AA] hover:bg-[#1CA099] text-black shadow-lg shadow-[#20B2AA]/30 transition transform hover:scale-105 active:scale-95 cursor-pointer font-bold"
                 title="Accept with Audio"
               >
                 <Phone className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -281,7 +281,7 @@ export function CallModal() {
               {session.callType === 'video' && (
                 <button
                   onClick={() => acceptCall('video')}
-                  className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/30 transition transform hover:scale-105 active:scale-95"
+                  className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#20B2AA] hover:bg-[#1CA099] text-black shadow-lg shadow-[#20B2AA]/30 transition transform hover:scale-105 active:scale-95 cursor-pointer font-bold"
                   title="Accept with Video"
                 >
                   <Video className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -293,10 +293,10 @@ export function CallModal() {
               {/* Mic Mute/Unmute */}
               <button
                 onClick={toggleMute}
-                className={`flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full border transition ${
+                className={`flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full border transition cursor-pointer ${
                   isMuted
                     ? 'bg-rose-500/20 border-rose-500 text-rose-400 hover:bg-rose-500/30'
-                    : 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700'
+                    : 'bg-[#202222] border-[#2D3030] text-[#EDEDED] hover:bg-[#262828]'
                 }`}
                 title={isMuted ? 'Unmute Microphone' : 'Mute Microphone'}
               >
@@ -307,10 +307,10 @@ export function CallModal() {
               {isVideo && (
                 <button
                   onClick={toggleVideo}
-                  className={`flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full border transition ${
+                  className={`flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full border transition cursor-pointer ${
                     isVideoOff
                       ? 'bg-rose-500/20 border-rose-500 text-rose-400 hover:bg-rose-500/30'
-                      : 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700'
+                      : 'bg-[#202222] border-[#2D3030] text-[#EDEDED] hover:bg-[#262828]'
                   }`}
                   title={isVideoOff ? 'Turn Camera On' : 'Turn Camera Off'}
                 >
@@ -322,10 +322,10 @@ export function CallModal() {
               {isVideo && (
                 <button
                   onClick={() => void toggleScreenShare()}
-                  className={`flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full border transition ${
+                  className={`flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full border transition cursor-pointer ${
                     isScreenSharing
-                      ? 'bg-blue-600 border-blue-500 text-white'
-                      : 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700'
+                      ? 'bg-[#20B2AA] border-[#20B2AA] text-black font-bold'
+                      : 'bg-[#202222] border-[#2D3030] text-[#EDEDED] hover:bg-[#262828]'
                   }`}
                   title={isScreenSharing ? 'Stop Screen Share' : 'Share Screen'}
                 >
@@ -336,7 +336,7 @@ export function CallModal() {
               {/* End Call Button */}
               <button
                 onClick={endCall}
-                className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/30 transition transform hover:scale-105 active:scale-95 ml-1 sm:ml-2"
+                className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/30 transition transform hover:scale-105 active:scale-95 ml-1 sm:ml-2 cursor-pointer"
                 title="End Call"
               >
                 <PhoneOff className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -346,7 +346,7 @@ export function CallModal() {
             <div className="flex items-center justify-center">
               <button
                 onClick={endCall}
-                className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/30 transition transform hover:scale-105 active:scale-95"
+                className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/30 transition transform hover:scale-105 active:scale-95 cursor-pointer"
                 title="Cancel Call"
               >
                 <PhoneOff className="w-5 h-5 sm:w-6 sm:h-6" />

@@ -48,17 +48,17 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-6 selection:bg-blue-500 selection:text-white">
-          <div className="w-full max-w-lg bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl backdrop-blur-xl flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-200">
+        <div className="min-h-screen bg-[#191A1A] text-[#EDEDED] flex flex-col items-center justify-center p-6 selection:bg-[#20B2AA] selection:text-black">
+          <div className="w-full max-w-lg bg-[#141515] border border-[#2C2E2E] rounded-2xl p-8 shadow-2xl backdrop-blur-xl flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-200">
             {/* Warning Glow Icon */}
-            <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/25 flex items-center justify-center text-rose-500 mb-6 shadow-lg shadow-rose-500/10">
+            <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/25 flex items-center justify-center text-rose-400 mb-6 shadow-lg shadow-rose-500/10">
               <AlertTriangle className="w-8 h-8 animate-pulse" />
             </div>
 
-            <h1 className="text-2xl font-bold tracking-tight text-white mb-2">
+            <h1 className="text-2xl font-bold tracking-tight text-[#EDEDED] mb-2">
               Something went wrong
             </h1>
-            <p className="text-sm text-slate-400 mb-6 max-w-sm">
+            <p className="text-sm text-[#9EA3A3] mb-6 max-w-sm">
               An unexpected render error occurred in Whhispr. Your messages and account remain safe and intact.
             </p>
 
@@ -67,7 +67,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               <button
                 type="button"
                 onClick={this.handleReload}
-                className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-[#0066FF] hover:bg-blue-600 text-white font-semibold text-xs transition flex items-center justify-center space-x-2 shadow-lg shadow-blue-600/20 cursor-pointer"
+                className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-[#20B2AA] hover:bg-[#1CA099] text-black font-semibold text-xs transition flex items-center justify-center space-x-2 shadow-xs cursor-pointer"
               >
                 <RefreshCw className="w-4 h-4" />
                 <span>Reload Whhispr</span>
@@ -76,7 +76,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               <button
                 type="button"
                 onClick={this.handleReset}
-                className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition flex items-center justify-center space-x-2 cursor-pointer"
+                className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-[#202222] hover:bg-[#262828] text-[#EDEDED] font-semibold text-xs border border-[#2D3030] transition flex items-center justify-center space-x-2 cursor-pointer"
               >
                 <Home className="w-4 h-4" />
                 <span>Return to Home</span>
@@ -85,11 +85,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
             {/* Collapsible Error Trace */}
             {this.state.error && (
-              <div className="w-full border-t border-slate-800/80 pt-4 text-left">
+              <div className="w-full border-t border-[#2C2E2E] pt-4 text-left">
                 <button
                   type="button"
                   onClick={this.toggleDetails}
-                  className="flex items-center justify-between w-full text-xs font-semibold text-slate-400 hover:text-slate-200 py-1 transition cursor-pointer"
+                  className="flex items-center justify-between w-full text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] py-1 transition cursor-pointer"
                 >
                   <span>Technical details</span>
                   {this.state.showDetails ? (
@@ -100,10 +100,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                 </button>
 
                 {this.state.showDetails && (
-                  <div className="mt-3 p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 text-left font-mono text-[11px] text-rose-400 overflow-x-auto max-h-48 whitespace-pre-wrap">
+                  <div className="mt-3 p-3.5 rounded-xl bg-[#191A1A] border border-[#2C2E2E] text-left font-mono text-[11px] text-rose-400 overflow-x-auto max-h-48 whitespace-pre-wrap">
                     <p className="font-bold mb-1">{this.state.error.toString()}</p>
                     {this.state.errorInfo?.componentStack && (
-                      <p className="text-slate-500 mt-2">{this.state.errorInfo.componentStack}</p>
+                      <p className="text-[#737878] mt-2">{this.state.errorInfo.componentStack}</p>
                     )}
                   </div>
                 )}

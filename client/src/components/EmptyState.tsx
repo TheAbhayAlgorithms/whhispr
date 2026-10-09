@@ -24,15 +24,15 @@ export function EmptyState({
       className={`flex flex-col items-center justify-center text-center p-8 max-w-sm mx-auto select-none ${className}`}
       role="status"
     >
-      <div className="w-16 h-16 rounded-3xl bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-4 shadow-sm">
+      <div className="w-16 h-16 rounded-2xl bg-[#1D2B29] border border-[#25423E] text-[#20B2AA] flex items-center justify-center mb-4 shadow-sm">
         {icon}
       </div>
 
-      <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-1 tracking-tight">
+      <h3 className="text-base font-bold text-[#EDEDED] mb-1 tracking-tight">
         {title}
       </h3>
 
-      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-5">
+      <p className="text-xs text-[#9EA3A3] leading-relaxed mb-5">
         {description}
       </p>
 
@@ -40,7 +40,7 @@ export function EmptyState({
         <button
           type="button"
           onClick={onAction}
-          className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500"
+          className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-[#20B2AA] hover:bg-[#1CA099] text-black text-xs font-semibold shadow-xs transition active:scale-95 cursor-pointer"
         >
           {actionIcon}
           <span>{actionText}</span>

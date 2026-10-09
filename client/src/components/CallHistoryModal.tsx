@@ -58,24 +58,24 @@ export function CallHistoryModal({ isOpen, onClose, onStartCall }: CallHistoryMo
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 dark:bg-black/70 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="w-full sm:max-w-xl bg-white dark:bg-slate-900 border-t sm:border border-slate-200 dark:border-slate-800 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[90vh] sm:h-auto sm:max-h-[85vh] pb-safe animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-150">
+      <div className="w-full sm:max-w-xl bg-[#141515] border-t sm:border border-[#2C2E2E] rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[90vh] sm:h-auto sm:max-h-[85vh] pb-safe animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-[#2C2E2E] shrink-0 bg-[#141515]">
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-[#202222] border border-[#2D3030] text-[#20B2AA] flex items-center justify-center shrink-0">
               <Phone className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Call Log</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <h3 className="text-base font-semibold text-[#EDEDED]">Call Log</h3>
+              <p className="text-xs text-[#9EA3A3]">
                 Recent voice and video conversations
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition touch-target-44 flex items-center justify-center shrink-0"
+            className="p-1.5 rounded-xl hover:bg-[#202222] text-[#9EA3A3] hover:text-[#EDEDED] transition touch-target-44 flex items-center justify-center shrink-0"
             aria-label="Close call history"
           >
             <X className="w-5 h-5" />
@@ -83,19 +83,19 @@ export function CallHistoryModal({ isOpen, onClose, onStartCall }: CallHistoryMo
         </div>
 
         {/* Call List */}
-        <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/50 p-2">
+        <div className="flex-1 overflow-y-auto divide-y divide-[#242626] p-2 bg-[#141515]">
           {isLoadingHistory ? (
-            <div className="py-16 text-center text-slate-400">
-              <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-blue-500" />
+            <div className="py-16 text-center text-[#737878]">
+              <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#20B2AA]" />
               <p className="text-xs">Loading call history...</p>
             </div>
           ) : callHistory.length === 0 ? (
-            <div className="py-16 text-center text-slate-400">
+            <div className="py-16 text-center text-[#737878]">
               <Clock className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+              <p className="text-sm font-medium text-[#EDEDED]">
                 No recent calls
               </p>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-[#737878] mt-1">
                 Voice and video calls with your contacts will appear here
               </p>
             </div>
@@ -108,11 +108,11 @@ export function CallHistoryModal({ isOpen, onClose, onStartCall }: CallHistoryMo
               return (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/40 rounded-2xl transition"
+                  className="flex items-center justify-between p-3.5 hover:bg-[#191A1A] rounded-xl transition"
                 >
                   <div className="flex items-center space-x-3 min-w-0">
                     {/* User Avatar */}
-                    <div className="relative w-11 h-11 rounded-2xl overflow-hidden bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center shrink-0">
+                    <div className="relative w-11 h-11 rounded-xl overflow-hidden bg-[#202222] border border-[#2D3030] flex items-center justify-center shrink-0">
                       {other?.avatar_url ? (
                         <img
                           src={other.avatar_url}
@@ -120,36 +120,36 @@ export function CallHistoryModal({ isOpen, onClose, onStartCall }: CallHistoryMo
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        <User className="w-5 h-5 text-[#20B2AA]" />
                       )}
                     </div>
 
                     <div className="min-w-0">
                       <div className="flex items-center space-x-1.5">
-                        <span className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                        <span className="text-sm font-medium text-[#EDEDED] truncate">
                           {other?.display_name || other?.username || 'Unknown'}
                         </span>
                         {item.type === 'video' ? (
-                          <Video className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                          <Video className="w-3.5 h-3.5 text-[#20B2AA] shrink-0" />
                         ) : (
-                          <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <Phone className="w-3.5 h-3.5 text-[#737878] shrink-0" />
                         )}
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-[#9EA3A3] mt-0.5">
                         <div className="flex items-center space-x-1">
                           {isMissed ? (
-                            <PhoneMissed className="w-3.5 h-3.5 text-rose-500" />
+                            <PhoneMissed className="w-3.5 h-3.5 text-rose-400" />
                           ) : isOutgoing ? (
-                            <PhoneOutgoing className="w-3.5 h-3.5 text-slate-400" />
+                            <PhoneOutgoing className="w-3.5 h-3.5 text-[#737878]" />
                           ) : (
-                            <PhoneIncoming className="w-3.5 h-3.5 text-emerald-500" />
+                            <PhoneIncoming className="w-3.5 h-3.5 text-[#20B2AA]" />
                           )}
                           <span
                             className={
                               isMissed
-                                ? 'text-rose-500 font-medium'
-                                : 'text-slate-500 dark:text-slate-400'
+                                ? 'text-rose-400 font-medium'
+                                : 'text-[#9EA3A3]'
                             }
                           >
                             {isMissed
@@ -159,9 +159,9 @@ export function CallHistoryModal({ isOpen, onClose, onStartCall }: CallHistoryMo
                                 : 'Incoming'}
                           </span>
                         </div>
-                        <span>•</span>
+                        <span className="text-[#737878]">•</span>
                         <span>{formatDuration(item.duration)}</span>
-                        <span>•</span>
+                        <span className="text-[#737878]">•</span>
                         <span>{formatDate(item.started_at)}</span>
                       </div>
                     </div>
@@ -180,7 +180,7 @@ export function CallHistoryModal({ isOpen, onClose, onStartCall }: CallHistoryMo
                             callType: 'audio',
                           });
                         }}
-                        className="p-2 rounded-xl text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition"
+                        className="p-2 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#20B2AA] hover:text-[#1CA099] transition cursor-pointer"
                         title="Call with voice"
                       >
                         <Phone className="w-4 h-4" />
@@ -195,7 +195,7 @@ export function CallHistoryModal({ isOpen, onClose, onStartCall }: CallHistoryMo
                             callType: 'video',
                           });
                         }}
-                        className="p-2 rounded-xl text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition"
+                        className="p-2 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#EDEDED] hover:text-[#20B2AA] transition cursor-pointer"
                         title="Call with video"
                       >
                         <Video className="w-4 h-4" />

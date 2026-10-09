@@ -4,21 +4,21 @@ export function ChatListSkeleton({ count = 6 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="p-3 rounded-2xl flex items-center space-x-3 bg-slate-50/60 dark:bg-slate-850/40 border border-slate-100/50 dark:border-slate-800/40"
+          className="p-3 rounded-xl flex items-center space-x-3 bg-[#202222] border border-[#2D3030]"
         >
           {/* Avatar skeleton */}
-          <div className="w-12 h-12 rounded-2xl bg-slate-200 dark:bg-slate-800 shrink-0" />
+          <div className="w-10 h-10 rounded-full bg-[#2C2E2E] shrink-0" />
 
           {/* Text lines skeleton */}
           <div className="flex-1 space-y-2 py-0.5">
             <div className="flex justify-between items-center">
               <div
-                className="h-3.5 bg-slate-200 dark:bg-slate-800 rounded-md"
+                className="h-3.5 bg-[#2C2E2E] rounded-md"
                 style={{ width: `${40 + (i % 3) * 20}%` }}
               />
-              <div className="h-2.5 w-10 bg-slate-200 dark:bg-slate-800 rounded-md" />
+              <div className="h-2.5 w-10 bg-[#2C2E2E] rounded-md" />
             </div>
-            <div className="h-3 bg-slate-200/70 dark:bg-slate-800/60 rounded-md w-3/4" />
+            <div className="h-3 bg-[#2C2E2E]/60 rounded-md w-3/4" />
           </div>
         </div>
       ))}
@@ -32,7 +32,7 @@ export function MessagesSkeleton({ count = 7 }: { count?: number }) {
 
   return (
     <div
-      className="p-4 sm:p-6 space-y-4 animate-pulse overflow-hidden"
+      className="p-4 sm:p-6 space-y-4 animate-pulse overflow-hidden bg-[#191A1A]"
       role="status"
       aria-label="Loading chat messages"
     >
@@ -44,25 +44,25 @@ export function MessagesSkeleton({ count = 7 }: { count?: number }) {
             className={`flex items-end space-x-2 ${isRight ? 'justify-end' : 'justify-start'}`}
           >
             {!isRight && (
-              <div className="w-7 h-7 rounded-xl bg-slate-200 dark:bg-slate-800 shrink-0 mb-1" />
+              <div className="w-7 h-7 rounded-full bg-[#2C2E2E] shrink-0 mb-1" />
             )}
 
             <div
               className={`rounded-2xl p-3.5 space-y-2 ${
                 isRight
-                  ? 'bg-blue-200/50 dark:bg-blue-900/40 rounded-br-xs'
-                  : 'bg-slate-200/60 dark:bg-slate-800/60 rounded-bl-xs'
+                  ? 'bg-[#1D2B29] border border-[#25423E] rounded-br-xs'
+                  : 'bg-[#202222] border border-[#2D3030] rounded-bl-xs'
               }`}
               style={{
                 width: `${140 + ((i * 37) % 180)}px`,
                 maxWidth: '75%',
               }}
             >
-              <div className="h-3 bg-slate-300/60 dark:bg-slate-700/60 rounded-sm w-full" />
+              <div className="h-3 bg-[#2C2E2E] rounded-sm w-full" />
               {i % 2 === 0 && (
-                <div className="h-3 bg-slate-300/40 dark:bg-slate-700/40 rounded-sm w-2/3" />
+                <div className="h-3 bg-[#2C2E2E]/60 rounded-sm w-2/3" />
               )}
-              <div className="h-2 w-12 bg-slate-300/40 dark:bg-slate-700/40 rounded-sm ml-auto mt-1" />
+              <div className="h-2 w-12 bg-[#2C2E2E]/40 rounded-sm ml-auto mt-1" />
             </div>
           </div>
         );
@@ -82,16 +82,16 @@ export function ContactCardsSkeleton({ count = 4 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex items-center justify-between"
+          className="p-4 rounded-xl bg-[#202222] border border-[#2D3030] flex items-center justify-between"
         >
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-2xl bg-slate-200 dark:bg-slate-800 shrink-0" />
+            <div className="w-12 h-12 rounded-full bg-[#2C2E2E] shrink-0" />
             <div className="space-y-1.5">
-              <div className="h-3.5 bg-slate-200 dark:bg-slate-800 rounded-md w-28" />
-              <div className="h-2.5 bg-slate-200/70 dark:bg-slate-800/60 rounded-md w-20" />
+              <div className="h-3.5 bg-[#2C2E2E] rounded-md w-28" />
+              <div className="h-2.5 bg-[#2C2E2E]/60 rounded-md w-20" />
             </div>
           </div>
-          <div className="h-8 w-16 bg-slate-200 dark:bg-slate-800 rounded-xl" />
+          <div className="h-8 w-16 bg-[#2C2E2E] rounded-lg" />
         </div>
       ))}
       <span className="sr-only">Loading contacts...</span>

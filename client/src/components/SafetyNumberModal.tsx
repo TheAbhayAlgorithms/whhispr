@@ -19,24 +19,24 @@ export function SafetyNumberModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 dark:bg-black/70 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="w-full sm:max-w-lg bg-white dark:bg-slate-900 border-t sm:border border-slate-200 dark:border-slate-800 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col pb-safe animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-150">
+      <div className="w-full sm:max-w-lg bg-[#141515] border-t sm:border border-[#2C2E2E] rounded-t-3xl sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col pb-safe animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-[#2C2E2E] shrink-0 bg-[#141515]">
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-[#1D2B29] border border-[#25423E] text-[#20B2AA] flex items-center justify-center shrink-0">
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Safety Number</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <h3 className="text-base font-bold text-[#EDEDED]">Safety Number</h3>
+              <p className="text-xs text-[#9EA3A3]">
                 End-to-End Encryption Verification
               </p>
             </div>
           </div>
           <button
             onClick={closeSafetyNumberModal}
-            className="p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition touch-target-44 flex items-center justify-center shrink-0 cursor-pointer"
+            className="p-1.5 rounded-xl hover:bg-[#202222] text-[#9EA3A3] hover:text-[#EDEDED] transition touch-target-44 flex items-center justify-center shrink-0 cursor-pointer"
             aria-label="Close safety number modal"
           >
             <X className="w-5 h-5" />
@@ -44,23 +44,23 @@ export function SafetyNumberModal() {
         </div>
 
         {/* Body */}
-        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 bg-[#141515]">
           <div className="text-center space-y-2">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-300 text-xs font-semibold">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#1D2B29] border border-[#25423E] text-[#20B2AA] text-xs font-semibold">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>Signal Protocol Double Ratchet</span>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-              Compare this safety number with <strong className="text-slate-800 dark:text-slate-200">{peerName}</strong> to verify that your messages and calls are encrypted end-to-end.
+            <p className="text-xs text-[#9EA3A3] max-w-sm mx-auto">
+              Compare this safety number with <strong className="text-[#EDEDED]">{peerName}</strong> to verify that your messages and calls are encrypted end-to-end.
             </p>
           </div>
 
           {/* 60-digit Numeric Matrix (12 blocks of 5) */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-2.5 p-3 sm:p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200/80 dark:border-slate-800">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-2.5 p-3 sm:p-4 rounded-xl bg-[#191A1A] border border-[#2C2E2E]">
             {groups.map((group, idx) => (
               <div
                 key={idx}
-                className="text-center font-mono text-xs sm:text-sm font-semibold tracking-wider text-slate-800 dark:text-slate-200 py-1.5 px-2 rounded-lg bg-white dark:bg-slate-900/60 shadow-xs border border-slate-100 dark:border-slate-800"
+                className="text-center font-mono text-xs sm:text-sm font-semibold tracking-wider text-[#EDEDED] py-1.5 px-2 rounded-lg bg-[#202222] shadow-xs border border-[#2D3030]"
               >
                 {group}
               </div>
@@ -71,9 +71,9 @@ export function SafetyNumberModal() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
             <button
               onClick={handleCopy}
-              className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold transition cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl border border-[#2D3030] bg-[#202222] text-[#EDEDED] hover:bg-[#262828] text-xs font-semibold transition cursor-pointer"
             >
-              {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+              {copied ? <Check className="w-4 h-4 text-[#20B2AA]" /> : <Copy className="w-4 h-4" />}
               <span>{copied ? 'Copied' : 'Copy Safety Number'}</span>
             </button>
 
@@ -81,8 +81,8 @@ export function SafetyNumberModal() {
               onClick={() => setIsVerified(!isVerified)}
               className={`w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-semibold shadow-xs transition cursor-pointer ${
                 isVerified
-                  ? 'bg-emerald-600 text-white hover:bg-emerald-500'
-                  : 'bg-[#0066FF] text-white hover:bg-blue-600'
+                  ? 'bg-[#1D2B29] border border-[#25423E] text-[#20B2AA]'
+                  : 'bg-[#20B2AA] text-black hover:bg-[#1CA099]'
               }`}
             >
               {isVerified ? (
@@ -100,8 +100,8 @@ export function SafetyNumberModal() {
           </div>
 
           {isVerified && (
-            <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 flex items-center space-x-2 text-xs text-emerald-800 dark:text-emerald-300">
-              <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+            <div className="p-3 rounded-xl bg-[#1D2B29] border border-[#25423E] flex items-center space-x-2 text-xs text-[#20B2AA]">
+              <ShieldCheck className="w-4 h-4 shrink-0 text-[#20B2AA]" />
               <span>You have verified this contact. You will be alerted if their security keys change.</span>
             </div>
           )}

@@ -104,51 +104,51 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
     <>
       {/* Mobile backdrop overlay */}
       <div
-        className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs sm:hidden animate-fade-in"
+        className="fixed inset-0 z-40 bg-black/70 backdrop-blur-xs sm:hidden animate-fade-in"
         onClick={onClose}
         aria-hidden="true"
       />
 
-      <aside className="fixed inset-y-0 right-0 z-50 w-full max-w-xs sm:max-w-none sm:relative sm:inset-auto sm:z-auto sm:w-80 md:w-88 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0 overflow-hidden shadow-2xl transition-all">
+      <aside className="fixed inset-y-0 right-0 z-50 w-full max-w-xs sm:max-w-none sm:relative sm:inset-auto sm:z-auto sm:w-80 md:w-88 border-l border-[#2C2E2E] bg-[#141515] flex flex-col shrink-0 overflow-hidden shadow-2xl transition-all">
         {/* Header */}
-        <div className="h-16 px-4 sm:px-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
-          <h3 className="font-bold text-sm text-slate-900 dark:text-white">
+        <div className="h-16 px-4 sm:px-5 border-b border-[#2C2E2E] flex items-center justify-between shrink-0 bg-[#141515]">
+          <h3 className="font-bold text-sm text-[#EDEDED]">
             {activeGroupDetails.type === 'channel' ? 'Channel Info' : 'Group Details'}
           </h3>
           <button
             onClick={onClose}
             aria-label="Close details"
-            className="min-w-[44px] min-h-[44px] p-2.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition"
+            className="min-w-[44px] min-h-[44px] p-2.5 rounded-xl text-[#9EA3A3] hover:text-[#EDEDED] hover:bg-[#202222] flex items-center justify-center transition cursor-pointer"
           >
             <X className="w-5 h-5 sm:w-4 sm:h-4" />
           </button>
         </div>
 
       {/* Body Container */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-6 pb-safe">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-6 pb-safe bg-[#141515]">
         {/* Profile Card */}
         <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl mx-auto mb-3 bg-[#0066FF] flex items-center justify-center text-white font-bold text-xl shadow-md shadow-blue-500/20">
+          <div className="w-16 h-16 rounded-2xl mx-auto mb-3 bg-[#1D2B29] border border-[#25423E] flex items-center justify-center text-[#20B2AA] font-bold text-xl shadow-md shadow-[#20B2AA]/10">
             {activeGroupDetails.type === 'channel' ? (
               <Hash className="w-8 h-8" />
             ) : (
               activeGroupDetails.name.charAt(0).toUpperCase()
             )}
           </div>
-          <h4 className="font-bold text-base text-slate-900 dark:text-white">
+          <h4 className="font-bold text-base text-[#EDEDED]">
             {activeGroupDetails.type === 'channel'
               ? `#${activeGroupDetails.name}`
               : activeGroupDetails.name}
           </h4>
-          <div className="mt-1 flex items-center justify-center space-x-2 text-xs text-slate-500">
+          <div className="mt-1 flex items-center justify-center space-x-2 text-xs text-[#9EA3A3]">
             {activeGroupDetails.type === 'channel' &&
               (activeGroupDetails.isPublic ? (
-                <span className="flex items-center space-x-1 text-emerald-600 dark:text-emerald-400">
+                <span className="flex items-center space-x-1 text-[#20B2AA]">
                   <Globe className="w-3.5 h-3.5" />
                   <span>Public Channel</span>
                 </span>
               ) : (
-                <span className="flex items-center space-x-1 text-amber-600 dark:text-amber-400">
+                <span className="flex items-center space-x-1 text-amber-400">
                   <Lock className="w-3.5 h-3.5" />
                   <span>Private Channel</span>
                 </span>
@@ -158,7 +158,7 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
           </div>
 
           {activeGroupDetails.description && (
-            <p className="mt-2.5 text-xs text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-950 p-3 rounded-xl border border-slate-200 dark:border-slate-800 text-left leading-relaxed">
+            <p className="mt-2.5 text-xs text-[#EDEDED] bg-[#202222] p-3 rounded-xl border border-[#2D3030] text-left leading-relaxed">
               {activeGroupDetails.description}
             </p>
           )}
@@ -170,34 +170,34 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
             {!showAddMember ? (
               <button
                 onClick={() => setShowAddMember(true)}
-                className="w-full py-2 px-3 rounded-xl bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 text-blue-600 dark:text-blue-400 text-xs font-semibold flex items-center justify-center space-x-1.5 transition cursor-pointer"
+                className="w-full py-2 px-3 rounded-xl bg-[#1D2B29] border border-[#25423E] hover:bg-[#25423E] text-[#20B2AA] text-xs font-semibold flex items-center justify-center space-x-1.5 transition cursor-pointer"
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 <span>Add Members</span>
               </button>
             ) : (
-              <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2">
+              <div className="p-3 bg-[#202222] rounded-xl border border-[#2D3030] space-y-2">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs font-semibold text-slate-900 dark:text-white">
+                  <p className="text-xs font-semibold text-[#EDEDED]">
                     Select from Contacts
                   </p>
                   <button
                     onClick={() => setShowAddMember(false)}
-                    className="text-xs text-slate-400 hover:text-slate-600"
+                    className="text-xs text-[#9EA3A3] hover:text-[#EDEDED] cursor-pointer"
                   >
                     Cancel
                   </button>
                 </div>
                 {availableToAdd.length === 0 ? (
-                  <p className="text-xs text-slate-400 italic">All your contacts are already in this group.</p>
+                  <p className="text-xs text-[#737878] italic">All your contacts are already in this group.</p>
                 ) : (
                   <div className="max-h-32 overflow-y-auto space-y-1">
                     {availableToAdd.map((contact) => (
                       <label
                         key={contact.userId}
-                        className="flex items-center justify-between text-xs p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                        className="flex items-center justify-between text-xs p-1.5 rounded-lg hover:bg-[#262828] cursor-pointer"
                       >
-                        <span className="font-medium text-slate-800 dark:text-slate-200 truncate">
+                        <span className="font-medium text-[#EDEDED] truncate">
                           {contact.displayName}
                         </span>
                         <input
@@ -210,7 +210,7 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
                               setSelectedToAdd((prev) => prev.filter((id) => id !== contact.userId));
                             }
                           }}
-                          className="w-3.5 h-3.5 accent-[#0066FF]"
+                          className="w-3.5 h-3.5 accent-[#20B2AA]"
                         />
                       </label>
                     ))}
@@ -219,7 +219,7 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
                 {selectedToAdd.length > 0 && (
                   <button
                     onClick={() => void handleAddSubmit()}
-                    className="w-full py-1.5 rounded-xl bg-[#0066FF] hover:bg-blue-600 text-white text-xs font-semibold shadow-xs cursor-pointer"
+                    className="w-full py-1.5 rounded-lg bg-[#20B2AA] hover:bg-[#1CA099] text-black text-xs font-semibold shadow-xs cursor-pointer"
                   >
                     Add ({selectedToAdd.length})
                   </button>
@@ -232,7 +232,7 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
         {/* Member Roster */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#737878]">
               Members ({activeGroupDetails.members.length})
             </h4>
           </div>
@@ -249,17 +249,17 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
               return (
                 <div
                   key={member.id}
-                  className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80 flex items-center justify-between space-x-2 relative"
+                  className="p-2.5 rounded-xl bg-[#202222] border border-[#2D3030] flex items-center justify-between space-x-2 relative"
                 >
                   <div className="flex items-center space-x-2.5 min-w-0">
-                    <div className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-700 dark:text-slate-300 shrink-0">
+                    <div className="w-8 h-8 rounded-lg bg-[#191A1A] border border-[#2D3030] flex items-center justify-center text-xs font-bold text-[#20B2AA] shrink-0">
                       {member.displayName.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">
-                        {member.displayName} {isCaller && <span className="text-slate-400 font-normal">(You)</span>}
+                      <p className="text-xs font-semibold text-[#EDEDED] truncate">
+                        {member.displayName} {isCaller && <span className="text-[#737878] font-normal">(You)</span>}
                       </p>
-                      <p className="text-[10px] text-slate-400 truncate">@{member.username}</p>
+                      <p className="text-[10px] text-[#737878] truncate">@{member.username}</p>
                     </div>
                   </div>
 
@@ -274,27 +274,27 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
                               activeMenuMemberId === member.userId ? null : member.userId,
                             )
                           }
-                          className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer"
+                          className="p-1 rounded-lg text-[#9EA3A3] hover:text-[#EDEDED] hover:bg-[#262828] cursor-pointer"
                         >
                           <ChevronDown className="w-3.5 h-3.5" />
                         </button>
                         {activeMenuMemberId === member.userId && (
-                          <div className="absolute right-0 top-6 w-32 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl rounded-xl p-1 z-30 text-xs">
+                          <div className="absolute right-0 top-6 w-32 bg-[#202222] border border-[#2D3030] shadow-xl rounded-xl p-1 z-30 text-xs">
                             <button
                               onClick={() => void handleRoleChange(member.userId, 'admin')}
-                              className="w-full text-left px-2 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 text-blue-600 cursor-pointer"
+                              className="w-full text-left px-2 py-1 rounded-lg hover:bg-[#262828] text-[#20B2AA] cursor-pointer"
                             >
                               Make Admin
                             </button>
                             <button
                               onClick={() => void handleRoleChange(member.userId, 'moderator')}
-                              className="w-full text-left px-2 py-1 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/30 text-emerald-600"
+                              className="w-full text-left px-2 py-1 rounded-lg hover:bg-[#262828] text-[#20B2AA] cursor-pointer"
                             >
                               Make Mod
                             </button>
                             <button
                               onClick={() => void handleRoleChange(member.userId, 'member')}
-                              className="w-full text-left px-2 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
+                              className="w-full text-left px-2 py-1 rounded-lg hover:bg-[#262828] text-[#EDEDED] cursor-pointer"
                             >
                               Make Member
                             </button>
@@ -307,7 +307,7 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
                       <button
                         onClick={() => void handleKick(member.userId, member.displayName)}
                         title="Remove member"
-                        className="p-1 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30"
+                        className="p-1 rounded-lg text-[#9EA3A3] hover:text-rose-400 hover:bg-rose-500/10 cursor-pointer"
                       >
                         <UserX className="w-3.5 h-3.5" />
                       </button>
@@ -320,10 +320,10 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
         </div>
 
         {/* Leave Group Action */}
-        <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
+        <div className="pt-4 border-t border-[#2C2E2E]">
           <button
             onClick={() => void handleLeave()}
-            className="w-full py-2.5 px-3 rounded-xl border border-rose-200 dark:border-rose-900/40 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-xs font-semibold flex items-center justify-center space-x-2 transition"
+            className="w-full py-2.5 px-3 rounded-xl border border-rose-500/30 text-rose-400 hover:bg-rose-500/10 text-xs font-semibold flex items-center justify-center space-x-2 transition cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Leave {activeGroupDetails.type === 'channel' ? 'Channel' : 'Group'}</span>

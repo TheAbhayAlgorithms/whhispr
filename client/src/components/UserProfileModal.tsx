@@ -10,24 +10,24 @@ export function UserProfileModal({ profile, onClose }: UserProfileModalProps) {
   if (!profile) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
-      <div className="bg-slate-900 border-t sm:border border-slate-800 rounded-t-3xl sm:rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative animate-scale-up max-h-[92dvh] sm:max-h-auto overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/70 backdrop-blur-xs animate-fade-in">
+      <div className="bg-[#141515] border-t sm:border border-[#2C2E2E] rounded-t-3xl sm:rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative animate-scale-up max-h-[92dvh] sm:max-h-auto overflow-y-auto">
         {/* Banner */}
-        <div className="h-24 sm:h-28 bg-[#0066FF] relative shrink-0">
+        <div className="h-24 sm:h-28 bg-gradient-to-r from-[#191A1A] via-[#1D2B29] to-[#191A1A] border-b border-[#2C2E2E] relative shrink-0">
           <button
             onClick={onClose}
             aria-label="Close profile"
-            className="absolute top-3 right-3 sm:top-4 sm:right-4 min-w-[44px] min-h-[44px] w-11 h-11 sm:w-8 sm:h-8 rounded-full bg-slate-950/50 hover:bg-slate-950/80 text-slate-200 flex items-center justify-center transition active:scale-95 cursor-pointer"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 min-w-[44px] min-h-[44px] w-11 h-11 sm:w-8 sm:h-8 rounded-full bg-[#141515]/70 hover:bg-[#141515] text-[#9EA3A3] hover:text-[#EDEDED] flex items-center justify-center transition active:scale-95 cursor-pointer"
           >
             <X className="w-5 h-5 sm:w-4 sm:h-4" />
           </button>
         </div>
 
         {/* Profile Details */}
-        <div className="px-5 sm:px-6 pb-6 pt-0 relative pb-safe">
+        <div className="px-5 sm:px-6 pb-6 pt-0 relative pb-safe bg-[#141515]">
           {/* Avatar */}
           <div className="-mt-12 mb-4 flex justify-between items-end">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-slate-800 border-4 border-slate-900 flex items-center justify-center text-2xl sm:text-3xl font-bold text-blue-300 shadow-xl shrink-0">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-[#202222] border-4 border-[#141515] flex items-center justify-center text-2xl sm:text-3xl font-bold text-[#20B2AA] shadow-xl shrink-0">
               {profile.avatarUrl ? (
                 <img
                   src={profile.avatarUrl}
@@ -40,7 +40,7 @@ export function UserProfileModal({ profile, onClose }: UserProfileModalProps) {
             </div>
 
             {profile.isContact ? (
-              <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold flex items-center space-x-1">
+              <span className="px-3 py-1 rounded-full bg-[#1D2B29] border border-[#25423E] text-[#20B2AA] text-xs font-semibold flex items-center space-x-1">
                 <Check className="w-3.5 h-3.5" />
                 <span>In Contacts</span>
               </span>
@@ -48,36 +48,36 @@ export function UserProfileModal({ profile, onClose }: UserProfileModalProps) {
           </div>
 
           <div>
-            <h2 className="text-xl font-bold text-white tracking-tight">{profile.displayName}</h2>
-            <p className="text-xs text-blue-400 font-medium">@{profile.username}</p>
+            <h2 className="text-xl font-bold text-[#EDEDED] tracking-tight">{profile.displayName}</h2>
+            <p className="text-xs text-[#20B2AA] font-medium">@{profile.username}</p>
           </div>
 
           {/* Status Message */}
           {profile.statusMessage && (
-            <div className="mt-4 p-3 rounded-2xl bg-slate-950/50 border border-slate-800/80 text-xs text-slate-300 flex items-center space-x-2">
-              <span className="text-blue-400 text-sm">💬</span>
+            <div className="mt-4 p-3 rounded-xl bg-[#202222] border border-[#2D3030] text-xs text-[#EDEDED] flex items-center space-x-2">
+              <span className="text-[#20B2AA] text-sm">💬</span>
               <span>{profile.statusMessage}</span>
             </div>
           )}
 
           {/* Bio */}
           <div className="mt-4">
-            <h3 className="text-xs uppercase font-semibold text-slate-400 tracking-wider mb-1 flex items-center space-x-1.5">
-              <Shield className="w-3.5 h-3.5 text-blue-400" />
+            <h3 className="text-xs uppercase font-semibold text-[#737878] tracking-wider mb-1 flex items-center space-x-1.5">
+              <Shield className="w-3.5 h-3.5 text-[#20B2AA]" />
               <span>About</span>
             </h3>
-            <p className="text-xs text-slate-300 leading-relaxed bg-slate-950/40 p-3 rounded-2xl border border-slate-800/50">
+            <p className="text-xs text-[#9EA3A3] leading-relaxed bg-[#202222] p-3 rounded-xl border border-[#2D3030]">
               {profile.bio || 'No bio provided yet.'}
             </p>
           </div>
 
           {/* Last Seen */}
-          <div className="mt-4 flex items-center justify-between text-xs text-slate-400 pt-3 border-t border-slate-800/60">
+          <div className="mt-4 flex items-center justify-between text-xs text-[#737878] pt-3 border-t border-[#2C2E2E]">
             <span className="flex items-center space-x-1.5">
-              <Clock className="w-3.5 h-3.5 text-slate-500" />
+              <Clock className="w-3.5 h-3.5 text-[#737878]" />
               <span>Last Seen</span>
             </span>
-            <span className="text-slate-300 font-medium">
+            <span className="text-[#EDEDED] font-medium">
               {profile.lastSeen ? new Date(profile.lastSeen).toLocaleDateString() : 'Hidden'}
             </span>
           </div>
@@ -86,7 +86,7 @@ export function UserProfileModal({ profile, onClose }: UserProfileModalProps) {
           <div className="mt-6">
             <button
               onClick={onClose}
-              className="w-full flex items-center justify-center space-x-2 min-h-[44px] py-3 sm:py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white transition active:scale-[0.98]"
+              className="w-full flex items-center justify-center space-x-2 min-h-[44px] py-3 sm:py-2.5 px-4 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-xs font-semibold text-[#EDEDED] transition active:scale-[0.98] cursor-pointer"
             >
               <span>Close Profile</span>
             </button>

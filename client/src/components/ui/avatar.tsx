@@ -15,7 +15,7 @@ export function Avatar({ className = '', size = 'md', children, ...props }: Avat
 
   return (
     <div
-      className={`relative flex ${sizeClass} shrink-0 overflow-hidden rounded-full bg-slate-200 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700/60 shadow-xs select-none ${className}`}
+      className={`relative flex ${sizeClass} shrink-0 overflow-hidden rounded-full bg-[#202222] border border-[#2D3030] shadow-xs select-none ${className}`}
       {...props}
     >
       {children}
@@ -54,7 +54,7 @@ export interface AvatarFallbackProps extends React.HTMLAttributes<HTMLSpanElemen
 export function AvatarFallback({ className = '', children, ...props }: AvatarFallbackProps) {
   return (
     <span
-      className={`flex h-full w-full items-center justify-center rounded-full bg-slate-200 dark:bg-zinc-800 text-xs sm:text-[13px] font-semibold text-slate-700 dark:text-zinc-200 ${className}`}
+      className={`flex h-full w-full items-center justify-center rounded-full bg-[#1D2B29] text-xs sm:text-[13px] font-semibold text-[#20B2AA] ${className}`}
       {...props}
     >
       {children}
