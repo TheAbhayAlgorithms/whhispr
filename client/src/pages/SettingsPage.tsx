@@ -22,6 +22,7 @@ import {
 import { useAuthStore } from '../store/useAuthStore';
 import { useThemeStore } from '../store/useThemeStore';
 import { useSettingsStore } from '../store/useSettingsStore';
+import { ThemeToggle } from '../components/ThemeToggle';
 
 type SettingsTab = 'appearance' | 'account' | 'sessions' | 'notifications' | 'privacy';
 
@@ -180,14 +181,14 @@ export default function SettingsPage() {
           <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
             <Link
               to="/"
-              className="min-w-[44px] min-h-[44px] w-11 h-11 sm:w-9 sm:h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition shrink-0"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition shrink-0 active:scale-95"
               title="Return to Dashboard"
               aria-label="Return to Dashboard"
             >
-              <ArrowLeft className="w-5 h-5 sm:w-4 sm:h-4" />
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
             <div className="flex items-center space-x-2 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold shrink-0">
+              <div className="w-8 h-8 rounded-full bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold shrink-0">
                 <Sliders className="w-4 h-4" />
               </div>
               <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight truncate">
@@ -195,11 +196,12 @@ export default function SettingsPage() {
               </h1>
             </div>
           </div>
-          <div className="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400 shrink-0">
+          <div className="flex items-center space-x-2.5 sm:space-x-3 text-xs text-slate-500 dark:text-slate-400 shrink-0">
             <span className="hidden sm:inline">Signed in as</span>
             <span className="font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[100px] sm:max-w-none">
               @{user?.username}
             </span>
+            <ThemeToggle />
           </div>
         </div>
       </header>

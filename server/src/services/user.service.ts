@@ -144,9 +144,10 @@ export class UserService {
     userId: string,
     fileBuffer: Buffer,
     originalName: string,
+    mimeType?: string,
   ): Promise<string> {
     const ext = path.extname(originalName) || '.png';
-    const { publicUrl } = await StorageService.saveAvatar(fileBuffer, ext);
+    const { publicUrl } = await StorageService.saveAvatar(fileBuffer, ext, mimeType);
 
     // Fetch previous avatar to delete it cleanly
     const { rows } = await query<{ avatar_url: string | null }>(

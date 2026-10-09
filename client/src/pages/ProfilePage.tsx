@@ -133,10 +133,11 @@ export default function ProfilePage() {
           <div className="flex items-center space-x-3">
             <Link
               to="/"
-              className="min-w-[44px] min-h-[44px] w-11 h-11 sm:w-9 sm:h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition active:scale-95"
+              title="Back to Dashboard"
               aria-label="Back to Dashboard"
             >
-              <ArrowLeft className="w-5 h-5 sm:w-4 sm:h-4" />
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
             <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
               Edit Profile
@@ -144,7 +145,7 @@ export default function ProfilePage() {
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-3">
-            <ThemeToggle hideLabelBelow="sm" />
+            <ThemeToggle />
 
             {saveSuccess && (
               <div className="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-medium animate-fade-in">

@@ -568,89 +568,89 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex items-center space-x-1.5 sm:space-x-2">
-          {/* Daylight / Dark Theme Toggle Button (Tablet & Desktop only; Mobile accesses via drawer menu) */}
-          <div className="hidden md:flex items-center">
-            <ThemeToggle hideLabelBelow="lg" />
+          {/* Daylight / Dark Theme Toggle Button (Single circular toggle button) */}
+          <div className="flex items-center">
+            <ThemeToggle />
           </div>
 
-          {/* In-App Notifications Bell (Visible on all screen sizes) */}
+          {/* In-App Notifications Bell */}
           <button
             type="button"
             onClick={() => toggleNotificationCenter()}
-            className="relative p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition cursor-pointer touch-target-44 flex items-center justify-center shrink-0"
+            className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition cursor-pointer flex items-center justify-center shrink-0 active:scale-95"
             title="Notifications"
             aria-label="Notifications"
           >
             <Bell className="w-4 h-4 text-indigo-500" />
             {unreadNotificationsCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center animate-pulse shadow-xs">
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-rose-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center animate-pulse shadow-xs">
                 {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
               </span>
             )}
           </button>
 
-          {/* Contacts - visible on tablet & desktop (hidden on mobile < md) */}
+          {/* Contacts - Single Symbol Button */}
           <Link
             to="/contacts"
-            className="hidden md:flex items-center space-x-1 sm:space-x-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 transition relative"
+            className="hidden md:flex relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition items-center justify-center shrink-0 active:scale-95"
             title="Contacts"
             aria-label="Contacts"
           >
-            <Users className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-            <span className="hidden lg:inline">Contacts</span>
+            <Users className="w-4 h-4 text-indigo-500 shrink-0" />
             {incomingRequests.length > 0 && (
-              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">
+              <span className="absolute -top-0.5 -right-0.5 px-1 min-w-[16px] h-4 rounded-full text-[10px] font-bold bg-amber-500 text-white flex items-center justify-center animate-pulse shadow-xs">
                 {incomingRequests.length}
               </span>
             )}
           </Link>
 
-          {/* Tablet & Desktop Navigation Items */}
-          <div className="hidden md:flex items-center space-x-1.5 lg:space-x-2">
+          {/* Tablet & Desktop Navigation Items - All Single Symbol Buttons */}
+          <div className="hidden md:flex items-center space-x-1.5 sm:space-x-2">
+            {/* Explore Channels */}
             <button
               onClick={() => setShowChannelBrowserModal(true)}
-              className="flex items-center space-x-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800 text-xs font-semibold text-indigo-600 dark:text-indigo-400 transition"
-              title="Discover Public Channels"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 transition flex items-center justify-center shrink-0 active:scale-95"
+              title="Explore Channels"
               aria-label="Explore Channels"
             >
-              <Compass className="w-3.5 h-3.5 shrink-0" />
-              <span className="hidden lg:inline">Explore Channels</span>
+              <Compass className="w-4 h-4 shrink-0" />
             </button>
 
+            {/* Profile */}
             <Link
               to="/profile"
-              className="flex items-center space-x-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-600/20 hover:bg-indigo-100 dark:hover:bg-indigo-600/30 border border-indigo-200 dark:border-indigo-500/30 text-xs font-semibold text-indigo-600 dark:text-indigo-300 transition"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-indigo-50 dark:bg-indigo-600/20 hover:bg-indigo-100 dark:hover:bg-indigo-600/30 border border-indigo-200 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-300 transition flex items-center justify-center shrink-0 active:scale-95"
               title="Profile"
               aria-label="Profile"
             >
-              <UserIcon className="w-3.5 h-3.5 shrink-0" />
-              <span className="hidden lg:inline">Profile</span>
+              <UserIcon className="w-4 h-4 shrink-0" />
             </Link>
 
+            {/* Settings */}
             <Link
               to="/settings"
-              className="flex items-center space-x-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 transition"
-              title="Settings & Preferences"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition flex items-center justify-center shrink-0 active:scale-95"
+              title="Settings"
               aria-label="Settings"
             >
-              <SettingsIcon className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 shrink-0" />
-              <span className="hidden lg:inline">Settings</span>
+              <SettingsIcon className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" />
             </Link>
 
+            {/* Admin Portal (if admin) */}
             {user?.role === 'admin' && (
               <Link
                 to="/admin"
-                className="flex items-center space-x-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/50 border border-purple-200 dark:border-purple-500/40 text-xs font-semibold text-purple-600 dark:text-purple-300 transition"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/50 border border-purple-200 dark:border-purple-500/40 text-purple-600 dark:text-purple-300 transition flex items-center justify-center shrink-0 active:scale-95"
                 title="Admin Portal"
                 aria-label="Admin Portal"
               >
-                <Shield className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
-                <span className="hidden lg:inline">Admin</span>
+                <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
               </Link>
             )}
 
+            {/* Profile Avatar / User Badge */}
             <div className="flex items-center space-x-2 pl-2 border-l border-slate-200 dark:border-slate-800 text-right">
-              <div className="hidden lg:block text-right">
+              <div className="hidden xl:block text-right">
                 <p className="text-xs font-semibold text-slate-900 dark:text-white leading-none">
                   {user?.displayName}
                 </p>
@@ -658,8 +658,9 @@ export default function DashboardPage() {
                   @{user?.username}
                 </p>
               </div>
-              <div
-                className="w-8 h-8 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800 border border-indigo-500/40 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-300 shrink-0"
+              <Link
+                to="/profile"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800 border-2 border-indigo-500/40 hover:border-indigo-500 transition-colors flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-300 shrink-0 shadow-xs"
                 title={`${user?.displayName} (@${user?.username})`}
               >
                 {user?.avatarUrl ? (
@@ -671,18 +672,18 @@ export default function DashboardPage() {
                 ) : (
                   <span>{user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}</span>
                 )}
-              </div>
+              </Link>
             </div>
 
+            {/* Sign Out - Single Symbol Button */}
             <button
               onClick={handleLogout}
               disabled={loggingOut}
-              className="flex items-center space-x-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 dark:bg-slate-800 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 dark:hover:border-rose-500/30 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300 transition"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 dark:bg-slate-800 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 dark:hover:border-rose-500/30 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 transition flex items-center justify-center shrink-0 active:scale-95"
               title="Sign Out"
               aria-label="Sign Out"
             >
-              <LogOut className="w-3.5 h-3.5 shrink-0" />
-              <span className="hidden lg:inline">{loggingOut ? 'Signing out...' : 'Sign Out'}</span>
+              <LogOut className="w-4 h-4 shrink-0" />
             </button>
           </div>
 
@@ -690,7 +691,7 @@ export default function DashboardPage() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
-            className="md:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition touch-target-44 flex items-center justify-center shrink-0"
+            className="md:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition flex items-center justify-center shrink-0 active:scale-95"
             aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={mobileMenuOpen}
           >

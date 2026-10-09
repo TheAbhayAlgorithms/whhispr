@@ -35,6 +35,7 @@ export class UserController {
       req.user.userId,
       req.file.buffer,
       req.file.originalname,
+      req.file.mimetype,
     );
 
     res.status(200).json({

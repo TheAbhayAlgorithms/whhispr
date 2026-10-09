@@ -2,26 +2,25 @@ import { useThemeStore } from '../store/useThemeStore';
 import { Sun, Moon } from 'lucide-react';
 
 interface ThemeToggleProps {
+  className?: string;
+  size?: 'sm' | 'md' | 'lg';
   showLabel?: boolean;
   hideLabelBelow?: 'sm' | 'md' | 'lg';
-  className?: string;
 }
 
 export function ThemeToggle({
-  showLabel = true,
-  hideLabelBelow,
   className = '',
+  size = 'md',
 }: ThemeToggleProps) {
   const { theme, toggleTheme } = useThemeStore();
   const isLight = theme === 'light';
 
-  const labelClasses = hideLabelBelow === 'lg'
-    ? 'hidden lg:inline whitespace-nowrap'
-    : hideLabelBelow === 'md'
-    ? 'hidden md:inline whitespace-nowrap'
-    : hideLabelBelow === 'sm'
-    ? 'hidden sm:inline whitespace-nowrap'
-    : 'whitespace-nowrap';
+  const sizeClasses =
+    size === 'sm'
+      ? 'w-8 h-8'
+      : size === 'lg'
+      ? 'w-10 h-10'
+      : 'w-9 h-9 sm:w-10 sm:h-10';
 
   return (
     <button
@@ -29,24 +28,19 @@ export function ThemeToggle({
       type="button"
       id="daylight-theme-toggle-btn"
       title={isLight ? 'Daylight theme is ON (Click to switch to Dark mode)' : 'Dark theme is ON (Click to switch to Daylight mode)'}
-      className={`group flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border transition-all duration-200 text-xs font-semibold shadow-xs select-none whitespace-nowrap shrink-0 touch-target-44 sm:min-h-0 ${
-        isLight
-          ? 'bg-amber-50 hover:bg-amber-100/90 border-amber-200/90 text-amber-900 hover:border-amber-300'
-          : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200 hover:border-slate-600'
-      } ${className}`}
       aria-label={isLight ? 'Switch to Dark Mode' : 'Switch to Daylight Mode'}
+      className={`group relative rounded-full flex items-center justify-center border transition-all duration-300 shadow-xs active:scale-95 cursor-pointer shrink-0 ${sizeClasses} ${
+        isLight
+          ? 'bg-amber-50 hover:bg-amber-100 border-amber-200/90 text-amber-600 hover:border-amber-300 shadow-amber-500/10'
+          : 'bg-slate-800/90 hover:bg-slate-700 border-slate-700 text-slate-200 hover:border-slate-600 shadow-slate-900/40'
+      } ${className}`}
     >
       {isLight ? (
-        <>
-          <Sun className="w-4 h-4 text-amber-500 fill-amber-400 transition-transform group-hover:rotate-45 shrink-0" />
-          {showLabel && <span className={labelClasses}>Daylight ON</span>}
-        </>
+        <Sun className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-amber-500 fill-amber-400/40 transition-transform duration-300 group-hover:rotate-45 shrink-0" />
       ) : (
-        <>
-          <Moon className="w-4 h-4 text-indigo-400 fill-indigo-400/20 transition-transform group-hover:-rotate-12 shrink-0" />
-          {showLabel && <span className={labelClasses}>Dark Mode</span>}
-        </>
+        <Moon className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-indigo-400 fill-indigo-400/30 transition-transform duration-300 group-hover:-rotate-12 shrink-0" />
       )}
     </button>
   );
 }
+

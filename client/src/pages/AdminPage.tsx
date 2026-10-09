@@ -248,13 +248,13 @@ export default function AdminPage() {
           <button
             onClick={() => void loadData()}
             disabled={isLoading}
-            className="min-w-[44px] min-h-[44px] p-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition disabled:opacity-50 flex items-center justify-center"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition disabled:opacity-50 flex items-center justify-center active:scale-95"
             title="Refresh Data"
             aria-label="Refresh Data"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           </button>
-          <ThemeToggle hideLabelBelow="sm" />
+          <ThemeToggle />
         </div>
       </header>
 

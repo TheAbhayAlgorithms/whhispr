@@ -126,14 +126,14 @@ export default function ContactsPage() {
           <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
             <Link
               to="/"
-              className="p-2 -ml-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition min-w-[44px] min-h-[44px] flex items-center justify-center shrink-0"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition flex items-center justify-center shrink-0 active:scale-95"
               title="Back to Dashboard"
               aria-label="Back to Dashboard"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 shrink-0">
-              <Users className="w-5 h-5" />
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 shrink-0">
+              <Users className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div className="min-w-0">
               <h1 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight leading-tight truncate">
@@ -145,16 +145,18 @@ export default function ContactsPage() {
             </div>
           </div>
 
-          <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
-            {/* Daylight Theme Toggle Button */}
-            <ThemeToggle hideLabelBelow="sm" />
+          <div className="flex items-center space-x-2 sm:space-x-2.5 shrink-0">
+            {/* Daylight / Dark Theme Toggle Button */}
+            <ThemeToggle />
 
+            {/* Back to Chats - Single Symbol Button */}
             <Link
               to="/"
-              className="hidden sm:inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition min-h-[44px]"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center justify-center transition active:scale-95"
+              title="Back to Chats"
+              aria-label="Back to Chats"
             >
-              <MessageSquare className="w-3.5 h-3.5" />
-              <span>Chats</span>
+              <MessageSquare className="w-4 h-4" />
             </Link>
           </div>
         </div>
