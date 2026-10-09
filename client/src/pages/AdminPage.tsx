@@ -202,7 +202,7 @@ export default function AdminPage() {
           </p>
           <button
             onClick={() => navigate('/')}
-            className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-semibold transition shadow-md shadow-indigo-600/20"
+            className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold transition shadow-md shadow-blue-600/20"
           >
             Return to Dashboard
           </button>
@@ -225,7 +225,7 @@ export default function AdminPage() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center space-x-2 sm:space-x-2.5 min-w-0">
-            <div className="p-2 bg-indigo-600 text-white rounded-xl shadow-md shadow-indigo-600/20 shrink-0">
+            <div className="p-2 bg-blue-600 text-white rounded-xl shadow-md shadow-blue-600/20 shrink-0">
               <Shield className="w-5 h-5" />
             </div>
             <div className="min-w-0">
@@ -233,7 +233,7 @@ export default function AdminPage() {
                 <h1 className="text-sm sm:text-base font-bold tracking-tight text-slate-900 dark:text-white truncate">
                   Admin Portal
                 </h1>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 rounded-full shrink-0">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 rounded-full shrink-0">
                   Admin
                 </span>
               </div>
@@ -344,7 +344,7 @@ export default function AdminPage() {
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Your Role
               </span>
-              <div className="p-2 bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-xl">
+              <div className="p-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-xl">
                 <Crown className="w-4 h-4" />
               </div>
             </div>
@@ -364,7 +364,7 @@ export default function AdminPage() {
               onClick={() => setActiveTab('users')}
               className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold transition ${
                 activeTab === 'users'
-                  ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                  ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -374,7 +374,7 @@ export default function AdminPage() {
               onClick={() => setActiveTab('messages')}
               className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold transition ${
                 activeTab === 'messages'
-                  ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                  ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -393,7 +393,7 @@ export default function AdminPage() {
               placeholder={
                 activeTab === 'users' ? 'Search by name, @username, email...' : 'Search message content or sender...'
               }
-              className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-base sm:text-xs placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-base sm:text-xs placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -432,7 +432,7 @@ export default function AdminPage() {
                         >
                           <td className="py-3.5 px-4">
                             <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 text-white font-bold flex items-center justify-center text-xs flex-shrink-0">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-blue-600 text-white font-bold flex items-center justify-center text-xs flex-shrink-0">
                                 {u.avatarUrl ? (
                                   <img
                                     src={u.avatarUrl}
@@ -447,7 +447,7 @@ export default function AdminPage() {
                                 <div className="font-semibold text-slate-900 dark:text-white flex items-center space-x-1.5">
                                   <span>{u.displayName}</span>
                                   {isSelf && (
-                                    <span className="text-[10px] px-1.5 py-0.2 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-md font-semibold">
+                                    <span className="text-[10px] px-1.5 py-0.2 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-md font-semibold">
                                       You
                                     </span>
                                   )}
@@ -465,7 +465,7 @@ export default function AdminPage() {
 
                           <td className="py-3.5 px-4">
                             {u.role === 'admin' ? (
-                              <span className="inline-flex items-center space-x-1 px-2.5 py-1 bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 rounded-full font-semibold text-[11px]">
+                              <span className="inline-flex items-center space-x-1 px-2.5 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 rounded-full font-semibold text-[11px]">
                                 <Crown className="w-3 h-3" />
                                 <span>Admin</span>
                               </span>

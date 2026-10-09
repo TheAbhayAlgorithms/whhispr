@@ -539,366 +539,394 @@ export default function DashboardPage() {
   });
 
   return (
-    <div className="h-screen h-dvh bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col overflow-hidden transition-colors duration-200">
-      {/* Real-time offline and reconnect status bar */}
-      <OfflineBanner />
-
-      {/* Top Navbar */}
-      <header className="h-14 sm:h-16 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between shrink-0 z-20 sticky top-0">
-        <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
-          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 shrink-0">
-            <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-          </div>
-          <span className="text-lg sm:text-xl font-bold tracking-tight bg-gradient-to-r from-slate-900 via-slate-700 to-indigo-600 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent truncate">
-            Whhispr
-          </span>
-
-          {/* Real-time Socket Connection Badge */}
-          {socketStatus === 'connected' ? (
-            <span
-              title="Socket Connected (Live)"
-              className="text-xs px-2 sm:px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-medium flex items-center shrink-0"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-0 sm:mr-1.5 animate-pulse shrink-0" />
-              <span className="hidden sm:inline">Live</span>
-            </span>
-          ) : socketStatus === 'connecting' ? (
-            <span
-              title="Socket Connecting..."
-              className="text-xs px-2 sm:px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-medium flex items-center shrink-0"
-            >
-              <Radio className="w-3 h-3 mr-0 sm:mr-1 animate-spin text-amber-500 shrink-0" />
-              <span className="hidden sm:inline">Connecting...</span>
-            </span>
-          ) : (
-            <span
-              title="Socket Disconnected (Offline)"
-              className="text-xs px-2 sm:px-2.5 py-0.5 rounded-full bg-slate-500/10 text-slate-500 dark:text-slate-400 border border-slate-500/20 font-medium flex items-center shrink-0"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-400 mr-0 sm:mr-1.5 shrink-0" />
-              <span className="hidden sm:inline">Offline</span>
-            </span>
-          )}
-        </div>
-
-        <div className="flex items-center space-x-1.5 sm:space-x-2">
-          {/* Daylight / Dark Theme Toggle Button (Single circular toggle button) */}
-          <div className="flex items-center">
-            <ThemeToggle />
-          </div>
-
-          {/* In-App Notifications Bell */}
+    <div className="h-screen h-dvh bg-slate-100 dark:bg-black text-slate-900 dark:text-slate-100 flex flex-col md:flex-row overflow-hidden transition-colors duration-200">
+      {/* Desktop Vertical Navigation Rail (Electric Blue #0066FF matching user reference design) */}
+      <nav
+        aria-label="Platform navigation"
+        className="hidden md:flex w-20 flex-col items-center justify-between py-5 bg-[#0066FF] text-white shrink-0 z-30 shadow-2xl select-none"
+      >
+        {/* Top: User Avatar */}
+        <div className="flex flex-col items-center space-y-2">
           <button
             type="button"
-            onClick={() => toggleNotificationCenter()}
-            className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition cursor-pointer flex items-center justify-center shrink-0 active:scale-95"
-            title="Notifications"
-            aria-label="Notifications"
+            onClick={() => user && fetchUserProfile(user.id)}
+            className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/80 hover:border-white shadow-lg transition active:scale-95 cursor-pointer shrink-0"
+            title={`${user?.displayName} (@${user?.username})`}
           >
-            <Bell className="w-4 h-4 text-indigo-500" />
-            {unreadNotificationsCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-rose-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center animate-pulse shadow-xs">
-                {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
-              </span>
+            {user?.avatarUrl ? (
+              <img src={user.avatarUrl} alt={user.displayName} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-blue-700 text-white font-bold flex items-center justify-center text-sm">
+                {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
+              </div>
             )}
           </button>
 
-          {/* Contacts - Single Symbol Button */}
+          {/* Socket live indicator dot */}
+          <span
+            title={socketStatus === 'connected' ? 'Connected (Live)' : socketStatus}
+            className={`w-2.5 h-2.5 rounded-full ring-2 ring-[#0066FF] ${
+              socketStatus === 'connected'
+                ? 'bg-emerald-400 animate-pulse'
+                : socketStatus === 'connecting'
+                ? 'bg-amber-400 animate-ping'
+                : 'bg-slate-300'
+            }`}
+          />
+        </div>
+
+        {/* Middle: Navigation Action Icons */}
+        <div className="flex flex-col items-center space-y-3.5">
+          {/* Active Chats Button (Highlighted in White Pill matching user screenshot) */}
+          <button
+            type="button"
+            onClick={() => void handleSelectChat(null)}
+            className="relative w-12 h-12 rounded-2xl bg-white text-[#0066FF] shadow-lg flex items-center justify-center transition active:scale-95 cursor-pointer"
+            title="Conversations"
+          >
+            <MessageSquare className="w-6 h-6 fill-current" />
+          </button>
+
+          {/* Contacts */}
           <Link
             to="/contacts"
-            className="hidden md:flex relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition items-center justify-center shrink-0 active:scale-95"
+            className="relative w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95"
             title="Contacts"
-            aria-label="Contacts"
           >
-            <Users className="w-4 h-4 text-indigo-500 shrink-0" />
+            <Users className="w-6 h-6" />
             {incomingRequests.length > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 px-1 min-w-[16px] h-4 rounded-full text-[10px] font-bold bg-amber-500 text-white flex items-center justify-center animate-pulse shadow-xs">
+              <span className="absolute top-1.5 right-1.5 px-1 min-w-[16px] h-4 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900 flex items-center justify-center ring-2 ring-[#0066FF]">
                 {incomingRequests.length}
               </span>
             )}
           </Link>
 
-          {/* Tablet & Desktop Navigation Items - All Single Symbol Buttons */}
-          <div className="hidden md:flex items-center space-x-1.5 sm:space-x-2">
-            {/* Explore Channels */}
-            <button
-              onClick={() => setShowChannelBrowserModal(true)}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 transition flex items-center justify-center shrink-0 active:scale-95"
-              title="Explore Channels"
-              aria-label="Explore Channels"
-            >
-              <Compass className="w-4 h-4 shrink-0" />
-            </button>
-
-            {/* Profile */}
-            <Link
-              to="/profile"
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-indigo-50 dark:bg-indigo-600/20 hover:bg-indigo-100 dark:hover:bg-indigo-600/30 border border-indigo-200 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-300 transition flex items-center justify-center shrink-0 active:scale-95"
-              title="Profile"
-              aria-label="Profile"
-            >
-              <UserIcon className="w-4 h-4 shrink-0" />
-            </Link>
-
-            {/* Settings */}
-            <Link
-              to="/settings"
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition flex items-center justify-center shrink-0 active:scale-95"
-              title="Settings"
-              aria-label="Settings"
-            >
-              <SettingsIcon className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" />
-            </Link>
-
-            {/* Admin Portal (if admin) */}
-            {user?.role === 'admin' && (
-              <Link
-                to="/admin"
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/50 border border-purple-200 dark:border-purple-500/40 text-purple-600 dark:text-purple-300 transition flex items-center justify-center shrink-0 active:scale-95"
-                title="Admin Portal"
-                aria-label="Admin Portal"
-              >
-                <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
-              </Link>
-            )}
-
-            {/* Profile Avatar / User Badge */}
-            <div className="flex items-center space-x-2 pl-2 border-l border-slate-200 dark:border-slate-800 text-right">
-              <div className="hidden xl:block text-right">
-                <p className="text-xs font-semibold text-slate-900 dark:text-white leading-none">
-                  {user?.displayName}
-                </p>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">
-                  @{user?.username}
-                </p>
-              </div>
-              <Link
-                to="/profile"
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800 border-2 border-indigo-500/40 hover:border-indigo-500 transition-colors flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-300 shrink-0 shadow-xs"
-                title={`${user?.displayName} (@${user?.username})`}
-              >
-                {user?.avatarUrl ? (
-                  <img
-                    src={user.avatarUrl}
-                    alt={user.displayName}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span>{user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}</span>
-                )}
-              </Link>
-            </div>
-
-            {/* Sign Out - Single Symbol Button */}
-            <button
-              onClick={handleLogout}
-              disabled={loggingOut}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 dark:bg-slate-800 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 dark:hover:border-rose-500/30 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 transition flex items-center justify-center shrink-0 active:scale-95"
-              title="Sign Out"
-              aria-label="Sign Out"
-            >
-              <LogOut className="w-4 h-4 shrink-0" />
-            </button>
-          </div>
-
-          {/* Mobile Menu Button for screens < md */}
+          {/* Explore Channels */}
           <button
             type="button"
-            onClick={() => setMobileMenuOpen((prev) => !prev)}
-            className="md:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition flex items-center justify-center shrink-0 active:scale-95"
-            aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-            aria-expanded={mobileMenuOpen}
+            onClick={() => setShowChannelBrowserModal(true)}
+            className="w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95 cursor-pointer"
+            title="Explore Channels"
           >
-            {mobileMenuOpen ? (
-              <CloseIcon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            ) : (
-              <Menu className="w-5 h-5" />
+            <Compass className="w-6 h-6" />
+          </button>
+
+          {/* Notifications */}
+          <button
+            type="button"
+            onClick={() => toggleNotificationCenter()}
+            className="relative w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95 cursor-pointer"
+            title="Notifications"
+          >
+            <Bell className="w-6 h-6" />
+            {unreadNotificationsCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-rose-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center ring-2 ring-[#0066FF] animate-pulse">
+                {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+              </span>
             )}
           </button>
+
+          {/* Settings */}
+          <Link
+            to="/settings"
+            className="w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95"
+            title="Settings"
+          >
+            <SettingsIcon className="w-6 h-6" />
+          </Link>
+
+          {/* Admin link if user is admin */}
+          {user?.role === 'admin' && (
+            <Link
+              to="/admin"
+              className="w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95"
+              title="Admin Portal"
+            >
+              <Shield className="w-6 h-6" />
+            </Link>
+          )}
+
+          {/* Circular Daylight / Dark Theme Toggle Button */}
+          <div className="pt-1">
+            <ThemeToggle className="!bg-white/20 !border-white/30 !text-white hover:!bg-white/30" />
+          </div>
         </div>
 
-        {/* Mobile Dropdown Menu (< md) - Compact, adjusted, and eliminates useless empty space */}
-        {mobileMenuOpen && (
-          <>
-            <div
-              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-2xs md:hidden animate-in fade-in duration-150"
-              onClick={() => setMobileMenuOpen(false)}
-              aria-hidden="true"
-            />
-            <div className="fixed top-16 right-3 z-50 w-72 max-w-[calc(100vw-24px)] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-2.5 flex flex-col md:hidden animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-150 origin-top-right max-h-[calc(100dvh-5rem)] overflow-y-auto">
-              {/* User Profile Card */}
-              <div className="flex items-center space-x-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
-                <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800 border-2 border-indigo-500/40 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-300 shrink-0">
-                  {user?.avatarUrl ? (
-                    <img
-                      src={user.avatarUrl}
-                      alt={user.displayName}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span>{user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}</span>
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                    {user?.displayName}
-                  </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                    @{user?.username}
-                  </p>
-                </div>
-                {user?.role === 'admin' && (
-                  <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 rounded-md shrink-0">
-                    Admin
-                  </span>
-                )}
-              </div>
+        {/* Bottom: Logout / Exit */}
+        <div className="flex flex-col items-center">
+          <button
+            type="button"
+            onClick={handleLogout}
+            disabled={loggingOut}
+            className="w-12 h-12 rounded-2xl text-white/85 hover:text-white hover:bg-white/15 flex items-center justify-center transition active:scale-95 cursor-pointer"
+            title="Sign Out"
+          >
+            <LogOut className="w-6 h-6" />
+          </button>
+        </div>
+      </nav>
 
-              {/* Daylight Theme Toggle Row */}
-              <div className="mt-2 px-2.5 py-2 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-100/80 dark:border-slate-800/80 flex items-center justify-between">
-                <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Theme</span>
-                <ThemeToggle showLabel={true} />
-              </div>
+      {/* Main Column (Mobile Header + Chat Workspace) */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Real-time offline and reconnect status bar */}
+        <OfflineBanner />
 
-              {/* Menu Links */}
-              <div className="mt-2 pt-1.5 border-t border-slate-100 dark:border-slate-800 space-y-0.5">
-                <Link
-                  to="/contacts"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-[0.99]"
-                >
-                  <div className="flex items-center space-x-2.5">
-                    <Users className="w-4 h-4 text-indigo-500 shrink-0" />
-                    <span>Contacts</span>
+        {/* Top Navbar for Mobile (< md) */}
+        <header className="md:hidden h-14 border-b border-slate-200 dark:border-[#1E1E2A] bg-white/90 dark:bg-[#0D0D14]/90 backdrop-blur-md px-3 flex items-center justify-between shrink-0 z-20 sticky top-0">
+          <div className="flex items-center space-x-2 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-[#0066FF] flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
+              <MessageSquare className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-base font-bold tracking-tight text-slate-900 dark:text-white truncate">
+              Whhispr
+            </span>
+
+            {/* Real-time Socket Connection Badge */}
+            {socketStatus === 'connected' ? (
+              <span
+                title="Socket Connected (Live)"
+                className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-medium flex items-center shrink-0"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse shrink-0" />
+                <span>Live</span>
+              </span>
+            ) : socketStatus === 'connecting' ? (
+              <span
+                title="Socket Connecting..."
+                className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-medium flex items-center shrink-0"
+              >
+                <Radio className="w-3 h-3 mr-1 animate-spin text-amber-500 shrink-0" />
+                <span>Connecting...</span>
+              </span>
+            ) : (
+              <span
+                title="Socket Disconnected (Offline)"
+                className="text-[11px] px-2 py-0.5 rounded-full bg-slate-500/10 text-slate-500 dark:text-slate-400 border border-slate-500/20 font-medium flex items-center shrink-0"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1 shrink-0" />
+                <span>Offline</span>
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center space-x-1.5">
+            {/* Daylight / Dark Theme Toggle Button */}
+            <ThemeToggle size="sm" />
+
+            {/* In-App Notifications Bell */}
+            <button
+              type="button"
+              onClick={() => toggleNotificationCenter()}
+              className="relative w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-[#161622] dark:hover:bg-[#1E1E2C] border border-slate-200 dark:border-[#222232] text-slate-700 dark:text-slate-300 transition cursor-pointer flex items-center justify-center shrink-0 active:scale-95"
+              title="Notifications"
+              aria-label="Notifications"
+            >
+              <Bell className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              {unreadNotificationsCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-rose-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center animate-pulse shadow-xs">
+                  {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                </span>
+              )}
+            </button>
+
+            {/* Mobile Menu Button for screens < md */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-[#161622] dark:hover:bg-[#1E1E2C] border border-slate-200 dark:border-[#222232] text-slate-700 dark:text-slate-300 transition flex items-center justify-center shrink-0 active:scale-95"
+              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={mobileMenuOpen}
+            >
+              {mobileMenuOpen ? (
+                <CloseIcon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              ) : (
+                <Menu className="w-4 h-4" />
+              )}
+            </button>
+          </div>
+
+          {/* Mobile Dropdown Menu (< md) */}
+          {mobileMenuOpen && (
+            <>
+              <div
+                className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs md:hidden animate-in fade-in duration-150"
+                onClick={() => setMobileMenuOpen(false)}
+                aria-hidden="true"
+              />
+              <div className="fixed top-14 right-3 z-50 w-72 max-w-[calc(100vw-24px)] bg-white dark:bg-[#0D0D14] border border-slate-200 dark:border-[#1E1E2A] rounded-2xl shadow-2xl p-2.5 flex flex-col md:hidden animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-150 origin-top-right max-h-[calc(100dvh-4.5rem)] overflow-y-auto">
+                {/* User Profile Card */}
+                <div className="flex items-center space-x-2.5 p-2 rounded-xl bg-slate-50 dark:bg-[#161622] border border-slate-100 dark:border-[#222232]">
+                  <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-200 dark:bg-[#1E1E2C] border-2 border-blue-500/40 flex items-center justify-center text-xs font-bold text-blue-600 dark:text-blue-300 shrink-0">
+                    {user?.avatarUrl ? (
+                      <img
+                        src={user.avatarUrl}
+                        alt={user.displayName}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span>{user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}</span>
+                    )}
                   </div>
-                  {incomingRequests.length > 0 && (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">
-                      {incomingRequests.length}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                      {user?.displayName}
+                    </p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                      @{user?.username}
+                    </p>
+                  </div>
+                  {user?.role === 'admin' && (
+                    <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 rounded-md shrink-0">
+                      Admin
                     </span>
                   )}
-                </Link>
+                </div>
 
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setShowChannelBrowserModal(true);
-                  }}
-                  className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition text-left active:scale-[0.99]"
-                >
-                  <Compass className="w-4 h-4 text-indigo-500 shrink-0" />
-                  <span>Explore Channels</span>
-                </button>
+                {/* Daylight Theme Toggle Row */}
+                <div className="mt-2 px-2.5 py-2 rounded-xl bg-slate-50/70 dark:bg-[#161622]/60 border border-slate-100/80 dark:border-[#222232] flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Theme</span>
+                  <ThemeToggle showLabel={true} />
+                </div>
 
-                <Link
-                  to="/profile"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-[0.99]"
-                >
-                  <UserIcon className="w-4 h-4 text-indigo-500 shrink-0" />
-                  <span>Profile</span>
-                </Link>
-
-                <Link
-                  to="/settings"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-[0.99]"
-                >
-                  <SettingsIcon className="w-4 h-4 text-slate-400 shrink-0" />
-                  <span>Settings</span>
-                </Link>
-
-                {user?.role === 'admin' && (
+                {/* Menu Links */}
+                <div className="mt-2 pt-1.5 border-t border-slate-100 dark:border-[#1E1E2A] space-y-0.5">
                   <Link
-                    to="/admin"
+                    to="/contacts"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 transition active:scale-[0.99]"
+                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#161622] transition active:scale-[0.99]"
                   >
-                    <Shield className="w-4 h-4 text-purple-500 shrink-0" />
-                    <span>Admin Portal</span>
+                    <div className="flex items-center space-x-2.5">
+                      <Users className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                      <span>Contacts</span>
+                    </div>
+                    {incomingRequests.length > 0 && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">
+                        {incomingRequests.length}
+                      </span>
+                    )}
                   </Link>
-                )}
+
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setShowChannelBrowserModal(true);
+                    }}
+                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#161622] transition text-left active:scale-[0.99]"
+                  >
+                    <Compass className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                    <span>Explore Channels</span>
+                  </button>
+
+                  <Link
+                    to="/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#161622] transition active:scale-[0.99]"
+                  >
+                    <UserIcon className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                    <span>Profile</span>
+                  </Link>
+
+                  <Link
+                    to="/settings"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#161622] transition active:scale-[0.99]"
+                  >
+                    <SettingsIcon className="w-4 h-4 text-slate-400 shrink-0" />
+                    <span>Settings</span>
+                  </Link>
+
+                  {user?.role === 'admin' && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition active:scale-[0.99]"
+                    >
+                      <Shield className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                      <span>Admin Portal</span>
+                    </Link>
+                  )}
+                </div>
+
+                {/* Sign Out Button */}
+                <div className="mt-1.5 pt-1.5 border-t border-slate-100 dark:border-[#1E1E2A]">
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      void handleLogout();
+                    }}
+                    disabled={loggingOut}
+                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition active:scale-[0.99]"
+                  >
+                    <LogOut className="w-4 h-4 shrink-0" />
+                    <span>{loggingOut ? 'Signing out...' : 'Sign Out'}</span>
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </header>
+
+        {/* Main Two-Panel Chat Workspace (Floated / Docked rounded cards on desktop) */}
+        <div className="flex-1 flex overflow-hidden p-0 md:p-3 md:gap-3 bg-slate-100 dark:bg-black">
+          {/* LEFT PANEL: Chats Sidebar */}
+          <aside
+            role="region"
+            aria-label="Conversations list"
+            className={`w-full md:w-80 lg:w-96 md:rounded-2xl lg:rounded-3xl border border-slate-200/80 dark:border-[#1E1E2A] bg-white dark:bg-[#0D0D14] flex flex-col shrink-0 overflow-hidden shadow-sm md:shadow-xl ${
+              activeChat ? 'hidden md:flex' : 'flex'
+            }`}
+          >
+            {/* Sidebar Top Actions & Search */}
+            <div className="p-3.5 border-b border-slate-200/80 dark:border-[#1E1E2A] space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+                  Groups & Chats
+                </span>
+                <div className="flex items-center space-x-1.5">
+                  <button
+                    onClick={() => setShowCallHistoryModal(true)}
+                    className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-[#161622] dark:hover:bg-[#1E1E2C] text-blue-600 dark:text-blue-400 text-xs font-semibold shadow-xs transition"
+                    title="View Call History"
+                  >
+                    <PhoneCall className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                    <span>Calls</span>
+                  </button>
+                  <button
+                    onClick={() => setShowCreateGroupModal(true)}
+                    className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-[#0066FF] hover:bg-blue-600 text-white text-xs font-semibold shadow-md shadow-blue-500/20 transition cursor-pointer"
+                    title="Create Group or Channel"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>New</span>
+                  </button>
+                </div>
               </div>
 
-              {/* Sign Out Button */}
-              <div className="mt-1.5 pt-1.5 border-t border-slate-100 dark:border-slate-800">
+              <div className="relative flex items-center">
+                <Search className="w-4 h-4 text-slate-400 dark:text-zinc-500 absolute left-3 top-2.5 pointer-events-none" />
+                <input
+                  type="text"
+                  value={chatSearch}
+                  onChange={(e) => setChatSearch(e.target.value)}
+                  placeholder="Search..."
+                  aria-label="Search conversations"
+                  className="w-full pl-9 pr-10 sm:pr-14 py-2 bg-slate-100 dark:bg-[#161622] border border-slate-200 dark:border-[#222232] rounded-xl text-base sm:text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#0066FF] transition"
+                />
                 <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    void handleLogout();
-                  }}
-                  disabled={loggingOut}
-                  className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition active:scale-[0.99]"
+                  type="button"
+                  onClick={() => setShowGlobalSearch(true)}
+                  title="Global Search (⌘K)"
+                  aria-label="Global Search"
+                  className="hidden sm:inline-flex absolute right-2 px-1.5 py-0.5 rounded bg-slate-200 dark:bg-[#20202E] text-[10px] font-mono font-medium text-slate-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 transition"
                 >
-                  <LogOut className="w-4 h-4 shrink-0" />
-                  <span>{loggingOut ? 'Signing out...' : 'Sign Out'}</span>
+                  ⌘K
                 </button>
               </div>
             </div>
-          </>
-        )}
-      </header>
-
-      {/* Main Two-Panel Chat Workspace */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* LEFT PANEL: Chats Sidebar */}
-        <aside
-          role="region"
-          aria-label="Conversations list"
-          className={`w-full md:w-80 lg:w-96 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 flex flex-col shrink-0 ${
-            activeChat ? 'hidden md:flex' : 'flex'
-          }`}
-        >
-          {/* Sidebar Top Actions & Search */}
-          <div className="p-3.5 border-b border-slate-200 dark:border-slate-800 space-y-2.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Conversations
-              </span>
-              <div className="flex items-center space-x-1.5">
-                <button
-                  onClick={() => setShowCallHistoryModal(true)}
-                  className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold shadow-xs transition"
-                  title="View Call History"
-                >
-                  <PhoneCall className="w-3.5 h-3.5 text-indigo-500" />
-                  <span>Calls</span>
-                </button>
-                <button
-                  onClick={() => setShowCreateGroupModal(true)}
-                  className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-xs transition"
-                  title="Create Group or Channel"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>New</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="relative flex items-center">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
-              <input
-                type="text"
-                value={chatSearch}
-                onChange={(e) => setChatSearch(e.target.value)}
-                placeholder="Search conversations..."
-                aria-label="Search conversations"
-                className="w-full pl-9 pr-10 sm:pr-14 py-2 bg-slate-100 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-xl text-base sm:text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-              />
-              <button
-                type="button"
-                onClick={() => setShowGlobalSearch(true)}
-                title="Global Search (⌘K)"
-                aria-label="Global Search"
-                className="hidden sm:inline-flex absolute right-2 px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-mono font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition"
-              >
-                ⌘K
-              </button>
-            </div>
-          </div>
 
           {/* Chats Scroll List */}
           <div
-            className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/40"
+            className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-[#161622]"
             role="list"
             aria-label="Chat conversations"
           >
@@ -935,35 +963,35 @@ export default function DashboardPage() {
                   <button
                     key={chat.id}
                     onClick={() => void handleSelectChat(chat.id)}
-                    className={`w-full text-left p-3 sm:p-3.5 flex items-start space-x-3 transition-colors ${
+                    className={`w-full text-left p-3 sm:p-3.5 flex items-start space-x-3 transition-colors cursor-pointer ${
                       isSelected
-                        ? 'bg-indigo-50/80 dark:bg-indigo-950/40 border-l-4 border-indigo-600'
-                        : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                        ? 'bg-blue-50/80 dark:bg-blue-600/15 border-l-4 border-[#0066FF]'
+                        : 'hover:bg-slate-50 dark:hover:bg-[#14141E]'
                     }`}
                   >
-                    {/* Avatar Icon (48px on mobile, 44px on sm+) */}
+                    {/* Avatar Icon */}
                     <div className="relative shrink-0">
                       {chat.type === 'channel' ? (
-                        <div className="w-12 h-12 sm:w-11 sm:h-11 rounded-2xl sm:rounded-xl bg-gradient-to-tr from-violet-500/20 to-purple-500/20 border border-violet-500/30 text-violet-600 dark:text-violet-400 flex items-center justify-center font-bold text-lg shadow-xs">
+                        <div className="w-12 h-12 sm:w-11 sm:h-11 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-lg shadow-xs">
                           <Hash className="w-5 h-5" />
                         </div>
                       ) : chat.type === 'group' ? (
-                        <div className="w-12 h-12 sm:w-11 sm:h-11 rounded-2xl sm:rounded-xl bg-gradient-to-tr from-indigo-500/20 to-sky-500/20 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-base shadow-xs">
+                        <div className="w-12 h-12 sm:w-11 sm:h-11 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-base shadow-xs">
                           <Users className="w-5 h-5" />
                         </div>
                       ) : chat.avatarUrl ? (
                         <img
                           src={chat.avatarUrl}
                           alt={chat.name || 'Chat'}
-                          className="w-12 h-12 sm:w-11 sm:h-11 rounded-2xl sm:rounded-xl object-cover border border-slate-200 dark:border-slate-700"
+                          className="w-12 h-12 sm:w-11 sm:h-11 rounded-2xl object-cover border border-slate-200 dark:border-[#222232]"
                         />
                       ) : (
-                        <div className="w-12 h-12 sm:w-11 sm:h-11 rounded-2xl sm:rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-base shadow-xs">
+                        <div className="w-12 h-12 sm:w-11 sm:h-11 rounded-2xl bg-[#0066FF] flex items-center justify-center text-white font-bold text-base shadow-sm shadow-blue-500/20">
                           {chat.name ? chat.name.charAt(0).toUpperCase() : 'C'}
                         </div>
                       )}
                       {chat.type === 'direct' && isUserOnline && (
-                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900" />
+                        <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white dark:border-[#0D0D14]" />
                       )}
                     </div>
 
@@ -971,24 +999,24 @@ export default function DashboardPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-1.5 truncate">
-                          {chat.type === 'channel' && <Hash className="w-3.5 h-3.5 text-slate-400 shrink-0" />}
+                          {chat.type === 'channel' && <Hash className="w-3.5 h-3.5 text-blue-500 shrink-0" />}
                           <h3 className="font-semibold text-xs text-slate-900 dark:text-white truncate">
                             {chat.name || 'Conversation'}
                           </h3>
                         </div>
                         {chat.lastMessage && (
-                          <span className="text-[10px] text-slate-400 shrink-0 ml-1">
+                          <span className="text-[10px] text-slate-400 dark:text-zinc-500 shrink-0 ml-1">
                             {formatMessageTime(chat.lastMessage.createdAt)}
                           </span>
                         )}
                       </div>
 
                       <div className="flex items-center justify-between mt-1">
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate pr-2">
+                        <p className="text-xs text-slate-500 dark:text-zinc-400 truncate pr-2">
                           {(typingUsers[chat.id] || []).filter(
                             (name) => name !== user?.username && name !== user?.displayName,
                           ).length > 0 ? (
-                            <span className="text-indigo-600 dark:text-indigo-400 font-semibold animate-pulse">
+                            <span className="text-blue-600 dark:text-blue-400 font-semibold animate-pulse">
                               typing...
                             </span>
                           ) : chat.lastMessage?.content ? (
@@ -999,14 +1027,19 @@ export default function DashboardPage() {
                               chat.lastMessage.content
                             )
                           ) : (
-                            <span className="italic text-slate-400">No messages yet</span>
+                            <span className="italic text-slate-400 dark:text-zinc-500">No messages yet</span>
                           )}
                         </p>
-                        {chat.unreadCount > 0 && (
-                          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-600 text-white shrink-0">
-                            {chat.unreadCount}
-                          </span>
-                        )}
+                        <div className="flex items-center space-x-1 shrink-0">
+                          {chat.lastMessage && chat.lastMessage.senderId === user?.id && (
+                            <CheckCheck className="w-3.5 h-3.5 text-[#0066FF]" />
+                          )}
+                          {chat.unreadCount > 0 && (
+                            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-[#0066FF] text-white shrink-0 shadow-xs">
+                              {chat.unreadCount}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </button>
@@ -1016,69 +1049,69 @@ export default function DashboardPage() {
           </div>
         </aside>
 
-        {/* RIGHT PANEL: Active Conversation View */}
+        {/* RIGHT PANEL: Active Conversation View (Floated dark card on desktop) */}
         <section
           role="region"
           aria-label="Active conversation"
-          className={`flex-1 flex flex-col bg-slate-100/60 dark:bg-slate-950 overflow-hidden ${
+          className={`flex-1 flex flex-col md:rounded-2xl lg:rounded-3xl border border-slate-200/80 dark:border-[#1E1E2A] bg-white dark:bg-[#0D0D14] overflow-hidden shadow-sm md:shadow-xl ${
             activeChat ? 'flex' : 'hidden md:flex'
           }`}
         >
           {activeChat ? (
             <>
               {/* Active Chat Header */}
-              <div className="h-14 sm:h-16 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between shrink-0">
+              <div className="h-14 sm:h-16 border-b border-slate-200/80 dark:border-[#1E1E2A] bg-white/95 dark:bg-[#0D0D14]/95 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between shrink-0">
                 <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
                   {/* Mobile Back Button to conversation list */}
                   <button
                     type="button"
                     onClick={() => void handleSelectChat(null)}
-                    className="md:hidden p-2 -ml-1 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition touch-target-44 flex items-center justify-center shrink-0"
+                    className="md:hidden p-2 -ml-1 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#161622] transition touch-target-44 flex items-center justify-center shrink-0 cursor-pointer"
                     aria-label="Back to conversations list"
                   >
-                    <ArrowLeft className="w-5 h-5" />
+                    <ArrowLeft className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   </button>
 
                   <div className="relative shrink-0">
                     {activeChat.type === 'channel' ? (
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-violet-500/20 to-purple-500/20 border border-violet-500/30 text-violet-600 dark:text-violet-400 flex items-center justify-center font-bold shadow-xs">
+                      <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold shadow-xs">
                         <Hash className="w-5 h-5" />
                       </div>
                     ) : activeChat.type === 'group' ? (
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500/20 to-sky-500/20 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold shadow-xs">
+                      <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold shadow-xs">
                         <Users className="w-5 h-5" />
                       </div>
                     ) : activeChat.avatarUrl ? (
                       <img
                         src={activeChat.avatarUrl}
                         alt={activeChat.name || ''}
-                        className="w-10 h-10 rounded-xl object-cover border border-slate-200 dark:border-slate-700"
+                        className="w-10 h-10 rounded-xl object-cover border border-slate-200 dark:border-[#222232]"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm shadow-xs">
+                      <div className="w-10 h-10 rounded-xl bg-[#0066FF] flex items-center justify-center text-white font-bold text-sm shadow-xs">
                         {activeChat.name ? activeChat.name.charAt(0).toUpperCase() : 'C'}
                       </div>
                     )}
                     {activeChat.type === 'direct' &&
                       activeChat.otherUser &&
                       onlineUsers[activeChat.otherUser.id]?.status === 'online' && (
-                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900" />
+                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white dark:border-[#0D0D14]" />
                       )}
                   </div>
 
                   <div className="min-w-0">
                     <div className="flex items-center space-x-1.5">
                       {activeChat.type === 'channel' && (
-                        <span className="font-bold text-indigo-500 text-sm">#</span>
+                        <span className="font-bold text-blue-500 text-sm">#</span>
                       )}
                       <h2 className="font-bold text-sm text-slate-900 dark:text-white truncate">
                         {activeChat.name}
                       </h2>
                     </div>
 
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate flex items-center space-x-1.5">
+                    <p className="text-[11px] text-slate-500 dark:text-zinc-400 truncate flex items-center space-x-1.5">
                       {activeTyping.length > 0 ? (
-                        <span className="text-indigo-600 dark:text-indigo-400 font-semibold animate-pulse">
+                        <span className="text-blue-600 dark:text-blue-400 font-semibold animate-pulse">
                           {activeTyping.length === 1
                             ? `${activeTyping[0]} is typing...`
                             : `${activeTyping.slice(0, 2).join(', ')} are typing...`}
@@ -1109,7 +1142,7 @@ export default function DashboardPage() {
                           {onlineUsers[activeChat.otherUser.id]?.status === 'online' ? (
                             <span className="text-emerald-500 font-medium">Online</span>
                           ) : (
-                            <span className="text-slate-400">
+                            <span className="text-slate-400 dark:text-zinc-500">
                               {onlineUsers[activeChat.otherUser.id]?.lastSeen
                                 ? `Offline • Last seen ${formatMessageTime(onlineUsers[activeChat.otherUser.id]!.lastSeen!)}`
                                 : 'Offline'}
@@ -1123,14 +1156,15 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
+                {/* Electric Blue Action Icons in Header matching user reference design */}
                 <div className="flex items-center space-x-1 sm:space-x-2 shrink-0">
                   <button
                     type="button"
                     onClick={() => toggleInChatSearch()}
-                    className={`p-1.5 sm:p-2 rounded-xl transition cursor-pointer ${
+                    className={`p-2 rounded-xl transition cursor-pointer ${
                       inChatSearchOpen
-                        ? 'bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400'
-                        : 'text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        ? 'bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400'
+                        : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40'
                     }`}
                     title="Search in conversation"
                   >
@@ -1149,7 +1183,7 @@ export default function DashboardPage() {
                             callType: 'audio',
                           })
                         }
-                        className="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                        className="p-2 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
                         title="Voice Call"
                       >
                         <Phone className="w-4 h-4" />
@@ -1165,7 +1199,7 @@ export default function DashboardPage() {
                             callType: 'video',
                           })
                         }
-                        className="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                        className="p-2 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
                         title="Video Call"
                       >
                         <Video className="w-4 h-4" />
@@ -1181,17 +1215,17 @@ export default function DashboardPage() {
                           activeChat.otherUser!.displayName || activeChat.otherUser!.username,
                         )
                       }
-                      className="inline-flex items-center space-x-1 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-300 text-xs font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition cursor-pointer"
+                      className="inline-flex items-center space-x-1 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 text-blue-700 dark:text-blue-300 text-xs font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/60 transition cursor-pointer"
                       title="End-to-End Encrypted (Click to verify safety number)"
                     >
-                      <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                      <Lock className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                       <span className="hidden sm:inline">E2EE</span>
                     </button>
                   )}
                   {activeChat.type === 'direct' && activeChat.otherUser ? (
                     <button
                       onClick={() => handleInspectOtherUser(activeChat.otherUser!.id)}
-                      className="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                      className="p-2 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
                       title="View Profile"
                     >
                       <Info className="w-4 h-4" />
@@ -1199,10 +1233,10 @@ export default function DashboardPage() {
                   ) : (
                     <button
                       onClick={() => setShowGroupDrawer(!showGroupDrawer)}
-                      className={`p-1.5 sm:p-2 rounded-xl transition cursor-pointer ${
+                      className={`p-2 rounded-xl transition cursor-pointer ${
                         showGroupDrawer
-                          ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
-                          : 'text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                          ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                          : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40'
                       }`}
                       title="Group Details & Members"
                     >
@@ -1220,8 +1254,8 @@ export default function DashboardPage() {
                     const el = document.getElementById(`msg-${msgId}`);
                     if (el) {
                       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      el.classList.add('ring-4', 'ring-indigo-500', 'ring-offset-2');
-                      setTimeout(() => el.classList.remove('ring-4', 'ring-indigo-500', 'ring-offset-2'), 2500);
+                      el.classList.add('ring-4', 'ring-blue-500', 'ring-offset-2');
+                      setTimeout(() => el.classList.remove('ring-4', 'ring-blue-500', 'ring-offset-2'), 2500);
                     }
                   }}
                 />
@@ -1326,7 +1360,7 @@ export default function DashboardPage() {
                                     setReplyingTo(msg);
                                     messageInputRef.current?.focus();
                                   }}
-                                  className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition"
+                                  className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition"
                                   title="Reply"
                                 >
                                   <Reply className="w-3.5 h-3.5" />
@@ -1358,7 +1392,7 @@ export default function DashboardPage() {
                               {/* Message Bubble */}
                               <Bubble variant={isMe ? 'default' : 'muted'} className="w-fit max-w-full">
                                 {!isMe && isFirstInSenderSequence && activeChat?.type !== 'direct' && (
-                                  <p className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 mb-1">
+                                  <p className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 mb-1">
                                     {msg.sender.displayName}
                                   </p>
                                 )}
@@ -1369,10 +1403,10 @@ export default function DashboardPage() {
                                     className={`mb-2 p-2 rounded-xl border-l-2 text-xs ${
                                       isMe
                                         ? 'bg-blue-700/60 border-white/60 text-blue-100'
-                                        : 'bg-black/5 dark:bg-black/30 border-indigo-500 text-slate-700 dark:text-zinc-200'
+                                        : 'bg-black/5 dark:bg-black/30 border-blue-500 text-slate-700 dark:text-zinc-200'
                                     }`}
                                   >
-                                    <p className="font-semibold text-[11px] text-blue-200 dark:text-indigo-400">
+                                    <p className="font-semibold text-[11px] text-blue-200 dark:text-blue-400">
                                       {msg.replyTo.sender.displayName || msg.replyTo.sender.username}
                                     </p>
                                     <p className="truncate text-[11px] opacity-90">
@@ -1570,14 +1604,14 @@ export default function DashboardPage() {
               </div>
 
               {/* Message Composer Footer */}
-              <div className="p-3 sm:p-4 border-t border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shrink-0 relative">
+              <div className="p-3 sm:p-4 border-t border-slate-200/80 dark:border-[#1E1E2A] bg-white/95 dark:bg-[#0D0D14]/95 backdrop-blur-md shrink-0 relative">
                 {/* Replying banner */}
                 {replyingTo && (
-                  <div className="flex items-center justify-between px-3 py-1.5 mb-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-xs animate-in fade-in slide-in-from-bottom-2 duration-150">
+                  <div className="flex items-center justify-between px-3 py-1.5 mb-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-xs animate-in fade-in slide-in-from-bottom-2 duration-150">
                     <div className="flex items-center space-x-2 truncate">
-                      <Reply className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                      <Reply className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
                       <div className="truncate">
-                        <span className="font-semibold text-indigo-700 dark:text-indigo-300">
+                        <span className="font-semibold text-blue-700 dark:text-blue-300">
                           Replying to {replyingTo.sender.displayName}:
                         </span>{' '}
                         <span className="text-slate-600 dark:text-slate-300 truncate">
@@ -1626,19 +1660,19 @@ export default function DashboardPage() {
                 {showEmojiPicker && (
                   <div
                     ref={emojiPickerRef}
-                    className="absolute bottom-18 left-2 sm:left-4 z-30 w-[calc(100vw-1.5rem)] max-w-xs sm:w-80 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl p-3 animate-in fade-in zoom-in-95 duration-150 backdrop-blur-xl"
+                    className="absolute bottom-18 left-2 sm:left-4 z-30 w-[calc(100vw-1.5rem)] max-w-xs sm:w-80 bg-white/95 dark:bg-[#12121A]/95 border border-slate-200 dark:border-[#222232] rounded-2xl shadow-xl p-3 animate-in fade-in zoom-in-95 duration-150 backdrop-blur-xl"
                   >
-                    <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 dark:border-[#222232]">
                       <div className="flex space-x-1">
                         {(['smileys', 'gestures', 'hearts', 'objects'] as const).map((cat) => (
                           <button
                             key={cat}
                             type="button"
                             onClick={() => setEmojiCategory(cat)}
-                            className={`px-2 py-1 text-xs rounded-lg font-medium transition ${
+                            className={`px-2 py-1 text-xs rounded-lg font-medium transition cursor-pointer ${
                               emojiCategory === cat
-                                ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 font-semibold'
-                                : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-semibold'
+                                : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-[#1E1E2C]'
                             }`}
                           >
                             {cat === 'smileys'
@@ -1666,7 +1700,7 @@ export default function DashboardPage() {
                           key={emoji}
                           type="button"
                           onClick={() => handleInsertEmoji(emoji)}
-                          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 hover:scale-120 transition"
+                          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-[#1E1E2C] hover:scale-120 transition cursor-pointer"
                         >
                           {emoji}
                         </button>
@@ -1677,20 +1711,20 @@ export default function DashboardPage() {
 
                 {/* Staged Attachment Preview */}
                 {stagedFile && (
-                  <div className="mb-2 p-2 px-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-between animate-in fade-in duration-150">
+                  <div className="mb-2 p-2 px-3 rounded-2xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 flex items-center justify-between animate-in fade-in duration-150">
                     <div className="flex items-center space-x-2.5 min-w-0">
                       {stagedPreviewUrl ? (
                         <img
                           src={stagedPreviewUrl}
                           alt="preview"
-                          className="w-9 h-9 rounded-lg object-cover border border-indigo-300"
+                          className="w-9 h-9 rounded-lg object-cover border border-blue-300"
                         />
                       ) : stagedFile.type.startsWith('video/') ? (
-                        <Film className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                        <Film className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
                       ) : stagedFile.type.startsWith('audio/') ? (
-                        <Music className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                        <Music className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
                       ) : (
-                        <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                        <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
                       )}
                       <div className="min-w-0">
                         <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">
@@ -1704,7 +1738,7 @@ export default function DashboardPage() {
                     <button
                       type="button"
                       onClick={clearStagedFile}
-                      className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-white/40"
+                      className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-white/40 cursor-pointer"
                     >
                       <CloseIcon className="w-4 h-4" />
                     </button>
@@ -1727,10 +1761,10 @@ export default function DashboardPage() {
                       type="button"
                       onClick={() => setShowMobileActionsMenu(!showMobileActionsMenu)}
                       disabled={isSending || isUploadingMedia}
-                      className={`p-2.5 rounded-xl transition touch-target-44 flex items-center justify-center shrink-0 ${
+                      className={`p-2.5 rounded-xl transition touch-target-44 flex items-center justify-center shrink-0 cursor-pointer ${
                         showMobileActionsMenu
-                          ? 'bg-indigo-600 text-white rotate-45'
-                          : 'text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                          ? 'bg-[#0066FF] text-white rotate-45'
+                          : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-[#1E1E2C]'
                       }`}
                       title="More actions"
                       aria-label="Add attachment or emoji"
@@ -1739,16 +1773,16 @@ export default function DashboardPage() {
                     </button>
 
                     {showMobileActionsMenu && (
-                      <div className="absolute bottom-12 left-0 z-30 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl p-1.5 flex flex-col space-y-1 min-w-[170px] animate-in fade-in slide-in-from-bottom-2 duration-150">
+                      <div className="absolute bottom-12 left-0 z-30 bg-white dark:bg-[#12121A] border border-slate-200 dark:border-[#222232] rounded-2xl shadow-xl p-1.5 flex flex-col space-y-1 min-w-[170px] animate-in fade-in slide-in-from-bottom-2 duration-150">
                         <button
                           type="button"
                           onClick={() => {
                             setShowMobileActionsMenu(false);
                             fileInputRef.current?.click();
                           }}
-                          className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                          className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#1E1E2C] transition cursor-pointer"
                         >
-                          <Paperclip className="w-4 h-4 text-indigo-500 shrink-0" />
+                          <Paperclip className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
                           <span>Attach Media / File</span>
                         </button>
                         <button
@@ -1757,9 +1791,9 @@ export default function DashboardPage() {
                             setShowMobileActionsMenu(false);
                             setShowEmojiPicker(true);
                           }}
-                          className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                          className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#1E1E2C] transition cursor-pointer"
                         >
-                          <Smile className="w-4 h-4 text-amber-500 shrink-0" />
+                          <Smile className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
                           <span>Insert Emoji</span>
                         </button>
                       </div>
@@ -1772,7 +1806,7 @@ export default function DashboardPage() {
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isSending || isUploadingMedia}
-                      className="p-2.5 rounded-xl text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition shrink-0"
+                      className="p-2.5 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition shrink-0 cursor-pointer"
                       title="Attach file or photo"
                       aria-label="Attach file or photo"
                     >
@@ -1782,10 +1816,10 @@ export default function DashboardPage() {
                       type="button"
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                       disabled={isSending || isUploadingMedia}
-                      className={`p-2.5 rounded-xl transition shrink-0 ${
+                      className={`p-2.5 rounded-xl transition shrink-0 cursor-pointer ${
                         showEmojiPicker
-                          ? 'bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400'
-                          : 'text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                          ? 'bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400'
+                          : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40'
                       }`}
                       title="Insert emoji"
                       aria-label="Insert emoji"
@@ -1827,14 +1861,14 @@ export default function DashboardPage() {
                         ? `Message ${activeChat.name}...`
                         : 'Type a message... (Press Enter to send)'
                     }
-                    className="flex-1 px-3 sm:px-4 py-2.5 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition resize-none max-h-32 overflow-y-auto leading-relaxed"
+                    className="flex-1 px-3 sm:px-4 py-2.5 bg-slate-100 dark:bg-[#161622] border border-slate-200 dark:border-[#222232] rounded-xl text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#0066FF] transition resize-none max-h-32 overflow-y-auto leading-relaxed"
                     style={{ minHeight: '44px' }}
                   />
 
                   <button
                     type="submit"
                     disabled={(!messageInput.trim() && !stagedFile) || isSending || isUploadingMedia}
-                    className="p-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:hover:bg-indigo-600 text-white shadow-md shadow-indigo-600/20 transition touch-target-44 flex items-center justify-center shrink-0 self-end"
+                    className="p-2.5 rounded-xl bg-[#0066FF] hover:bg-blue-600 disabled:opacity-40 disabled:hover:bg-[#0066FF] text-white shadow-md shadow-blue-500/25 transition touch-target-44 flex items-center justify-center shrink-0 self-end cursor-pointer"
                     title="Send Message"
                     aria-label="Send Message"
                   >
@@ -1850,27 +1884,27 @@ export default function DashboardPage() {
           ) : (
             /* Empty State when no chat is selected (Tablet & Desktop only; hidden on mobile) */
             <div className="hidden md:flex flex-1 flex-col items-center justify-center p-8 text-center">
-              <div className="w-16 h-16 rounded-3xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-4 shadow-lg shadow-indigo-500/10">
+              <div className="w-16 h-16 rounded-3xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-4 shadow-lg shadow-blue-500/10">
                 <MessageSquare className="w-8 h-8" />
               </div>
               <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">
                 Your Whhispr Hub
               </h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mb-6 leading-relaxed">
+              <p className="text-sm text-slate-500 dark:text-zinc-400 max-w-sm mb-6 leading-relaxed">
                 Select a conversation on the left, start a new group or channel, or share media with
                 friends.
               </p>
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => setShowCreateGroupModal(true)}
-                  className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 transition"
+                  className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-[#0066FF] hover:bg-blue-600 text-white text-xs font-semibold shadow-md shadow-blue-500/20 transition cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Create Group / Channel</span>
                 </button>
                 <button
                   onClick={() => setShowChannelBrowserModal(true)}
-                  className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition"
+                  className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-[#161622] dark:hover:bg-[#1E1E2C] text-blue-600 dark:text-blue-400 text-xs font-semibold transition cursor-pointer"
                 >
                   <Compass className="w-4 h-4" />
                   <span>Explore Channels</span>
@@ -1895,7 +1929,7 @@ export default function DashboardPage() {
         <button
           type="button"
           onClick={() => setShowCreateGroupModal(true)}
-          className="md:hidden fixed right-4 bottom-20 z-20 w-13 h-13 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white shadow-xl shadow-indigo-600/30 flex items-center justify-center touch-target-44 hover:scale-105 active:scale-95 transition"
+          className="md:hidden fixed right-4 bottom-20 z-20 w-13 h-13 rounded-full bg-[#0066FF] hover:bg-blue-600 text-white shadow-xl shadow-blue-600/30 flex items-center justify-center touch-target-44 hover:scale-105 active:scale-95 transition"
           aria-label="New Conversation or Group"
           title="New Conversation or Group"
         >
@@ -1906,13 +1940,13 @@ export default function DashboardPage() {
       {/* Mobile Bottom Tab Bar (shown when conversations list is visible) */}
       {!activeChat && (
         <nav
-          className="md:hidden border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md pb-safe shrink-0 z-20"
+          className="md:hidden border-t border-slate-200 dark:border-[#1E1E2A] bg-white/95 dark:bg-[#0D0D14]/95 backdrop-blur-md pb-safe shrink-0 z-20"
           aria-label="Mobile Navigation"
         >
           <div className="grid grid-cols-5 h-14">
             <button
               type="button"
-              className="flex flex-col items-center justify-center text-indigo-600 dark:text-indigo-400 touch-target-44"
+              className="flex flex-col items-center justify-center text-blue-600 dark:text-blue-400 touch-target-44"
               aria-label="Chats"
             >
               <MessageSquare className="w-5 h-5" />
@@ -1921,7 +1955,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setShowCallHistoryModal(true)}
-              className="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 touch-target-44"
+              className="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 touch-target-44"
               aria-label="Calls"
             >
               <PhoneCall className="w-5 h-5" />
@@ -1929,7 +1963,7 @@ export default function DashboardPage() {
             </button>
             <Link
               to="/contacts"
-              className="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 relative touch-target-44"
+              className="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 relative touch-target-44"
               aria-label="Contacts"
             >
               <div className="relative">
@@ -1945,7 +1979,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setShowChannelBrowserModal(true)}
-              className="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 touch-target-44"
+              className="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 touch-target-44"
               aria-label="Explore Channels"
             >
               <Compass className="w-5 h-5" />
@@ -1953,7 +1987,7 @@ export default function DashboardPage() {
             </button>
             <Link
               to="/profile"
-              className="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 touch-target-44"
+              className="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 touch-target-44"
               aria-label="Profile"
             >
               <UserIcon className="w-5 h-5" />
@@ -1962,6 +1996,7 @@ export default function DashboardPage() {
           </div>
         </nav>
       )}
+      </div>
 
       {/* Lightbox Image Preview Modal */}
       {lightboxImageUrl && (

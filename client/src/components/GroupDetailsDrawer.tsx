@@ -83,7 +83,7 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
         );
       case 'admin':
         return (
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center space-x-1">
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center space-x-1">
             <Shield className="w-3 h-3" />
             <span>Admin</span>
           </span>
@@ -128,7 +128,7 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
       <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-6 pb-safe">
         {/* Profile Card */}
         <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl mx-auto mb-3 bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-xl shadow-md">
+          <div className="w-16 h-16 rounded-2xl mx-auto mb-3 bg-[#0066FF] flex items-center justify-center text-white font-bold text-xl shadow-md shadow-blue-500/20">
             {activeGroupDetails.type === 'channel' ? (
               <Hash className="w-8 h-8" />
             ) : (
@@ -170,7 +170,7 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
             {!showAddMember ? (
               <button
                 onClick={() => setShowAddMember(true)}
-                className="w-full py-2 px-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-400 text-xs font-semibold flex items-center justify-center space-x-1.5 transition"
+                className="w-full py-2 px-3 rounded-xl bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 text-blue-600 dark:text-blue-400 text-xs font-semibold flex items-center justify-center space-x-1.5 transition cursor-pointer"
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 <span>Add Members</span>
@@ -210,7 +210,7 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
                               setSelectedToAdd((prev) => prev.filter((id) => id !== contact.userId));
                             }
                           }}
-                          className="w-3.5 h-3.5 accent-indigo-600"
+                          className="w-3.5 h-3.5 accent-[#0066FF]"
                         />
                       </label>
                     ))}
@@ -219,7 +219,7 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
                 {selectedToAdd.length > 0 && (
                   <button
                     onClick={() => void handleAddSubmit()}
-                    className="w-full py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold shadow-xs"
+                    className="w-full py-1.5 rounded-xl bg-[#0066FF] hover:bg-blue-600 text-white text-xs font-semibold shadow-xs cursor-pointer"
                   >
                     Add ({selectedToAdd.length})
                   </button>
@@ -274,7 +274,7 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
                               activeMenuMemberId === member.userId ? null : member.userId,
                             )
                           }
-                          className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 dark:hover:bg-slate-800"
+                          className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer"
                         >
                           <ChevronDown className="w-3.5 h-3.5" />
                         </button>
@@ -282,7 +282,7 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
                           <div className="absolute right-0 top-6 w-32 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl rounded-xl p-1 z-30 text-xs">
                             <button
                               onClick={() => void handleRoleChange(member.userId, 'admin')}
-                              className="w-full text-left px-2 py-1 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-indigo-600"
+                              className="w-full text-left px-2 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 text-blue-600 cursor-pointer"
                             >
                               Make Admin
                             </button>

@@ -63,7 +63,7 @@ export function CallHistoryModal({ isOpen, onClose, onStartCall }: CallHistoryMo
         {/* Modal Header */}
         <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
               <Phone className="w-4 h-4" />
             </div>
             <div>
@@ -86,7 +86,7 @@ export function CallHistoryModal({ isOpen, onClose, onStartCall }: CallHistoryMo
         <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/50 p-2">
           {isLoadingHistory ? (
             <div className="py-16 text-center text-slate-400">
-              <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-500" />
+              <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-blue-500" />
               <p className="text-xs">Loading call history...</p>
             </div>
           ) : callHistory.length === 0 ? (
@@ -112,7 +112,7 @@ export function CallHistoryModal({ isOpen, onClose, onStartCall }: CallHistoryMo
                 >
                   <div className="flex items-center space-x-3 min-w-0">
                     {/* User Avatar */}
-                    <div className="relative w-11 h-11 rounded-2xl overflow-hidden bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center shrink-0">
+                    <div className="relative w-11 h-11 rounded-2xl overflow-hidden bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center shrink-0">
                       {other?.avatar_url ? (
                         <img
                           src={other.avatar_url}
@@ -120,7 +120,7 @@ export function CallHistoryModal({ isOpen, onClose, onStartCall }: CallHistoryMo
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                        <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                       )}
                     </div>
 
@@ -130,7 +130,7 @@ export function CallHistoryModal({ isOpen, onClose, onStartCall }: CallHistoryMo
                           {other?.display_name || other?.username || 'Unknown'}
                         </span>
                         {item.type === 'video' ? (
-                          <Video className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                          <Video className="w-3.5 h-3.5 text-blue-500 shrink-0" />
                         ) : (
                           <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                         )}
@@ -195,7 +195,7 @@ export function CallHistoryModal({ isOpen, onClose, onStartCall }: CallHistoryMo
                             callType: 'video',
                           });
                         }}
-                        className="p-2 rounded-xl text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition"
+                        className="p-2 rounded-xl text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition"
                         title="Call with video"
                       >
                         <Video className="w-4 h-4" />

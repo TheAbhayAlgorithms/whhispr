@@ -46,7 +46,7 @@ export function DecryptedText({ content, senderId, isMe }: DecryptedTextProps) {
       {isEncrypted && (
         <span
           title="End-to-End Encrypted Message"
-          className={`shrink-0 mt-0.5 ${isMe ? 'text-indigo-200' : 'text-slate-400 dark:text-slate-500'}`}
+          className={`shrink-0 mt-0.5 ${isMe ? 'text-blue-200' : 'text-slate-400 dark:text-slate-500'}`}
         >
           <Lock className="w-3.5 h-3.5" />
         </span>

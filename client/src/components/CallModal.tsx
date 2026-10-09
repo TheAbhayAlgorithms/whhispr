@@ -129,7 +129,7 @@ export function CallModal() {
           </div>
 
           <div className="flex items-center space-x-2">
-            <span className="px-3 py-1 rounded-full text-[11px] font-medium tracking-wide uppercase bg-slate-800/80 border border-slate-700/80 text-indigo-300">
+            <span className="px-3 py-1 rounded-full text-[11px] font-medium tracking-wide uppercase bg-slate-800/80 border border-slate-700/80 text-blue-300">
               {session.callType} Call
             </span>
           </div>
@@ -149,7 +149,7 @@ export function CallModal() {
               />
 
               {/* Local Video PiP (Floating Top Right) */}
-              <div className="absolute top-16 sm:top-20 right-3 sm:right-6 w-28 h-20 sm:w-48 sm:h-32 md:w-56 md:h-36 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border-2 border-indigo-500/60 bg-slate-900 z-10 transition-all duration-300">
+              <div className="absolute top-16 sm:top-20 right-3 sm:right-6 w-28 h-20 sm:w-48 sm:h-32 md:w-56 md:h-36 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border-2 border-blue-500/60 bg-slate-900 z-10 transition-all duration-300">
                 <video
                   ref={localVideoRef}
                   autoPlay
@@ -168,8 +168,8 @@ export function CallModal() {
           {session.status === 'connected' && !isVideo ? (
             <div className="flex flex-col items-center justify-center p-8 space-y-6">
               <div className="relative">
-                <div className="absolute -inset-4 rounded-full bg-indigo-500/20 animate-pulse blur-xl" />
-                <div className="relative w-28 h-28 rounded-full border-4 border-indigo-500/50 overflow-hidden shadow-2xl flex items-center justify-center bg-indigo-600">
+                <div className="absolute -inset-4 rounded-full bg-blue-500/20 animate-pulse blur-xl" />
+                <div className="relative w-28 h-28 rounded-full border-4 border-blue-500/50 overflow-hidden shadow-2xl flex items-center justify-center bg-blue-600">
                   {(session.isInitiator ? session.recipientAvatar : session.callerAvatar) ? (
                     <img
                       src={(session.isInitiator ? session.recipientAvatar : session.callerAvatar)!}
@@ -196,8 +196,8 @@ export function CallModal() {
           {session.status === 'outgoing' ? (
             <div className="flex flex-col items-center justify-center p-8 space-y-6">
               <div className="relative">
-                <div className="absolute -inset-6 rounded-full bg-indigo-500/20 animate-ping duration-1000" />
-                <div className="relative w-28 h-28 rounded-full border-4 border-indigo-500/40 overflow-hidden shadow-2xl flex items-center justify-center bg-indigo-600">
+                <div className="absolute -inset-6 rounded-full bg-blue-500/20 animate-ping duration-1000" />
+                <div className="relative w-28 h-28 rounded-full border-4 border-blue-500/40 overflow-hidden shadow-2xl flex items-center justify-center bg-blue-600">
                   {session.recipientAvatar ? (
                     <img
                       src={session.recipientAvatar}
@@ -221,7 +221,7 @@ export function CallModal() {
             <div className="flex flex-col items-center justify-center p-8 space-y-6">
               <div className="relative">
                 <div className="absolute -inset-6 rounded-full bg-emerald-500/25 animate-ping duration-1000" />
-                <div className="relative w-28 h-28 rounded-full border-4 border-emerald-500/50 overflow-hidden shadow-2xl flex items-center justify-center bg-indigo-600">
+                <div className="relative w-28 h-28 rounded-full border-4 border-emerald-500/50 overflow-hidden shadow-2xl flex items-center justify-center bg-blue-600">
                   {session.callerAvatar ? (
                     <img
                       src={session.callerAvatar}
@@ -234,7 +234,7 @@ export function CallModal() {
                 </div>
               </div>
               <div className="text-center">
-                <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-indigo-950/60 border border-indigo-700/60 text-indigo-300 text-xs font-semibold mb-3">
+                <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-blue-950/60 border border-blue-700/60 text-blue-300 text-xs font-semibold mb-3">
                   <Sparkles className="w-3 h-3" />
                   <span>Incoming {session.callType} Call</span>
                 </div>
@@ -281,7 +281,7 @@ export function CallModal() {
               {session.callType === 'video' && (
                 <button
                   onClick={() => acceptCall('video')}
-                  className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-900/30 transition transform hover:scale-105 active:scale-95"
+                  className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/30 transition transform hover:scale-105 active:scale-95"
                   title="Accept with Video"
                 >
                   <Video className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -324,7 +324,7 @@ export function CallModal() {
                   onClick={() => void toggleScreenShare()}
                   className={`flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full border transition ${
                     isScreenSharing
-                      ? 'bg-indigo-600 border-indigo-500 text-white'
+                      ? 'bg-blue-600 border-blue-500 text-white'
                       : 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700'
                   }`}
                   title={isScreenSharing ? 'Stop Screen Share' : 'Share Screen'}

@@ -74,7 +74,7 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
       >
         {/* Search Header Bar */}
         <div className="p-3.5 sm:p-4 border-b border-slate-200 dark:border-slate-800 flex items-center space-x-3 bg-slate-50/50 dark:bg-slate-950/40 shrink-0">
-          <Search className="w-5 h-5 text-indigo-500 shrink-0" />
+          <Search className="w-5 h-5 text-blue-500 shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -120,7 +120,7 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
               onClick={() => setActiveTab('all')}
               className={`px-3 py-1.5 rounded-xl font-medium transition cursor-pointer flex items-center space-x-1.5 shrink-0 ${
                 activeTab === 'all'
-                  ? 'bg-indigo-600 text-white shadow-xs'
+                  ? 'bg-blue-600 text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
@@ -132,7 +132,7 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
               onClick={() => setActiveTab('messages')}
               className={`px-3 py-1.5 rounded-xl font-medium transition cursor-pointer flex items-center space-x-1.5 shrink-0 ${
                 activeTab === 'messages'
-                  ? 'bg-indigo-600 text-white shadow-xs'
+                  ? 'bg-blue-600 text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
@@ -146,7 +146,7 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
               onClick={() => setActiveTab('users')}
               className={`px-3 py-1.5 rounded-xl font-medium transition cursor-pointer flex items-center space-x-1.5 shrink-0 ${
                 activeTab === 'users'
-                  ? 'bg-indigo-600 text-white shadow-xs'
+                  ? 'bg-blue-600 text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
@@ -160,7 +160,7 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
               onClick={() => setActiveTab('chats')}
               className={`px-3 py-1.5 rounded-xl font-medium transition cursor-pointer flex items-center space-x-1.5 shrink-0 ${
                 activeTab === 'chats'
-                  ? 'bg-indigo-600 text-white shadow-xs'
+                  ? 'bg-blue-600 text-white shadow-xs'
                   : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
@@ -176,7 +176,7 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {!globalQuery.trim() ? (
             <div className="py-12 text-center text-slate-400 space-y-2">
-              <Sparkles className="w-8 h-8 mx-auto text-indigo-400 opacity-60" />
+              <Sparkles className="w-8 h-8 mx-auto text-blue-400 opacity-60" />
               <p className="text-sm font-medium">Type to search messages, people, or channels</p>
               <p className="text-xs text-slate-400">Search is instant, scoped to your permissions, and full-text indexed</p>
             </div>
@@ -201,7 +201,7 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
                         <div
                           key={msg.id}
                           onClick={() => void handleSelectMessage(msg.chatId)}
-                          className="p-3 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 transition cursor-pointer group"
+                          className="p-3 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-800 hover:bg-blue-50/50 dark:hover:bg-blue-950/30 transition cursor-pointer group"
                         >
                           <div className="flex items-center justify-between mb-1 text-xs">
                             <span className="font-semibold text-slate-900 dark:text-white flex items-center space-x-1.5">
@@ -238,10 +238,10 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
                         <div
                           key={u.userId}
                           onClick={() => void handleSelectUser(u.userId)}
-                          className="p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 transition cursor-pointer flex items-center justify-between"
+                          className="p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-800 hover:bg-blue-50/50 dark:hover:bg-blue-950/30 transition cursor-pointer flex items-center justify-between"
                         >
                           <div className="flex items-center space-x-3">
-                            <div className="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs">
+                            <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs">
                               {u.avatarUrl ? (
                                 <img
                                   src={u.avatarUrl}
@@ -259,7 +259,7 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
                               <p className="text-[11px] text-slate-400">@{u.username}</p>
                             </div>
                           </div>
-                          <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+                          <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline">
                             Message
                           </span>
                         </div>
@@ -281,10 +281,10 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
                         <div
                           key={c.id}
                           onClick={() => void handleSelectChannel(c.id)}
-                          className="p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 transition cursor-pointer flex items-center justify-between"
+                          className="p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-800 hover:bg-blue-50/50 dark:hover:bg-blue-950/30 transition cursor-pointer flex items-center justify-between"
                         >
                           <div className="flex items-center space-x-3 min-w-0">
-                            <div className="w-9 h-9 rounded-2xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs shrink-0">
+                            <div className="w-9 h-9 rounded-2xl bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs shrink-0">
                               <Hash className="w-4 h-4" />
                             </div>
                             <div className="min-w-0">

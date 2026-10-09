@@ -47,7 +47,7 @@ export default function VerifyEmailPage() {
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <div className="flex justify-center">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-500 via-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#0066FF] to-blue-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
             <MessageSquare className="w-6 h-6 text-white" />
           </div>
         </div>
@@ -60,7 +60,7 @@ export default function VerifyEmailPage() {
         <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl py-6 px-4 sm:py-8 sm:px-10 shadow-xl rounded-3xl border border-slate-200 dark:border-slate-800 text-center">
           {loading ? (
             <div className="py-8">
-              <div className="mx-auto w-10 h-10 rounded-full border-3 border-indigo-500 border-t-transparent animate-spin mb-4" />
+              <div className="mx-auto w-10 h-10 rounded-full border-3 border-blue-500 border-t-transparent animate-spin mb-4" />
               <p className="text-sm text-slate-600 dark:text-slate-400">Verifying your email address...</p>
             </div>
           ) : success ? (
@@ -72,7 +72,7 @@ export default function VerifyEmailPage() {
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">{message}</p>
               <Link
                 to="/login"
-                className="inline-flex items-center justify-center py-2.5 px-6 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/30 transition"
+                className="inline-flex items-center justify-center py-2.5 px-6 rounded-xl text-sm font-semibold text-white bg-[#0066FF] hover:bg-blue-600 shadow-md shadow-blue-600/30 transition"
               >
                 <span>Continue to Sign In</span>
                 <ArrowRight className="ml-2 w-4 h-4" />
@@ -87,7 +87,7 @@ export default function VerifyEmailPage() {
               <p className="text-sm text-rose-600 dark:text-rose-300 mb-6">{message}</p>
               <Link
                 to="/login"
-                className="inline-flex items-center text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300"
+                className="inline-flex items-center text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300"
               >
                 Return to Login
               </Link>

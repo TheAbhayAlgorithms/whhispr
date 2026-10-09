@@ -14,8 +14,8 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-100">
-        <div className="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center animate-pulse mb-4">
-          <Activity className="w-6 h-6 text-indigo-400 animate-spin" />
+        <div className="w-12 h-12 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center animate-pulse mb-4">
+          <Activity className="w-6 h-6 text-blue-400 animate-spin" />
         </div>
         <p className="text-sm font-medium text-slate-400">Authenticating session...</p>
       </div>

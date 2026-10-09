@@ -26,7 +26,7 @@ interface NotificationCenterModalProps {
 function getNotificationIcon(type: NotificationType) {
   switch (type) {
     case 'new_message':
-      return <MessageSquare className="w-4 h-4 text-indigo-500" />;
+      return <MessageSquare className="w-4 h-4 text-blue-500" />;
     case 'contact_request':
       return <UserPlus className="w-4 h-4 text-emerald-500" />;
     case 'mention':
@@ -38,7 +38,7 @@ function getNotificationIcon(type: NotificationType) {
     case 'reaction':
       return <Smile className="w-4 h-4 text-pink-500" />;
     default:
-      return <Bell className="w-4 h-4 text-indigo-500" />;
+      return <Bell className="w-4 h-4 text-blue-500" />;
   }
 }
 
@@ -99,10 +99,10 @@ export function NotificationCenterModal({ isOpen, onClose }: NotificationCenterM
         {/* Header */}
         <div className="flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 border-b border-slate-100 dark:border-slate-800 pt-safe">
           <div className="flex items-center space-x-2.5">
-            <div className="relative w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+            <div className="relative w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
               <Bell className="w-4 h-4" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-indigo-600 text-white rounded-full text-[10px] font-bold flex items-center justify-center shadow-xs">
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-600 text-white rounded-full text-[10px] font-bold flex items-center justify-center shadow-xs">
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}
@@ -119,7 +119,7 @@ export function NotificationCenterModal({ isOpen, onClose }: NotificationCenterM
             {unreadCount > 0 && (
               <button
                 onClick={() => void markAllAsRead()}
-                className="min-w-[44px] min-h-[44px] p-2.5 rounded-xl text-xs text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 font-medium transition cursor-pointer flex items-center justify-center"
+                className="min-w-[44px] min-h-[44px] p-2.5 rounded-xl text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 font-medium transition cursor-pointer flex items-center justify-center"
                 title="Mark all as read"
                 aria-label="Mark all as read"
               >
@@ -138,14 +138,14 @@ export function NotificationCenterModal({ isOpen, onClose }: NotificationCenterM
 
         {/* Web Push Permission Banner */}
         {isPushSupported && !isPushSubscribed && (
-          <div className="px-4 py-2.5 bg-indigo-50 dark:bg-indigo-950/40 border-b border-indigo-100 dark:border-indigo-900/40 flex items-center justify-between text-xs">
-            <div className="flex items-center space-x-2 text-indigo-700 dark:text-indigo-300">
+          <div className="px-4 py-2.5 bg-blue-50 dark:bg-blue-950/40 border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between text-xs">
+            <div className="flex items-center space-x-2 text-blue-700 dark:text-blue-300">
               <BellRing className="w-3.5 h-3.5 shrink-0" />
               <span className="text-[11px]">Enable desktop push notifications</span>
             </div>
             <button
               onClick={() => void subscribePush()}
-              className="px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-medium text-[11px] hover:bg-indigo-500 shadow-xs transition cursor-pointer"
+              className="px-2.5 py-1 rounded-lg bg-blue-600 text-white font-medium text-[11px] hover:bg-blue-500 shadow-xs transition cursor-pointer"
             >
               Enable
             </button>
@@ -156,7 +156,7 @@ export function NotificationCenterModal({ isOpen, onClose }: NotificationCenterM
         <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60 p-2">
           {isLoading && notifications.length === 0 ? (
             <div className="py-20 text-center text-slate-400">
-              <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-500" />
+              <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-blue-500" />
               <p className="text-xs">Loading alerts...</p>
             </div>
           ) : notifications.length === 0 ? (
@@ -177,7 +177,7 @@ export function NotificationCenterModal({ isOpen, onClose }: NotificationCenterM
                 className={`group relative flex items-start space-x-3 p-3 rounded-2xl transition cursor-pointer ${
                   notif.is_read
                     ? 'hover:bg-slate-50 dark:hover:bg-slate-800/40 opacity-80'
-                    : 'bg-indigo-50/40 dark:bg-indigo-950/20 hover:bg-indigo-50/70 dark:hover:bg-indigo-950/40'
+                    : 'bg-blue-50/40 dark:bg-blue-950/20 hover:bg-blue-50/70 dark:hover:bg-blue-950/40'
                 }`}
               >
                 {/* Icon Badge */}
@@ -198,7 +198,7 @@ export function NotificationCenterModal({ isOpen, onClose }: NotificationCenterM
                       {notif.title}
                     </h4>
                     {!notif.is_read && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 shrink-0" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0" />
                     )}
                   </div>
 

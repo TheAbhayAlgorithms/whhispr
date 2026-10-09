@@ -31,14 +31,14 @@ export function ThemeToggle({
       aria-label={isLight ? 'Switch to Dark Mode' : 'Switch to Daylight Mode'}
       className={`group relative rounded-full flex items-center justify-center border transition-all duration-300 shadow-xs active:scale-95 cursor-pointer shrink-0 ${sizeClasses} ${
         isLight
-          ? 'bg-amber-50 hover:bg-amber-100 border-amber-200/90 text-amber-600 hover:border-amber-300 shadow-amber-500/10'
-          : 'bg-slate-800/90 hover:bg-slate-700 border-slate-700 text-slate-200 hover:border-slate-600 shadow-slate-900/40'
+          ? 'bg-blue-50 hover:bg-blue-100 border-blue-200/90 text-blue-600 hover:border-blue-300 shadow-blue-500/10'
+          : 'bg-[#16161c] hover:bg-[#1f1f28] border-[#262633] text-blue-400 hover:border-blue-500/40 shadow-blue-500/10'
       } ${className}`}
     >
       {isLight ? (
-        <Sun className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-amber-500 fill-amber-400/40 transition-transform duration-300 group-hover:rotate-45 shrink-0" />
+        <Sun className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-blue-600 fill-blue-500/30 transition-transform duration-300 group-hover:rotate-45 shrink-0" />
       ) : (
-        <Moon className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-indigo-400 fill-indigo-400/30 transition-transform duration-300 group-hover:-rotate-12 shrink-0" />
+        <Moon className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-blue-400 fill-blue-400/30 transition-transform duration-300 group-hover:-rotate-12 shrink-0" />
       )}
     </button>
   );

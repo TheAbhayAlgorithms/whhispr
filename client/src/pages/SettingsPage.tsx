@@ -156,12 +156,12 @@ export default function SettingsPage() {
   };
 
   const getDeviceIcon = (ua: string | null) => {
-    if (!ua) return <Globe className="w-5 h-5 text-indigo-500" />;
+    if (!ua) return <Globe className="w-5 h-5 text-blue-500" />;
     const lower = ua.toLowerCase();
     if (lower.includes('mobile') || lower.includes('android') || lower.includes('iphone')) {
-      return <Smartphone className="w-5 h-5 text-indigo-500" />;
+      return <Smartphone className="w-5 h-5 text-blue-500" />;
     }
-    return <Laptop className="w-5 h-5 text-indigo-500" />;
+    return <Laptop className="w-5 h-5 text-blue-500" />;
   };
 
   const parseBrowser = (ua: string | null) => {
@@ -188,7 +188,7 @@ export default function SettingsPage() {
               <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
             <div className="flex items-center space-x-2 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold shrink-0">
+              <div className="w-8 h-8 rounded-full bg-blue-600/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold shrink-0">
                 <Sliders className="w-4 h-4" />
               </div>
               <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight truncate">
@@ -234,7 +234,7 @@ export default function SettingsPage() {
                 onClick={() => setActiveTab('appearance')}
                 className={`flex items-center space-x-2.5 md:space-x-3 px-3.5 py-2.5 md:px-4 md:py-3 rounded-xl md:rounded-2xl font-medium text-xs md:text-sm transition text-left shrink-0 md:w-full ${
                   activeTab === 'appearance'
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                 }`}
               >
@@ -244,7 +244,7 @@ export default function SettingsPage() {
                   <div
                     className={`hidden md:block text-xs ${
                       activeTab === 'appearance'
-                        ? 'text-indigo-100'
+                        ? 'text-blue-100'
                         : 'text-slate-400 dark:text-slate-500'
                     }`}
                   >
@@ -257,7 +257,7 @@ export default function SettingsPage() {
                 onClick={() => setActiveTab('account')}
                 className={`flex items-center space-x-2.5 md:space-x-3 px-3.5 py-2.5 md:px-4 md:py-3 rounded-xl md:rounded-2xl font-medium text-xs md:text-sm transition text-left shrink-0 md:w-full ${
                   activeTab === 'account'
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                 }`}
               >
@@ -267,7 +267,7 @@ export default function SettingsPage() {
                   <div
                     className={`hidden md:block text-xs ${
                       activeTab === 'account'
-                        ? 'text-indigo-100'
+                        ? 'text-blue-100'
                         : 'text-slate-400 dark:text-slate-500'
                     }`}
                   >
@@ -280,7 +280,7 @@ export default function SettingsPage() {
                 onClick={() => setActiveTab('sessions')}
                 className={`flex items-center space-x-2.5 md:space-x-3 px-3.5 py-2.5 md:px-4 md:py-3 rounded-xl md:rounded-2xl font-medium text-xs md:text-sm transition text-left shrink-0 md:w-full ${
                   activeTab === 'sessions'
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                 }`}
               >
@@ -290,7 +290,7 @@ export default function SettingsPage() {
                   <div
                     className={`hidden md:block text-xs ${
                       activeTab === 'sessions'
-                        ? 'text-indigo-100'
+                        ? 'text-blue-100'
                         : 'text-slate-400 dark:text-slate-500'
                     }`}
                   >
@@ -302,7 +302,7 @@ export default function SettingsPage() {
                     className={`px-1.5 py-0.2 md:px-2 md:py-0.5 rounded-full text-[10px] md:text-xs font-semibold ${
                       activeTab === 'sessions'
                         ? 'bg-white/20 text-white'
-                        : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300'
+                        : 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
                     }`}
                   >
                     {sessions.length}
@@ -314,7 +314,7 @@ export default function SettingsPage() {
                 onClick={() => setActiveTab('notifications')}
                 className={`flex items-center space-x-2.5 md:space-x-3 px-3.5 py-2.5 md:px-4 md:py-3 rounded-xl md:rounded-2xl font-medium text-xs md:text-sm transition text-left shrink-0 md:w-full ${
                   activeTab === 'notifications'
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                 }`}
               >
@@ -324,7 +324,7 @@ export default function SettingsPage() {
                   <div
                     className={`hidden md:block text-xs ${
                       activeTab === 'notifications'
-                        ? 'text-indigo-100'
+                        ? 'text-blue-100'
                         : 'text-slate-400 dark:text-slate-500'
                     }`}
                   >
@@ -337,7 +337,7 @@ export default function SettingsPage() {
                 onClick={() => setActiveTab('privacy')}
                 className={`flex items-center space-x-2.5 md:space-x-3 px-3.5 py-2.5 md:px-4 md:py-3 rounded-xl md:rounded-2xl font-medium text-xs md:text-sm transition text-left shrink-0 md:w-full ${
                   activeTab === 'privacy'
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                 }`}
               >
@@ -347,7 +347,7 @@ export default function SettingsPage() {
                   <div
                     className={`hidden md:block text-xs ${
                       activeTab === 'privacy'
-                        ? 'text-indigo-100'
+                        ? 'text-blue-100'
                         : 'text-slate-400 dark:text-slate-500'
                     }`}
                   >
@@ -402,7 +402,7 @@ export default function SettingsPage() {
                       onClick={() => setTheme('light')}
                       className={`relative p-5 rounded-2xl border-2 text-left flex flex-col items-center space-y-3 transition group ${
                         theme === 'light'
-                          ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/20 shadow-sm'
+                          ? 'border-blue-600 bg-blue-50/50 dark:bg-blue-950/20 shadow-sm'
                           : 'border-slate-200 dark:border-slate-700/60 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800/40'
                       }`}
                     >
@@ -418,7 +418,7 @@ export default function SettingsPage() {
                         </p>
                       </div>
                       {theme === 'light' && (
-                        <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs">
+                        <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">
                           <Check className="w-3.5 h-3.5" />
                         </div>
                       )}
@@ -429,11 +429,11 @@ export default function SettingsPage() {
                       onClick={() => setTheme('dark')}
                       className={`relative p-5 rounded-2xl border-2 text-left flex flex-col items-center space-y-3 transition group ${
                         theme === 'dark'
-                          ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/20 shadow-sm'
+                          ? 'border-blue-600 bg-blue-50/50 dark:bg-blue-950/20 shadow-sm'
                           : 'border-slate-200 dark:border-slate-700/60 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800/40'
                       }`}
                     >
-                      <div className="w-12 h-12 rounded-xl bg-indigo-900/60 text-indigo-400 flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-xl bg-blue-900/60 text-blue-400 flex items-center justify-center">
                         <Moon className="w-6 h-6" />
                       </div>
                       <div className="text-center">
@@ -445,7 +445,7 @@ export default function SettingsPage() {
                         </p>
                       </div>
                       {theme === 'dark' && (
-                        <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs">
+                        <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">
                           <Check className="w-3.5 h-3.5" />
                         </div>
                       )}
@@ -475,7 +475,7 @@ export default function SettingsPage() {
                 {/* Change Password Card */}
                 <div className="bg-white dark:bg-slate-900/60 rounded-3xl border border-slate-200 dark:border-slate-800/80 p-6 sm:p-8 shadow-sm">
                   <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                       <Lock className="w-5 h-5" />
                     </div>
                     <div>
@@ -513,7 +513,7 @@ export default function SettingsPage() {
                           value={currentPassword}
                           onChange={(e) => setCurrentPassword(e.target.value)}
                           placeholder="Enter current password"
-                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-10"
+                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
                         />
                         <button
                           type="button"
@@ -540,7 +540,7 @@ export default function SettingsPage() {
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             placeholder="Min 8 chars, uppercase & digit"
-                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-10"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
                           />
                           <button
                             type="button"
@@ -565,7 +565,7 @@ export default function SettingsPage() {
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           placeholder="Re-type new password"
-                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
                     </div>
@@ -574,7 +574,7 @@ export default function SettingsPage() {
                       <button
                         type="submit"
                         disabled={isUpdatingPassword}
-                        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition shadow-sm disabled:opacity-50 flex items-center justify-center space-x-2"
+                        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition shadow-sm disabled:opacity-50 flex items-center justify-center space-x-2"
                       >
                         {isUpdatingPassword ? (
                           <>
@@ -676,7 +676,7 @@ export default function SettingsPage() {
                       className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition"
                     >
                       <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
-                        <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/40 flex items-center justify-center shrink-0">
+                        <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/40 flex items-center justify-center shrink-0">
                           {getDeviceIcon(session.userAgent)}
                         </div>
                         <div className="min-w-0">
@@ -733,14 +733,14 @@ export default function SettingsPage() {
 
                 <div className="space-y-4 pt-2">
                   {/* Push Permission Request */}
-                  <div className="p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 flex items-center justify-between">
+                  <div className="p-4 rounded-2xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 flex items-center justify-between">
                     <div>
                       <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
                         Desktop Push Notifications
                       </h3>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                         Permission status:{' '}
-                        <span className="font-semibold capitalize text-indigo-600 dark:text-indigo-400">
+                        <span className="font-semibold capitalize text-blue-600 dark:text-blue-400">
                           {notificationPermission}
                         </span>
                       </p>
@@ -748,7 +748,7 @@ export default function SettingsPage() {
                     {notificationPermission !== 'granted' ? (
                       <button
                         onClick={handleRequestPushPermission}
-                        className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition shadow-sm"
+                        className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition shadow-sm"
                       >
                         Enable Notifications
                       </button>
@@ -776,7 +776,7 @@ export default function SettingsPage() {
                         updateNotifPrefs({ messageSounds: !notifPrefs.messageSounds })
                       }
                       className={`w-11 h-6 flex items-center rounded-full p-1 transition duration-200 ${
-                        notifPrefs.messageSounds ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'
+                        notifPrefs.messageSounds ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'
                       }`}
                     >
                       <div
@@ -803,7 +803,7 @@ export default function SettingsPage() {
                         updateNotifPrefs({ callRingtone: !notifPrefs.callRingtone })
                       }
                       className={`w-11 h-6 flex items-center rounded-full p-1 transition duration-200 ${
-                        notifPrefs.callRingtone ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'
+                        notifPrefs.callRingtone ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'
                       }`}
                     >
                       <div
@@ -830,7 +830,7 @@ export default function SettingsPage() {
                         updateNotifPrefs({ messagePreview: !notifPrefs.messagePreview })
                       }
                       className={`w-11 h-6 flex items-center rounded-full p-1 transition duration-200 ${
-                        notifPrefs.messagePreview ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'
+                        notifPrefs.messagePreview ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'
                       }`}
                     >
                       <div
@@ -857,8 +857,8 @@ export default function SettingsPage() {
                 </div>
 
                 {/* E2EE Status Card */}
-                <div className="p-5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 flex items-start space-x-4">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0">
+                <div className="p-5 rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 flex items-start space-x-4">
+                  <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
                     <Shield className="w-5 h-5" />
                   </div>
                   <div>
@@ -895,7 +895,7 @@ export default function SettingsPage() {
                         updatePrivacyPrefs({ readReceipts: !privacyPrefs.readReceipts })
                       }
                       className={`w-11 h-6 flex items-center rounded-full p-1 transition duration-200 ${
-                        privacyPrefs.readReceipts ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'
+                        privacyPrefs.readReceipts ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'
                       }`}
                     >
                       <div
@@ -925,7 +925,7 @@ export default function SettingsPage() {
                       }
                       className={`w-11 h-6 flex items-center rounded-full p-1 transition duration-200 ${
                         privacyPrefs.showOnlineStatus
-                          ? 'bg-indigo-600'
+                          ? 'bg-blue-600'
                           : 'bg-slate-300 dark:bg-slate-700'
                       }`}
                     >

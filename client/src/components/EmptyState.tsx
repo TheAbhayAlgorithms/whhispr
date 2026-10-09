@@ -24,7 +24,7 @@ export function EmptyState({
       className={`flex flex-col items-center justify-center text-center p-8 max-w-sm mx-auto select-none ${className}`}
       role="status"
     >
-      <div className="w-16 h-16 rounded-3xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-4 shadow-sm">
+      <div className="w-16 h-16 rounded-3xl bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-4 shadow-sm">
         {icon}
       </div>
 
@@ -40,7 +40,7 @@ export function EmptyState({
         <button
           type="button"
           onClick={onAction}
-          className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm transition active:scale-95 focus-visible:ring-2 focus-visible:ring-indigo-500"
+          className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500"
         >
           {actionIcon}
           <span>{actionText}</span>

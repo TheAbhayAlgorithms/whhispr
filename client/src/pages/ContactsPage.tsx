@@ -132,7 +132,7 @@ export default function ContactsPage() {
             >
               <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 shrink-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-blue-500 to-violet-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20 shrink-0">
               <Users className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div className="min-w-0">
@@ -186,7 +186,7 @@ export default function ContactsPage() {
             onClick={() => setActiveTab('contacts')}
             className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition shrink-0 ${
               activeTab === 'contacts'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
@@ -201,7 +201,7 @@ export default function ContactsPage() {
             onClick={() => setActiveTab('requests')}
             className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition relative shrink-0 ${
               activeTab === 'requests'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
@@ -218,7 +218,7 @@ export default function ContactsPage() {
             onClick={() => setActiveTab('add')}
             className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition shrink-0 ${
               activeTab === 'add'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
@@ -234,7 +234,7 @@ export default function ContactsPage() {
               <ContactCardsSkeleton count={6} />
             ) : contacts.length === 0 ? (
               <div className="text-center py-16 px-4 bg-white dark:bg-slate-900/50 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs">
-                <div className="w-14 h-14 mx-auto rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-500 mb-4">
+                <div className="w-14 h-14 mx-auto rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-500 mb-4">
                   <Users className="w-7 h-7" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">No contacts yet</h3>
@@ -243,7 +243,7 @@ export default function ContactsPage() {
                 </p>
                 <button
                   onClick={() => setActiveTab('add')}
-                  className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-md shadow-indigo-600/20 transition"
+                  className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold shadow-md shadow-blue-600/20 transition"
                 >
                   <UserPlus className="w-4 h-4" />
                   <span>Find People</span>
@@ -268,7 +268,7 @@ export default function ContactsPage() {
                               className="w-12 h-12 rounded-xl object-cover border border-slate-200 dark:border-slate-700"
                             />
                           ) : (
-                            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-lg shadow-xs">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-500 to-violet-500 flex items-center justify-center text-white font-bold text-lg shadow-xs">
                               {contact.displayName.charAt(0).toUpperCase()}
                             </div>
                           )}
@@ -285,7 +285,7 @@ export default function ContactsPage() {
                             {contact.displayName}
                           </h4>
                           <div className="flex items-center space-x-1.5 mt-0.5">
-                            <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium truncate">
+                            <p className="text-xs text-blue-600 dark:text-blue-400 font-medium truncate">
                               @{contact.username}
                             </p>
                             <span className="text-[10px] text-slate-300 dark:text-slate-600">&bull;</span>
@@ -309,7 +309,7 @@ export default function ContactsPage() {
                       <button
                         onClick={() => handleStartChat(contact.userId)}
                         title="Start Chat"
-                        className="p-2 rounded-xl text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition"
+                        className="p-2 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition"
                       >
                         <MessageSquare className="w-4 h-4" />
                       </button>
@@ -370,7 +370,7 @@ export default function ContactsPage() {
                           <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">
                             {req.displayName}
                           </h4>
-                          <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium truncate">
+                          <p className="text-xs text-blue-600 dark:text-blue-400 font-medium truncate">
                             @{req.username}
                           </p>
                         </div>
@@ -456,7 +456,7 @@ export default function ContactsPage() {
         {activeTab === 'add' && (
           <div className="max-w-xl mx-auto">
             <div className="bg-white dark:bg-slate-900/80 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-md">
-              <div className="flex items-center space-x-2 text-indigo-600 dark:text-indigo-400 mb-2">
+              <div className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 mb-2">
                 <Sparkles className="w-5 h-5" />
                 <h3 className="font-bold text-base text-slate-900 dark:text-white">Discover & Add People</h3>
               </div>
@@ -472,13 +472,13 @@ export default function ContactsPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search by username or name..."
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={isSearching}
-                  className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs sm:text-sm transition shadow-sm shrink-0"
+                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs sm:text-sm transition shadow-sm shrink-0"
                 >
                   {isSearching ? 'Searching...' : 'Search'}
                 </button>
@@ -508,7 +508,7 @@ export default function ContactsPage() {
                                 className="w-10 h-10 rounded-xl object-cover shrink-0"
                               />
                             ) : (
-                              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold shrink-0">
+                              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-500 to-violet-500 flex items-center justify-center text-white font-bold shrink-0">
                                 {user.displayName.charAt(0).toUpperCase()}
                               </div>
                             )}
@@ -516,7 +516,7 @@ export default function ContactsPage() {
                               <h4 className="font-semibold text-sm text-slate-900 dark:text-white truncate">
                                 {user.displayName}
                               </h4>
-                              <p className="text-xs text-indigo-600 dark:text-indigo-400 truncate">
+                              <p className="text-xs text-blue-600 dark:text-blue-400 truncate">
                                 @{user.username}
                               </p>
                             </div>
@@ -534,7 +534,7 @@ export default function ContactsPage() {
                             ) : (
                               <button
                                 onClick={() => handleSendRequest(user.userId)}
-                                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-xs transition"
+                                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-xs transition"
                               >
                                 <UserPlus className="w-3.5 h-3.5" />
                                 <span>Add</span>

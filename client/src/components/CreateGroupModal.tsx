@@ -80,7 +80,7 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
         {/* Header */}
         <div className="p-4 sm:p-6 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between shrink-0">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-xs shrink-0">
+            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-xs shrink-0">
               {tab === 'group' ? <Users className="w-5 h-5" /> : <Hash className="w-5 h-5" />}
             </div>
             <div>
@@ -110,7 +110,7 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
             onClick={() => setTab('group')}
             className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center space-x-2 transition ${
               tab === 'group'
-                ? 'bg-indigo-600 text-white shadow-xs'
+                ? 'bg-blue-600 text-white shadow-xs'
                 : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
             }`}
           >
@@ -122,7 +122,7 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
             onClick={() => setTab('channel')}
             className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center space-x-2 transition ${
               tab === 'channel'
-                ? 'bg-indigo-600 text-white shadow-xs'
+                ? 'bg-blue-600 text-white shadow-xs'
                 : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
             }`}
           >
@@ -156,7 +156,7 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                 placeholder={tab === 'group' ? 'e.g. Design Sync' : 'general'}
                 className={`w-full ${
                   tab === 'channel' ? 'pl-8' : 'pl-3.5'
-                } pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-base sm:text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition`}
+                } pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-base sm:text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition`}
               />
             </div>
           </div>
@@ -170,7 +170,7 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What is this conversation about?"
-              className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-base sm:text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-base sm:text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
             />
           </div>
 
@@ -198,7 +198,7 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                   type="checkbox"
                   checked={isPublic}
                   onChange={(e) => setIsPublic(e.target.checked)}
-                  className="w-4 h-4 accent-indigo-600 rounded"
+                  className="w-4 h-4 accent-blue-600 rounded"
                 />
               </div>
             </div>
@@ -224,12 +224,12 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                       onClick={() => toggleMemberSelection(contact.userId)}
                       className={`flex items-center justify-between p-2 rounded-xl cursor-pointer transition ${
                         isChecked
-                          ? 'bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/40'
+                          ? 'bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/40'
                           : 'hover:bg-slate-100 dark:hover:bg-slate-800/50'
                       }`}
                     >
                       <div className="flex items-center space-x-2.5">
-                        <div className="w-7 h-7 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-indigo-600">
+                        <div className="w-7 h-7 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-blue-600">
                           {contact.displayName.charAt(0).toUpperCase()}
                         </div>
                         <div>
@@ -242,7 +242,7 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                       <div
                         className={`w-5 h-5 rounded-md flex items-center justify-center border transition ${
                           isChecked
-                            ? 'bg-indigo-600 border-indigo-600 text-white'
+                            ? 'bg-blue-600 border-blue-600 text-white'
                             : 'border-slate-300 dark:border-slate-700 text-transparent'
                         }`}
                       >
@@ -267,7 +267,7 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
             <button
               type="submit"
               disabled={isSubmitting || !name.trim()}
-              className="inline-flex items-center space-x-1.5 px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 transition"
+              className="inline-flex items-center space-x-1.5 px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-xs font-semibold shadow-md shadow-blue-600/20 transition"
             >
               <Plus className="w-4 h-4" />
               <span>

@@ -50,7 +50,7 @@ export function MessagesSkeleton({ count = 7 }: { count?: number }) {
             <div
               className={`rounded-2xl p-3.5 space-y-2 ${
                 isRight
-                  ? 'bg-indigo-200/50 dark:bg-indigo-900/40 rounded-br-xs'
+                  ? 'bg-blue-200/50 dark:bg-blue-900/40 rounded-br-xs'
                   : 'bg-slate-200/60 dark:bg-slate-800/60 rounded-bl-xs'
               }`}
               style={{
