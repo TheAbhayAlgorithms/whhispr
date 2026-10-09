@@ -27,6 +27,20 @@ import { OfflineBanner } from '../components/OfflineBanner';
 import { ChatListSkeleton, MessagesSkeleton } from '../components/Skeletons';
 import { EmptyState } from '../components/EmptyState';
 import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@/components/ui/avatar';
+import {
+  Bubble,
+  BubbleContent,
+} from '@/components/ui/bubble';
+import {
+  Message,
+  MessageAvatar,
+  MessageContent,
+} from '@/components/ui/message';
+import {
   MessageSquare,
   LogOut,
   User as UserIcon,
@@ -1234,303 +1248,323 @@ export default function DashboardPage() {
                   currentMessages.map((msg, index) => {
                     const isMe = msg.senderId === user?.id;
                     const prevMsg = index > 0 ? currentMessages[index - 1] : null;
+                    const nextMsg = index < currentMessages.length - 1 ? currentMessages[index + 1] : null;
                     const showDateDivider =
                       !prevMsg ||
                       new Date(prevMsg.createdAt).toDateString() !==
                         new Date(msg.createdAt).toDateString();
 
+                    const isLastInSenderSequence =
+                      !nextMsg ||
+                      nextMsg.senderId !== msg.senderId ||
+                      new Date(nextMsg.createdAt).getTime() - new Date(msg.createdAt).getTime() > 5 * 60 * 1000 ||
+                      new Date(nextMsg.createdAt).toDateString() !== new Date(msg.createdAt).toDateString();
+
+                    const isFirstInSenderSequence =
+                      !prevMsg ||
+                      prevMsg.senderId !== msg.senderId ||
+                      new Date(msg.createdAt).getTime() - new Date(prevMsg.createdAt).getTime() > 5 * 60 * 1000 ||
+                      new Date(msg.createdAt).toDateString() !== new Date(prevMsg.createdAt).toDateString();
+
                     const attachments = msg.attachments || [];
 
                     return (
-                      <div key={msg.id} className="space-y-3">
+                      <div
+                        key={msg.id}
+                        className={showDateDivider ? 'mt-4 mb-2' : isFirstInSenderSequence ? 'mt-3 sm:mt-4' : 'mt-1.5'}
+                      >
                         {showDateDivider && (
                           <div className="flex items-center justify-center my-4">
-                            <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 shadow-2xs">
+                            <span className="px-3 py-1 rounded-full text-[11px] font-semibold bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 shadow-2xs">
                               {formatDateHeader(msg.createdAt)}
                             </span>
                           </div>
                         )}
 
-                        <div
-                          className={`flex items-end space-x-2 ${
-                            isMe ? 'justify-end' : 'justify-start'
-                          }`}
-                        >
-                          {!isMe && (
-                            <div className="w-7 h-7 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-300 shrink-0 mb-1">
-                              {msg.sender.avatarUrl ? (
-                                <img
-                                  src={msg.sender.avatarUrl}
-                                  alt={msg.sender.displayName}
-                                  className="w-full h-full object-cover"
+                        <Message align={isMe ? 'end' : 'start'} className="transition-all">
+                          <MessageAvatar>
+                            {isLastInSenderSequence ? (
+                              <Avatar size="md">
+                                <AvatarImage
+                                  src={isMe ? user?.avatarUrl || undefined : msg.sender.avatarUrl || undefined}
+                                  alt={isMe ? user?.displayName || 'Me' : msg.sender.displayName || 'User'}
                                 />
-                              ) : (
-                                <span>
-                                  {msg.sender.displayName
-                                    ? msg.sender.displayName.charAt(0).toUpperCase()
-                                    : 'U'}
-                                </span>
-                              )}
-                            </div>
-                          )}
+                                <AvatarFallback>
+                                  {isMe
+                                    ? (user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U')
+                                    : (msg.sender.displayName ? msg.sender.displayName.charAt(0).toUpperCase() : 'U')}
+                                </AvatarFallback>
+                              </Avatar>
+                            ) : (
+                              <div className="h-8 w-8 sm:h-9 sm:w-9 shrink-0" />
+                            )}
+                          </MessageAvatar>
 
-                          <div id={`msg-${msg.id}`} className="relative group max-w-[85%] sm:max-w-md md:max-w-lg transition-all rounded-2xl">
-                            {/* Hover Quick Reaction Bar */}
-                            {/* Quick Reactions & Actions Hover Bar */}
-                            <div
-                              className={`absolute -top-3.5 ${
-                                isMe ? 'right-2' : 'left-2'
-                              } hidden group-hover:flex items-center space-x-1 bg-white dark:bg-slate-800 shadow-md border border-slate-200 dark:border-slate-700 rounded-full px-2 py-0.5 z-10 transition`}
-                            >
-                              {QUICK_REACTIONS.map((emoji) => (
-                                <button
-                                  key={emoji}
-                                  type="button"
-                                  onClick={() => void toggleReaction(msg.id, emoji)}
-                                  className="w-6 h-6 flex items-center justify-center hover:scale-125 transition-transform text-xs"
-                                  title={`React with ${emoji}`}
-                                >
-                                  {emoji}
-                                </button>
-                              ))}
-                              <div className="w-px h-3 bg-slate-200 dark:bg-slate-700 mx-0.5" />
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setReplyingTo(msg);
-                                  messageInputRef.current?.focus();
-                                }}
-                                className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition"
-                                title="Reply"
+                          <MessageContent>
+                            <div id={`msg-${msg.id}`} className="relative group w-full">
+                              {/* Hover Quick Reaction Bar */}
+                              <div
+                                className={`absolute -top-3.5 ${
+                                  isMe ? 'right-2' : 'left-2'
+                                } hidden group-hover:flex items-center space-x-1 bg-white dark:bg-zinc-800 shadow-md border border-slate-200 dark:border-zinc-700 rounded-full px-2 py-0.5 z-10 transition`}
                               >
-                                <Reply className="w-3.5 h-3.5" />
-                              </button>
-                              {isMe && Date.now() - new Date(msg.createdAt).getTime() < 15 * 60 * 1000 && (
+                                {QUICK_REACTIONS.map((emoji) => (
+                                  <button
+                                    key={emoji}
+                                    type="button"
+                                    onClick={() => void toggleReaction(msg.id, emoji)}
+                                    className="w-6 h-6 flex items-center justify-center hover:scale-125 transition-transform text-xs"
+                                    title={`React with ${emoji}`}
+                                  >
+                                    {emoji}
+                                  </button>
+                                ))}
+                                <div className="w-px h-3 bg-slate-200 dark:bg-zinc-700 mx-0.5" />
                                 <button
                                   type="button"
                                   onClick={() => {
-                                    setEditingMessage(msg);
-                                    setMessageInput(msg.content);
+                                    setReplyingTo(msg);
                                     messageInputRef.current?.focus();
                                   }}
-                                  className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition"
-                                  title="Edit (within 15m)"
+                                  className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition"
+                                  title="Reply"
                                 >
-                                  <Pencil className="w-3.5 h-3.5" />
+                                  <Reply className="w-3.5 h-3.5" />
                                 </button>
-                              )}
-                              <button
-                                type="button"
-                                onClick={() => setDeletingMessage(msg)}
-                                className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition"
-                                title="Delete"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-
-                            {/* Message Bubble Body */}
-                            <div
-                              className={`rounded-2xl px-4 py-2.5 text-sm shadow-2xs ${
-                                isMe
-                                  ? 'bg-indigo-600 text-white rounded-br-xs'
-                                  : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-xs'
-                              }`}
-                            >
-                              {!isMe && (
-                                <p className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 mb-1">
-                                  {msg.sender.displayName}
-                                </p>
-                              )}
-
-                              {/* Quoted Reply Preview */}
-                              {msg.replyTo && (
-                                <div
-                                  className={`mb-2 p-2 rounded-xl border-l-3 text-xs ${
-                                    isMe
-                                      ? 'bg-indigo-700/60 border-indigo-300 text-indigo-100'
-                                      : 'bg-slate-100 dark:bg-slate-800/80 border-indigo-500 text-slate-700 dark:text-slate-200'
-                                  }`}
+                                {isMe && Date.now() - new Date(msg.createdAt).getTime() < 15 * 60 * 1000 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingMessage(msg);
+                                      setMessageInput(msg.content);
+                                      messageInputRef.current?.focus();
+                                    }}
+                                    className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition"
+                                    title="Edit (within 15m)"
+                                  >
+                                    <Pencil className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => setDeletingMessage(msg)}
+                                  className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition"
+                                  title="Delete"
                                 >
-                                  <p className="font-semibold text-[11px] text-indigo-300 dark:text-indigo-400">
-                                    {msg.replyTo.sender.displayName || msg.replyTo.sender.username}
-                                  </p>
-                                  <p className="truncate text-[11px] opacity-90">
-                                    {msg.replyTo.content || `[${msg.replyTo.type}]`}
-                                  </p>
-                                </div>
-                              )}
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
 
-                              {/* Render Attachments */}
-                              {attachments.length > 0 && (
-                                <div className="space-y-2 mb-1.5">
-                                  {attachments.map((att) => {
-                                    const isImg = att.mimeType.startsWith('image/');
-                                    const isVid = att.mimeType.startsWith('video/');
-                                    const isAud = att.mimeType.startsWith('audio/');
+                              {/* Message Bubble */}
+                              <Bubble variant={isMe ? 'default' : 'muted'} className="w-fit max-w-full">
+                                {!isMe && isFirstInSenderSequence && activeChat?.type !== 'direct' && (
+                                  <p className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 mb-1">
+                                    {msg.sender.displayName}
+                                  </p>
+                                )}
 
-                                    if (isImg) {
+                                {/* Quoted Reply Preview */}
+                                {msg.replyTo && (
+                                  <div
+                                    className={`mb-2 p-2 rounded-xl border-l-2 text-xs ${
+                                      isMe
+                                        ? 'bg-blue-700/60 border-white/60 text-blue-100'
+                                        : 'bg-black/5 dark:bg-black/30 border-indigo-500 text-slate-700 dark:text-zinc-200'
+                                    }`}
+                                  >
+                                    <p className="font-semibold text-[11px] text-blue-200 dark:text-indigo-400">
+                                      {msg.replyTo.sender.displayName || msg.replyTo.sender.username}
+                                    </p>
+                                    <p className="truncate text-[11px] opacity-90">
+                                      {msg.replyTo.content || `[${msg.replyTo.type}]`}
+                                    </p>
+                                  </div>
+                                )}
+
+                                {/* Render Attachments */}
+                                {attachments.length > 0 && (
+                                  <div className="space-y-2 mb-1.5">
+                                    {attachments.map((att) => {
+                                      const isImg = att.mimeType.startsWith('image/');
+                                      const isVid = att.mimeType.startsWith('video/');
+                                      const isAud = att.mimeType.startsWith('audio/');
+
+                                      if (isImg) {
+                                        return (
+                                          <div
+                                            key={att.id}
+                                            onClick={() => setLightboxImageUrl(att.publicUrl)}
+                                            className="cursor-pointer overflow-hidden rounded-xl group/img relative border border-black/10 dark:border-white/10"
+                                          >
+                                            <img
+                                              src={att.publicUrl}
+                                              alt={att.fileName}
+                                              className="max-h-64 rounded-xl object-contain bg-black/5 dark:bg-black/30 group-hover/img:scale-[1.01] transition duration-200"
+                                            />
+                                          </div>
+                                        );
+                                      }
+
+                                      if (isVid) {
+                                        return (
+                                          <video
+                                            key={att.id}
+                                            src={att.publicUrl}
+                                            controls
+                                            className="max-h-64 rounded-xl w-full bg-black/80"
+                                          />
+                                        );
+                                      }
+
+                                      if (isAud) {
+                                        return (
+                                          <div key={att.id} className="pt-1">
+                                            <audio src={att.publicUrl} controls className="w-full h-9" />
+                                          </div>
+                                        );
+                                      }
+
+                                      // Document or archive
                                       return (
                                         <div
                                           key={att.id}
-                                          onClick={() => setLightboxImageUrl(att.publicUrl)}
-                                          className="cursor-pointer overflow-hidden rounded-xl group/img relative border border-black/10 dark:border-white/10"
-                                        >
-                                          <img
-                                            src={att.publicUrl}
-                                            alt={att.fileName}
-                                            className="max-h-64 rounded-xl object-contain bg-black/5 dark:bg-black/30 group-hover/img:scale-[1.01] transition duration-200"
-                                          />
-                                        </div>
-                                      );
-                                    }
-
-                                    if (isVid) {
-                                      return (
-                                        <video
-                                          key={att.id}
-                                          src={att.publicUrl}
-                                          controls
-                                          className="max-h-64 rounded-xl w-full bg-black/80"
-                                        />
-                                      );
-                                    }
-
-                                    if (isAud) {
-                                      return (
-                                        <div key={att.id} className="pt-1">
-                                          <audio src={att.publicUrl} controls className="w-full h-9" />
-                                        </div>
-                                      );
-                                    }
-
-                                    // Document or archive
-                                    return (
-                                      <div
-                                        key={att.id}
-                                        className={`flex items-center justify-between p-2.5 rounded-xl border ${
-                                          isMe
-                                            ? 'bg-indigo-700/60 border-indigo-500/50 text-white'
-                                            : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white'
-                                        }`}
-                                      >
-                                        <div className="flex items-center space-x-2.5 min-w-0 pr-2">
-                                          <FileText className="w-6 h-6 shrink-0 opacity-80" />
-                                          <div className="min-w-0">
-                                            <p className="text-xs font-semibold truncate leading-tight">
-                                              {att.fileName}
-                                            </p>
-                                            <p className="text-[10px] opacity-75 mt-0.5">
-                                              {formatFileSize(att.fileSize)}
-                                            </p>
-                                          </div>
-                                        </div>
-                                        <a
-                                          href={att.publicUrl}
-                                          download={att.fileName}
-                                          className={`p-1.5 rounded-lg transition shrink-0 ${
+                                          className={`flex items-center justify-between p-2.5 rounded-xl border ${
                                             isMe
-                                              ? 'hover:bg-white/20 text-white'
-                                              : 'hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300'
+                                              ? 'bg-blue-700/60 border-blue-400/40 text-white'
+                                              : 'bg-white/60 dark:bg-zinc-900/60 border-slate-200 dark:border-zinc-700/60 text-slate-900 dark:text-zinc-100'
                                           }`}
-                                          title="Download"
                                         >
-                                          <Download className="w-4 h-4" />
-                                        </a>
-                                      </div>
-                                    );
-                                  })}
+                                          <div className="flex items-center space-x-2.5 min-w-0 pr-2">
+                                            <FileText className="w-6 h-6 shrink-0 opacity-80" />
+                                            <div className="min-w-0">
+                                              <p className="text-xs font-semibold truncate leading-tight">
+                                                {att.fileName}
+                                              </p>
+                                              <p className="text-[10px] opacity-75 mt-0.5">
+                                                {formatFileSize(att.fileSize)}
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <a
+                                            href={att.publicUrl}
+                                            download={att.fileName}
+                                            className={`p-1.5 rounded-lg transition shrink-0 ${
+                                              isMe
+                                                ? 'hover:bg-white/20 text-white'
+                                                : 'hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-600 dark:text-zinc-300'
+                                            }`}
+                                            title="Download"
+                                          >
+                                            <Download className="w-4 h-4" />
+                                          </a>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+
+                                {/* Text Content */}
+                                {msg.content && (
+                                  <BubbleContent>
+                                    <DecryptedText
+                                      content={msg.content}
+                                      senderId={msg.senderId || ''}
+                                      isMe={isMe}
+                                    />
+                                  </BubbleContent>
+                                )}
+
+                                <div
+                                  className={`flex items-center justify-end space-x-1 mt-1 text-[10px] select-none ${
+                                    isMe ? 'text-blue-100/80' : 'text-slate-400 dark:text-zinc-400'
+                                  }`}
+                                >
+                                  {msg.isEdited && (
+                                    <span className="opacity-75 italic text-[9px] mr-1">(edited)</span>
+                                  )}
+                                  <span>{formatMessageTime(msg.createdAt)}</span>
+                                  {isMe && (
+                                    <span title={msg.status || 'sent'} className="inline-flex items-center">
+                                      {msg.status === 'read' ? (
+                                        <CheckCheck className="w-3.5 h-3.5 text-white drop-shadow-xs" />
+                                      ) : msg.status === 'delivered' ? (
+                                        <CheckCheck className="w-3.5 h-3.5 text-blue-200/90" />
+                                      ) : msg.status === 'sending' ? (
+                                        <Clock className="w-3 h-3 text-blue-200 animate-spin" />
+                                      ) : msg.status === 'failed' ? (
+                                        <span className="flex items-center text-rose-200 text-[10px] space-x-0.5">
+                                          <AlertTriangle className="w-3 h-3 text-rose-200" />
+                                          <span>Failed</span>
+                                        </span>
+                                      ) : (
+                                        <Check className="w-3.5 h-3.5 text-blue-200/70" />
+                                      )}
+                                    </span>
+                                  )}
+                                </div>
+                              </Bubble>
+
+                              {/* Message Reaction Chips */}
+                              {msg.reactions && msg.reactions.length > 0 && (
+                                <div
+                                  className={`flex flex-wrap gap-1 mt-1 ${
+                                    isMe ? 'justify-end' : 'justify-start'
+                                  }`}
+                                >
+                                  {msg.reactions.map((rx) => (
+                                    <button
+                                      key={rx.emoji}
+                                      type="button"
+                                      onClick={() => void toggleReaction(msg.id, rx.emoji)}
+                                      title={
+                                        rx.users && rx.users.length > 0
+                                          ? rx.users.map((u) => u.displayName || u.username).join(', ')
+                                          : rx.emoji
+                                      }
+                                      className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-xs transition border cursor-pointer ${
+                                        rx.hasReacted
+                                          ? 'bg-blue-50 dark:bg-blue-950/70 border-blue-400 dark:border-blue-600 text-blue-700 dark:text-blue-300 font-semibold shadow-2xs'
+                                          : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800'
+                                      }`}
+                                    >
+                                      <span>{rx.emoji}</span>
+                                      <span className="text-[11px] font-medium">{rx.count}</span>
+                                    </button>
+                                  ))}
                                 </div>
                               )}
-
-                              {/* Text Content */}
-                              {msg.content && (
-                                <DecryptedText
-                                  content={msg.content}
-                                  senderId={msg.senderId || ''}
-                                  isMe={isMe}
-                                />
-                              )}
-
-                              <div
-                                className={`flex items-center justify-end space-x-1 mt-1 text-[10px] ${
-                                  isMe ? 'text-indigo-200' : 'text-slate-400'
-                                }`}
-                              >
-                                {msg.isEdited && (
-                                  <span className="opacity-75 italic text-[9px] mr-1">(edited)</span>
-                                )}
-                                <span>{formatMessageTime(msg.createdAt)}</span>
-                                {isMe && (
-                                  <span title={msg.status || 'sent'} className="inline-flex items-center">
-                                    {msg.status === 'read' ? (
-                                      <CheckCheck className="w-3.5 h-3.5 text-sky-300 drop-shadow-xs" />
-                                    ) : msg.status === 'delivered' ? (
-                                      <CheckCheck className="w-3.5 h-3.5 text-indigo-200/90" />
-                                    ) : msg.status === 'sending' ? (
-                                      <Clock className="w-3 h-3 text-indigo-200 animate-spin" />
-                                    ) : msg.status === 'failed' ? (
-                                      <span className="flex items-center text-rose-300 text-[10px] space-x-0.5">
-                                        <AlertTriangle className="w-3 h-3 text-rose-300" />
-                                        <span>Failed</span>
-                                      </span>
-                                    ) : (
-                                      <Check className="w-3.5 h-3.5 text-indigo-200/70" />
-                                    )}
-                                  </span>
-                                )}
-                              </div>
                             </div>
-
-                            {/* Message Reaction Chips */}
-                            {msg.reactions && msg.reactions.length > 0 && (
-                              <div
-                                className={`flex flex-wrap gap-1 mt-1 ${
-                                  isMe ? 'justify-end' : 'justify-start'
-                                }`}
-                              >
-                                {msg.reactions.map((rx) => (
-                                  <button
-                                    key={rx.emoji}
-                                    type="button"
-                                    onClick={() => void toggleReaction(msg.id, rx.emoji)}
-                                    title={
-                                      rx.users && rx.users.length > 0
-                                        ? rx.users.map((u) => u.displayName || u.username).join(', ')
-                                        : rx.emoji
-                                    }
-                                    className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-xs transition border cursor-pointer ${
-                                      rx.hasReacted
-                                        ? 'bg-indigo-50 dark:bg-indigo-950/70 border-indigo-400 dark:border-indigo-600 text-indigo-700 dark:text-indigo-300 font-semibold shadow-2xs'
-                                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                                    }`}
-                                  >
-                                    <span>{rx.emoji}</span>
-                                    <span className="text-[11px] font-medium">{rx.count}</span>
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                          </MessageContent>
+                        </Message>
                       </div>
                     );
                   })
                 )}
                 {/* Real-time Typing Bubble */}
                 {activeTyping.length > 0 && (
-                  <div className="flex items-center space-x-2 text-xs text-indigo-600 dark:text-indigo-400 font-medium py-1 px-2 animate-in fade-in slide-in-from-bottom-2 duration-150">
-                    <span className="flex space-x-1.5 items-center bg-indigo-50 dark:bg-indigo-950/60 px-3 py-1.5 rounded-full border border-indigo-200 dark:border-indigo-800 shadow-2xs">
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-bounce [animation-delay:-0.3s]"></span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-bounce [animation-delay:-0.15s]"></span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-bounce"></span>
-                      <span className="ml-1 text-[11px] font-medium text-slate-700 dark:text-slate-300">
-                        {activeTyping.length === 1
-                          ? `${activeTyping[0]} is typing...`
-                          : `${activeTyping.slice(0, 2).join(', ')} are typing...`}
-                      </span>
-                    </span>
-                  </div>
+                  <Message align="start" className="mt-2 animate-in fade-in slide-in-from-bottom-2 duration-150">
+                    <MessageAvatar>
+                      <Avatar size="sm">
+                        <AvatarFallback className="text-[10px]">
+                          {activeTyping[0].charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </MessageAvatar>
+                    <MessageContent>
+                      <Bubble variant="muted" className="py-2 px-3.5">
+                        <div className="flex items-center space-x-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-zinc-400 animate-bounce [animation-delay:-0.3s]" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-zinc-400 animate-bounce [animation-delay:-0.15s]" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-zinc-400 animate-bounce" />
+                          <span className="ml-1 text-[11px] text-slate-500 dark:text-zinc-400">
+                            {activeTyping.length === 1
+                              ? `${activeTyping[0]} is typing...`
+                              : `${activeTyping.slice(0, 2).join(', ')} are typing...`}
+                          </span>
+                        </div>
+                      </Bubble>
+                    </MessageContent>
+                  </Message>
                 )}
                 <div ref={messagesEndRef} />
               </div>
