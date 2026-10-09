@@ -46,7 +46,6 @@ import {
   LogOut,
   User as UserIcon,
   Users,
-  Send,
   Bell,
   Search,
   Check,
@@ -78,6 +77,8 @@ import {
   MessageSquarePlus,
   Menu,
   Pin,
+  Sparkles,
+  ArrowUp,
 } from 'lucide-react';
 
 function formatMessageTime(dateString: string): string {
@@ -602,10 +603,10 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="h-screen h-dvh bg-[#121316] text-[#f1f2f6] flex flex-col overflow-hidden transition-colors duration-200">
+    <div className="h-screen h-dvh bg-[#191A1A] text-[#EDEDED] flex flex-col overflow-hidden transition-colors duration-200">
       {/* Top Navbar Only */}
       <WarmTooltipGroup delay={200} warmWindow={300} travel={220} lean={0}>
-        <header className="h-14 sm:h-16 w-full border-b border-[#242630] bg-[#18191E] px-3 sm:px-5 lg:px-6 flex items-center justify-between shrink-0 z-30 select-none shadow-xs">
+        <header className="h-14 sm:h-16 w-full border-b border-[#2C2E2E] bg-[#141515] px-3 sm:px-5 lg:px-6 flex items-center justify-between shrink-0 z-30 select-none shadow-xs">
           {/* Left: Brand */}
           <div className="flex items-center space-x-3 shrink-0 min-w-0">
             <button
@@ -614,14 +615,14 @@ export default function DashboardPage() {
               className="flex items-center space-x-2.5 group cursor-pointer focus:outline-none"
               aria-label="Whhispr Home"
             >
-              <div className="w-10 h-10 rounded-2xl bg-[#0066FF] flex items-center justify-center text-white shadow-md shadow-blue-500/25 group-hover:scale-105 active:scale-95 transition shrink-0">
-                <MessageSquare className="w-5 h-5 fill-current" />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#20B2AA] flex items-center justify-center text-black shadow-md shadow-[#20B2AA]/20 group-hover:scale-105 active:scale-95 transition shrink-0 font-bold">
+                <MessageSquare className="w-5 h-5 fill-current text-black" />
               </div>
               <div className="flex flex-col text-left">
-                <span className="text-base font-bold tracking-tight text-white leading-tight">
+                <span className="text-base font-bold tracking-tight text-[#EDEDED] leading-tight">
                   Whhispr
                 </span>
-                <span className="text-[10px] font-medium text-zinc-500 hidden sm:inline">
+                <span className="text-[10px] font-medium text-[#9EA3A3] hidden sm:inline">
                   Secure Messaging
                 </span>
               </div>
@@ -637,8 +638,8 @@ export default function DashboardPage() {
                 onClick={() => void handleSelectChat(null)}
                 className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer active:scale-95 ${
                   !activeChat
-                    ? 'bg-blue-50 dark:bg-blue-950/50 text-[#0066FF] dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/50 shadow-xs'
-                    : 'text-slate-600 dark:text-zinc-300 hover:text-[#0066FF] dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-[#161622]'
+                    ? 'bg-[#202222] text-[#20B2AA] border border-[#2D3030] shadow-xs'
+                    : 'text-[#9EA3A3] hover:text-[#EDEDED] hover:bg-[#202222]'
                 }`}
                 aria-label="Conversations"
               >
@@ -652,10 +653,10 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setShowCallHistoryModal(true)}
-                className="flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-300 hover:text-[#0066FF] dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-[#161622] transition cursor-pointer active:scale-95"
+                className="flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] hover:bg-[#202222] transition cursor-pointer active:scale-95"
                 aria-label="Call History"
               >
-                <PhoneCall className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <PhoneCall className="w-4 h-4 text-[#20B2AA]" />
                 <span>Calls</span>
               </button>
             </WarmTooltip>
@@ -664,13 +665,13 @@ export default function DashboardPage() {
             <WarmTooltip content="Contacts" shortcut="⌘2" side="bottom">
               <Link
                 to="/contacts"
-                className="relative flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-300 hover:text-[#0066FF] dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-[#161622] transition active:scale-95"
+                className="relative flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] hover:bg-[#202222] transition active:scale-95"
                 aria-label="Contacts"
               >
-                <Users className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <Users className="w-4 h-4 text-[#20B2AA]" />
                 <span>Contacts</span>
                 {incomingRequests.length > 0 && (
-                  <span className="px-1.5 min-w-[16px] h-4 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900 flex items-center justify-center">
+                  <span className="px-1.5 min-w-[16px] h-4 rounded-full text-[10px] font-bold bg-[#20B2AA] text-black flex items-center justify-center">
                     {incomingRequests.length}
                   </span>
                 )}
@@ -682,10 +683,10 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setShowChannelBrowserModal(true)}
-                className="flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-300 hover:text-[#0066FF] dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-[#161622] transition cursor-pointer active:scale-95"
+                className="flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#9EA3A3] hover:text-[#EDEDED] hover:bg-[#202222] transition cursor-pointer active:scale-95"
                 aria-label="Explore Channels"
               >
-                <Compass className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <Compass className="w-4 h-4 text-[#20B2AA]" />
                 <span>Explore</span>
               </button>
             </WarmTooltip>
@@ -698,7 +699,7 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setShowGlobalSearch(true)}
-                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#161622] dark:hover:bg-[#1E1E2C] border border-slate-200 dark:border-[#222232] text-blue-600 dark:text-blue-400 flex items-center justify-center transition cursor-pointer active:scale-95"
+                className="w-9 h-9 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED] flex items-center justify-center transition cursor-pointer active:scale-95"
                 aria-label="Search"
               >
                 <Search className="w-4 h-4" />
@@ -710,12 +711,12 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => toggleNotificationCenter()}
-                className="relative w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#161622] dark:hover:bg-[#1E1E2C] border border-slate-200 dark:border-[#222232] text-blue-600 dark:text-blue-400 flex items-center justify-center transition cursor-pointer active:scale-95"
+                className="relative w-9 h-9 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED] flex items-center justify-center transition cursor-pointer active:scale-95"
                 aria-label="Notifications"
               >
                 <Bell className="w-4 h-4" />
                 {unreadNotificationsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-rose-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center animate-pulse shadow-xs">
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[#20B2AA] text-black rounded-full text-[10px] font-bold flex items-center justify-center animate-pulse shadow-xs">
                     {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
                   </span>
                 )}
@@ -727,7 +728,7 @@ export default function DashboardPage() {
               <WarmTooltip content="Settings" shortcut="⌘," side="bottom">
                 <Link
                   to="/settings"
-                  className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#161622] dark:hover:bg-[#1E1E2C] border border-slate-200 dark:border-[#222232] text-slate-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 flex items-center justify-center transition active:scale-95"
+                  className="w-9 h-9 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED] flex items-center justify-center transition active:scale-95"
                   aria-label="Settings"
                 >
                   <SettingsIcon className="w-4 h-4" />
@@ -741,7 +742,7 @@ export default function DashboardPage() {
                 <WarmTooltip content="Admin Portal" shortcut="⌘A" side="bottom">
                   <Link
                     to="/admin"
-                    className="w-9 h-9 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/40 border border-blue-200 dark:border-blue-800/60 text-blue-600 dark:text-blue-400 flex items-center justify-center transition active:scale-95"
+                    className="w-9 h-9 rounded-xl bg-[#1D2B29] hover:bg-[#253B37] border border-[#25423E] text-[#20B2AA] flex items-center justify-center transition active:scale-95"
                     aria-label="Admin Portal"
                   >
                     <Shield className="w-4 h-4" />
@@ -762,13 +763,13 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => user && fetchUserProfile(user.id)}
-                className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-blue-500/40 hover:border-blue-500 shadow-sm transition active:scale-95 cursor-pointer shrink-0"
+                className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-[#20B2AA]/40 hover:border-[#20B2AA] shadow-sm transition active:scale-95 cursor-pointer shrink-0"
                 aria-label={`${user?.displayName} (@${user?.username})`}
               >
                 {user?.avatarUrl ? (
                   <img src={user.avatarUrl} alt={user.displayName} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-[#0066FF] text-white font-bold flex items-center justify-center text-xs">
+                  <div className="w-full h-full bg-[#20B2AA] text-black font-bold flex items-center justify-center text-xs">
                     {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
                   </div>
                 )}
@@ -782,7 +783,7 @@ export default function DashboardPage() {
                   type="button"
                   onClick={handleLogout}
                   disabled={loggingOut}
-                  className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-rose-50 dark:bg-[#161622] dark:hover:bg-rose-950/30 border border-slate-200 dark:border-[#222232] text-slate-500 hover:text-rose-600 dark:text-zinc-400 dark:hover:text-rose-400 flex items-center justify-center transition active:scale-95 cursor-pointer"
+                  className="w-9 h-9 rounded-xl bg-[#202222] hover:bg-rose-950/30 border border-[#2D3030] hover:border-rose-900/40 text-[#9EA3A3] hover:text-rose-400 flex items-center justify-center transition active:scale-95 cursor-pointer"
                   aria-label="Sign Out"
                 >
                   <LogOut className="w-4 h-4" />
@@ -794,7 +795,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen((prev) => !prev)}
-              className="md:hidden w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#161622] dark:hover:bg-[#1E1E2C] border border-slate-200 dark:border-[#222232] text-blue-600 dark:text-blue-400 transition flex items-center justify-center shrink-0 active:scale-95"
+              className="md:hidden w-9 h-9 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED] transition flex items-center justify-center shrink-0 active:scale-95"
               aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={mobileMenuOpen}
             >
@@ -810,14 +811,14 @@ export default function DashboardPage() {
           {mobileMenuOpen && (
             <>
               <div
-                className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs md:hidden animate-in fade-in duration-150"
+                className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs md:hidden animate-in fade-in duration-150"
                 onClick={() => setMobileMenuOpen(false)}
                 aria-hidden="true"
               />
-              <div className="fixed top-16 right-3 z-50 w-72 max-w-[calc(100vw-24px)] bg-white dark:bg-[#0D0D14] border border-slate-200 dark:border-[#1E1E2A] rounded-2xl shadow-2xl p-2.5 flex flex-col md:hidden animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-150 origin-top-right max-h-[calc(100dvh-4.5rem)] overflow-y-auto">
+              <div className="fixed top-16 right-3 z-50 w-72 max-w-[calc(100vw-24px)] bg-[#141515] border border-[#2C2E2E] rounded-2xl shadow-2xl p-2.5 flex flex-col md:hidden animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-150 origin-top-right max-h-[calc(100dvh-4.5rem)] overflow-y-auto">
                 {/* User Profile Card */}
-                <div className="flex items-center space-x-2.5 p-2 rounded-xl bg-slate-50 dark:bg-[#161622] border border-slate-100 dark:border-[#222232]">
-                  <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-200 dark:bg-[#1E1E2C] border-2 border-blue-500/40 flex items-center justify-center text-xs font-bold text-blue-600 dark:text-blue-300 shrink-0">
+                <div className="flex items-center space-x-2.5 p-2 rounded-xl bg-[#202222] border border-[#2D3030]">
+                  <div className="w-9 h-9 rounded-full overflow-hidden bg-[#262828] border-2 border-[#20B2AA]/40 flex items-center justify-center text-xs font-bold text-[#20B2AA] shrink-0">
                     {user?.avatarUrl ? (
                       <img
                         src={user.avatarUrl}
@@ -829,50 +830,50 @@ export default function DashboardPage() {
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                    <p className="text-xs font-bold text-[#EDEDED] truncate">
                       {user?.displayName}
                     </p>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                    <p className="text-[11px] text-[#9EA3A3] truncate">
                       @{user?.username}
                     </p>
                   </div>
                   {user?.role === 'admin' && (
-                    <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 rounded-md shrink-0">
+                    <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 bg-[#20B2AA]/15 text-[#20B2AA] border border-[#20B2AA]/30 rounded-md shrink-0">
                       Admin
                     </span>
                   )}
                 </div>
 
-                {/* Daylight Theme Toggle Row */}
-                <div className="mt-2 px-2.5 py-2 rounded-xl bg-slate-50/70 dark:bg-[#161622]/60 border border-slate-100/80 dark:border-[#222232] flex items-center justify-between">
-                  <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Theme</span>
+                {/* Theme Toggle Row */}
+                <div className="mt-2 px-2.5 py-2 rounded-xl bg-[#202222] border border-[#2D3030] flex items-center justify-between">
+                  <span className="text-xs font-medium text-[#EDEDED]">Theme</span>
                   <ThemeToggle showLabel={true} />
                 </div>
 
                 {/* Menu Links */}
-                <div className="mt-2 pt-1.5 border-t border-slate-100 dark:border-[#1E1E2A] space-y-0.5">
+                <div className="mt-2 pt-1.5 border-t border-[#2C2E2E] space-y-0.5">
                   <button
                     onClick={() => {
                       setMobileMenuOpen(false);
                       setShowCallHistoryModal(true);
                     }}
-                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#161622] transition text-left active:scale-[0.99]"
+                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#EDEDED] hover:bg-[#202222] transition text-left active:scale-[0.99]"
                   >
-                    <PhoneCall className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                    <PhoneCall className="w-4 h-4 text-[#20B2AA] shrink-0" />
                     <span>Calls</span>
                   </button>
 
                   <Link
                     to="/contacts"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#161622] transition active:scale-[0.99]"
+                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-[#EDEDED] hover:bg-[#202222] transition active:scale-[0.99]"
                   >
                     <div className="flex items-center space-x-2.5">
-                      <Users className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                      <Users className="w-4 h-4 text-[#20B2AA] shrink-0" />
                       <span>Contacts</span>
                     </div>
                     {incomingRequests.length > 0 && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#20B2AA] text-black">
                         {incomingRequests.length}
                       </span>
                     )}
@@ -883,27 +884,27 @@ export default function DashboardPage() {
                       setMobileMenuOpen(false);
                       setShowChannelBrowserModal(true);
                     }}
-                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#161622] transition text-left active:scale-[0.99]"
+                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#EDEDED] hover:bg-[#202222] transition text-left active:scale-[0.99]"
                   >
-                    <Compass className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                    <Compass className="w-4 h-4 text-[#20B2AA] shrink-0" />
                     <span>Explore Channels</span>
                   </button>
 
                   <Link
                     to="/profile"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#161622] transition active:scale-[0.99]"
+                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#EDEDED] hover:bg-[#202222] transition active:scale-[0.99]"
                   >
-                    <UserIcon className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                    <UserIcon className="w-4 h-4 text-[#20B2AA] shrink-0" />
                     <span>Profile</span>
                   </Link>
 
                   <Link
                     to="/settings"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#161622] transition active:scale-[0.99]"
+                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#EDEDED] hover:bg-[#202222] transition active:scale-[0.99]"
                   >
-                    <SettingsIcon className="w-4 h-4 text-slate-400 shrink-0" />
+                    <SettingsIcon className="w-4 h-4 text-[#9EA3A3] shrink-0" />
                     <span>Settings</span>
                   </Link>
 
@@ -911,23 +912,23 @@ export default function DashboardPage() {
                     <Link
                       to="/admin"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition active:scale-[0.99]"
+                      className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#20B2AA] hover:bg-[#1D2B29] transition active:scale-[0.99]"
                     >
-                      <Shield className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                      <Shield className="w-4 h-4 text-[#20B2AA] shrink-0" />
                       <span>Admin Portal</span>
                     </Link>
                   )}
                 </div>
 
                 {/* Sign Out Button */}
-                <div className="mt-1.5 pt-1.5 border-t border-slate-100 dark:border-[#1E1E2A]">
+                <div className="mt-1.5 pt-1.5 border-t border-[#2C2E2E]">
                   <button
                     onClick={() => {
                       setMobileMenuOpen(false);
                       void handleLogout();
                     }}
                     disabled={loggingOut}
-                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition active:scale-[0.99]"
+                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-950/30 transition active:scale-[0.99]"
                   >
                     <LogOut className="w-4 h-4 shrink-0" />
                     <span>{loggingOut ? 'Signing out...' : 'Sign Out'}</span>
@@ -942,34 +943,34 @@ export default function DashboardPage() {
       {/* Real-time offline and reconnect status bar */}
       <OfflineBanner />
 
-        {/* Main Two-Panel Minimal Chat Workspace */}
-        <div className="flex-1 min-h-0 flex overflow-hidden p-3 gap-3 bg-[#121316]">
+      {/* Main Two-Panel Minimal Chat Workspace */}
+      <div className="flex-1 min-h-0 flex overflow-hidden p-2.5 sm:p-3 gap-2.5 sm:gap-3 bg-[#191A1A]">
           {/* LEFT PANEL: Chats Sidebar */}
           <aside
             role="region"
             aria-label="Conversations list"
-            className={`w-full md:w-84 lg:w-92 xl:w-96 h-full rounded-3xl border border-[#242630] bg-[#18191E] flex flex-col shrink-0 overflow-hidden shadow-sm ${
+            className={`w-full md:w-84 lg:w-92 xl:w-96 h-full rounded-2xl border border-[#2C2E2E] bg-[#141515] flex flex-col shrink-0 overflow-hidden shadow-sm ${
               activeChat ? 'hidden md:flex' : 'flex'
             }`}
           >
             {/* Sidebar Header & Search */}
-            <div className="p-3.5 border-b border-[#242630] space-y-3">
+            <div className="p-3 sm:p-3.5 border-b border-[#2C2E2E] space-y-3">
               <div className="flex items-center justify-between">
-                <h2 className="text-base font-bold text-zinc-100">
-                  Chats
+                <h2 className="text-xs font-semibold tracking-wider text-[#9EA3A3] uppercase">
+                  Threads
                 </h2>
                 <div className="flex items-center space-x-1.5">
                   <button
                     onClick={() => setShowCallHistoryModal(true)}
-                    className="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-[#242630] hover:bg-[#2F313E] text-zinc-200 text-xs font-semibold shadow-xs transition cursor-pointer"
+                    className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#EDEDED] text-xs font-medium shadow-2xs transition cursor-pointer"
                     title="View Call History"
                   >
-                    <PhoneCall className="w-3.5 h-3.5 text-[#E2F952]" />
+                    <PhoneCall className="w-3.5 h-3.5 text-[#20B2AA]" />
                     <span>Calls</span>
                   </button>
                   <button
                     onClick={() => setShowCreateGroupModal(true)}
-                    className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-[#E2F952] hover:bg-[#d6ee3c] text-black text-xs font-bold shadow-sm transition cursor-pointer"
+                    className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-[#20B2AA] hover:bg-[#1CA099] text-black text-xs font-semibold shadow-xs transition cursor-pointer active:scale-95"
                     title="Create Group or Channel"
                   >
                     <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -980,21 +981,21 @@ export default function DashboardPage() {
 
               {/* Search Bar */}
               <div className="relative flex items-center">
-                <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-2.5 pointer-events-none" />
+                <Search className="w-4 h-4 text-[#737878] absolute left-3.5 top-2.5 pointer-events-none" />
                 <input
                   type="text"
                   value={chatSearch}
                   onChange={(e) => setChatSearch(e.target.value)}
-                  placeholder="Search conversations..."
+                  placeholder="Search threads..."
                   aria-label="Search conversations"
-                  className="w-full pl-9 pr-10 sm:pr-14 py-2 bg-[#121316] border border-[#262833] rounded-full text-base sm:text-xs text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#8B95F6] transition"
+                  className="w-full pl-9 pr-10 sm:pr-14 py-2 bg-[#191A1A] border border-[#2C2E2E] rounded-full text-xs text-[#EDEDED] placeholder-[#737878] focus:outline-none focus:border-[#20B2AA] focus:ring-1 focus:ring-[#20B2AA] transition"
                 />
                 <button
                   type="button"
                   onClick={() => setShowGlobalSearch(true)}
                   title="Global Search (⌘K)"
                   aria-label="Global Search"
-                  className="hidden sm:inline-flex absolute right-2.5 px-1.5 py-0.5 rounded bg-[#242630] text-[10px] font-mono font-medium text-zinc-400 hover:text-[#8B95F6] transition"
+                  className="hidden sm:inline-flex absolute right-2.5 px-1.5 py-0.5 rounded bg-[#202222] border border-[#2D3030] text-[10px] font-mono font-medium text-[#9EA3A3] hover:text-[#20B2AA] transition"
                 >
                   ⌘K
                 </button>
@@ -1016,8 +1017,8 @@ export default function DashboardPage() {
                     onClick={() => setCategoryFilter(tab.id)}
                     className={`px-3 py-1 rounded-full text-xs font-medium transition shrink-0 cursor-pointer ${
                       categoryFilter === tab.id
-                        ? 'bg-[#2E303D] text-[#E2F952] border border-[#3B3D4D] shadow-xs'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#242630]'
+                        ? 'bg-[#202222] text-[#20B2AA] border border-[#2D3030] shadow-xs'
+                        : 'text-[#9EA3A3] hover:text-[#EDEDED] hover:bg-[#202222]'
                     }`}
                   >
                     {tab.label}
@@ -1026,9 +1027,9 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Chats Scroll List with distinct spaces between each chat card matching Image 1 */}
+            {/* Chats Scroll List */}
             <div
-              className="flex-1 overflow-y-auto p-3 space-y-2.5"
+              className="flex-1 overflow-y-auto p-2.5 sm:p-3 space-y-2"
               role="list"
               aria-label="Chat conversations"
             >
@@ -1066,38 +1067,38 @@ export default function DashboardPage() {
                     <div
                       key={chat.id}
                       onClick={() => void handleSelectChat(chat.id)}
-                      className={`w-full text-left p-3 rounded-2xl flex items-center space-x-3.5 transition-all cursor-pointer relative group ${
+                      className={`w-full text-left p-3 rounded-xl flex items-center space-x-3 transition-all cursor-pointer relative group ${
                         isSelected
-                          ? 'bg-blue-50/80 dark:bg-[#252734] border border-[#0066FF]/40 dark:border-[#8B95F6]/40 shadow-md ring-1 ring-[#0066FF]/20 dark:ring-[#8B95F6]/25'
-                          : 'bg-slate-50 dark:bg-[#1C1D23] hover:bg-slate-100 dark:hover:bg-[#25262E] border border-slate-200/60 dark:border-[#282935]/70 hover:border-slate-300 dark:hover:border-[#383A4A]'
+                          ? 'bg-[#202222] border border-[#20B2AA]/50 shadow-sm ring-1 ring-[#20B2AA]/20'
+                          : 'bg-[#191A1A] hover:bg-[#202222] border border-[#262828] hover:border-[#2D3030]'
                       }`}
                     >
                       {/* Avatar Icon with Real-Time Online Dot marked directly on profile */}
                       <div className="relative shrink-0">
                         {chat.type === 'channel' ? (
-                          <div className="w-12 h-12 rounded-full bg-blue-500/10 dark:bg-[#242632] border border-blue-500/20 dark:border-[#303240] text-blue-600 dark:text-[#8B95F6] flex items-center justify-center font-bold text-base shadow-xs">
+                          <div className="w-11 h-11 rounded-full bg-[#202222] border border-[#2D3030] text-[#20B2AA] flex items-center justify-center font-bold text-sm shadow-xs">
                             <Hash className="w-5 h-5" />
                           </div>
                         ) : chat.type === 'group' ? (
-                          <div className="w-12 h-12 rounded-full bg-blue-500/10 dark:bg-[#242632] border border-blue-500/20 dark:border-[#303240] text-blue-600 dark:text-[#E2F952] flex items-center justify-center font-bold text-base shadow-xs">
+                          <div className="w-11 h-11 rounded-full bg-[#202222] border border-[#2D3030] text-[#20B2AA] flex items-center justify-center font-bold text-sm shadow-xs">
                             <Users className="w-5 h-5" />
                           </div>
                         ) : chat.avatarUrl ? (
                           <img
                             src={chat.avatarUrl}
                             alt={chat.name || 'Chat'}
-                            className="w-12 h-12 rounded-full object-cover border border-slate-200 dark:border-[#2E303E]"
+                            className="w-11 h-11 rounded-full object-cover border border-[#2D3030]"
                           />
                         ) : (
-                          <div className="w-12 h-12 rounded-full bg-[#0066FF] dark:bg-[#2E3140] border border-blue-400/20 dark:border-[#3B3E52] flex items-center justify-center text-white dark:text-zinc-100 font-bold text-base shadow-xs">
+                          <div className="w-11 h-11 rounded-full bg-[#202222] border border-[#2D3030] flex items-center justify-center text-[#EDEDED] font-bold text-sm shadow-xs">
                             {chat.name ? chat.name.charAt(0).toUpperCase() : 'C'}
                           </div>
                         )}
-                        {/* Real-time Online Dot marked on the profile as in Image 1 */}
+                        {/* Real-time Online Dot marked on the profile */}
                         {chat.type === 'direct' && isUserOnline && (
                           <span
                             title="Online"
-                            className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#E2F952] border-2 border-white dark:border-[#1C1D23] shadow-xs"
+                            className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#20B2AA] border-2 border-[#191A1A] shadow-xs"
                           />
                         )}
                       </div>
@@ -1106,32 +1107,32 @@ export default function DashboardPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-0.5">
                           <div className="flex items-center space-x-1.5 truncate">
-                            {chat.type === 'channel' && <Hash className="w-3.5 h-3.5 text-blue-500 shrink-0" />}
-                            <h3 className="font-semibold text-xs sm:text-sm text-slate-900 dark:text-zinc-100 truncate">
+                            {chat.type === 'channel' && <Hash className="w-3.5 h-3.5 text-[#20B2AA] shrink-0" />}
+                            <h3 className="font-medium text-xs sm:text-sm text-[#EDEDED] truncate">
                               {chat.name || 'Conversation'}
                             </h3>
                           </div>
                           <div className="flex items-center space-x-1.5 shrink-0 ml-1">
                             {isPinned && (
                               <span title="Pinned">
-                                <Pin className="w-3.5 h-3.5 text-[#0066FF] dark:text-[#E2F952] fill-current shrink-0" />
+                                <Pin className="w-3.5 h-3.5 text-[#20B2AA] fill-current shrink-0" />
                               </span>
                             )}
                             {chat.lastMessage && (
-                              <span className="text-[10px] text-slate-400 dark:text-zinc-500">
+                              <span className="text-[10px] text-[#737878]">
                                 {formatMessageTime(chat.lastMessage.createdAt)}
                               </span>
                             )}
                           </div>
                         </div>
 
-                        {/* Subtitle preview without offline text clutter */}
+                        {/* Subtitle preview */}
                         <div className="flex items-center justify-between">
-                          <p className="text-xs text-slate-500 dark:text-zinc-400 truncate pr-2">
+                          <p className="text-xs text-[#9EA3A3] truncate pr-2">
                             {(typingUsers[chat.id] || []).filter(
                               (name) => name !== user?.username && name !== user?.displayName,
                             ).length > 0 ? (
-                              <span className="text-blue-600 dark:text-[#8B95F6] font-semibold animate-pulse">
+                              <span className="text-[#20B2AA] font-semibold animate-pulse">
                                 typing...
                               </span>
                             ) : chat.lastMessage?.content ? (
@@ -1142,16 +1143,16 @@ export default function DashboardPage() {
                                 chat.lastMessage.content
                               )
                             ) : (
-                              <span className="italic text-slate-400 dark:text-zinc-500">No messages yet</span>
+                              <span className="italic text-[#737878]">No messages yet</span>
                             )}
                           </p>
 
                           <div className="flex items-center space-x-1 shrink-0">
                             {chat.lastMessage && chat.lastMessage.senderId === user?.id && (
-                              <CheckCheck className="w-3.5 h-3.5 text-[#0066FF] dark:text-[#8B95F6]" />
+                              <CheckCheck className="w-3.5 h-3.5 text-[#20B2AA]" />
                             )}
                             {chat.unreadCount > 0 && (
-                              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-[#0066FF] dark:bg-[#E2F952] text-white dark:text-black shrink-0 shadow-xs">
+                              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-[#20B2AA] text-black shrink-0 shadow-xs">
                                 {chat.unreadCount}
                               </span>
                             )}
@@ -1162,10 +1163,10 @@ export default function DashboardPage() {
                                 e.stopPropagation();
                                 togglePinChat(chat.id);
                               }}
-                              className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-[#2C2E3C] text-slate-400 dark:text-zinc-400 hover:text-[#0066FF] dark:hover:text-[#E2F952] transition cursor-pointer"
+                              className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-[#262828] text-[#9EA3A3] hover:text-[#20B2AA] transition cursor-pointer"
                               title={isPinned ? 'Unpin chat' : 'Pin chat'}
                             >
-                              <Pin className={`w-3.5 h-3.5 ${isPinned ? 'fill-current text-[#0066FF] dark:text-[#E2F952]' : ''}`} />
+                              <Pin className={`w-3.5 h-3.5 ${isPinned ? 'fill-current text-[#20B2AA]' : ''}`} />
                             </button>
                           </div>
                         </div>
@@ -1177,69 +1178,69 @@ export default function DashboardPage() {
             </div>
           </aside>
 
-        {/* RIGHT PANEL: Active Conversation View (Floated dark card on desktop) */}
+        {/* RIGHT PANEL: Active Conversation View */}
         <section
           role="region"
           aria-label="Active conversation"
-          className={`flex-1 h-full min-w-0 flex flex-col rounded-3xl border border-[#242630] bg-[#18191E] overflow-hidden shadow-sm ${
+          className={`flex-1 h-full min-w-0 flex flex-col rounded-2xl border border-[#2C2E2E] bg-[#141515] overflow-hidden shadow-sm ${
             activeChat ? 'flex' : 'hidden md:flex'
           }`}
         >
           {activeChat ? (
             <>
               {/* Active Chat Header */}
-              <div className="h-14 sm:h-16 border-b border-[#242630] bg-[#18191E] px-3 sm:px-6 flex items-center justify-between shrink-0">
+              <div className="h-14 sm:h-16 border-b border-[#2C2E2E] bg-[#141515] px-3 sm:px-6 flex items-center justify-between shrink-0">
                 <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
                   {/* Mobile Back Button to conversation list */}
                   <button
                     type="button"
                     onClick={() => void handleSelectChat(null)}
-                    className="md:hidden p-2 -ml-1 rounded-xl text-zinc-300 hover:bg-[#242630] transition touch-target-44 flex items-center justify-center shrink-0 cursor-pointer"
+                    className="md:hidden p-2 -ml-1 rounded-xl text-[#9EA3A3] hover:bg-[#202222] transition touch-target-44 flex items-center justify-center shrink-0 cursor-pointer"
                     aria-label="Back to conversations list"
                   >
-                    <ArrowLeft className="w-5 h-5 text-[#8B95F6]" />
+                    <ArrowLeft className="w-5 h-5 text-[#20B2AA]" />
                   </button>
 
                   <div className="relative shrink-0">
                     {activeChat.type === 'channel' ? (
-                      <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-[#8B95F6] flex items-center justify-center font-bold shadow-xs">
+                      <div className="w-10 h-10 rounded-xl bg-[#202222] border border-[#2D3030] text-[#20B2AA] flex items-center justify-center font-bold shadow-xs">
                         <Hash className="w-5 h-5" />
                       </div>
                     ) : activeChat.type === 'group' ? (
-                      <div className="w-10 h-10 rounded-xl bg-[#242632] border border-[#303240] text-[#E2F952] flex items-center justify-center font-bold shadow-xs">
+                      <div className="w-10 h-10 rounded-xl bg-[#202222] border border-[#2D3030] text-[#20B2AA] flex items-center justify-center font-bold shadow-xs">
                         <Users className="w-5 h-5" />
                       </div>
                     ) : activeChat.avatarUrl ? (
                       <img
                         src={activeChat.avatarUrl}
                         alt={activeChat.name || ''}
-                        className="w-10 h-10 rounded-xl object-cover border border-[#2E303E]"
+                        className="w-10 h-10 rounded-xl object-cover border border-[#2D3030]"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-xl bg-[#2E3140] border border-[#3B3E52] flex items-center justify-center text-zinc-100 font-bold text-sm shadow-xs">
+                      <div className="w-10 h-10 rounded-xl bg-[#202222] border border-[#2D3030] flex items-center justify-center text-[#EDEDED] font-bold text-sm shadow-xs">
                         {activeChat.name ? activeChat.name.charAt(0).toUpperCase() : 'C'}
                       </div>
                     )}
                     {activeChat.type === 'direct' &&
                       activeChat.otherUser &&
                       onlineUsers[activeChat.otherUser.id]?.status === 'online' && (
-                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#E2F952] border-2 border-[#18191E]" />
+                        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#20B2AA] border-2 border-[#141515]" />
                       )}
                   </div>
 
                   <div className="min-w-0">
                     <div className="flex items-center space-x-1.5">
                       {activeChat.type === 'channel' && (
-                        <span className="font-bold text-blue-500 text-sm">#</span>
+                        <span className="font-bold text-[#20B2AA] text-sm">#</span>
                       )}
-                      <h2 className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                      <h2 className="font-semibold text-sm text-[#EDEDED] truncate">
                         {activeChat.name}
                       </h2>
                     </div>
 
-                    <p className="text-[11px] text-slate-500 dark:text-zinc-400 truncate flex items-center space-x-1.5">
+                    <p className="text-[11px] text-[#9EA3A3] truncate flex items-center space-x-1.5">
                       {activeTyping.length > 0 ? (
-                        <span className="text-blue-600 dark:text-blue-400 font-semibold animate-pulse">
+                        <span className="text-[#20B2AA] font-semibold animate-pulse">
                           {activeTyping.length === 1
                             ? `${activeTyping[0]} is typing...`
                             : `${activeTyping.slice(0, 2).join(', ')} are typing...`}
@@ -1248,7 +1249,7 @@ export default function DashboardPage() {
                         <>
                           <span className="flex items-center space-x-1">
                             {activeChat.isPublic ? (
-                              <Globe className="w-3 h-3 text-emerald-500" />
+                              <Globe className="w-3 h-3 text-[#20B2AA]" />
                             ) : (
                               <Lock className="w-3 h-3 text-amber-500" />
                             )}
@@ -1267,7 +1268,7 @@ export default function DashboardPage() {
                         <>
                           <span>@{activeChat.otherUser.username}</span>
                           <span>&bull;</span>
-                          <span className="text-slate-400 dark:text-zinc-400">Encrypted workspace</span>
+                          <span className="text-[#9EA3A3]">Encrypted workspace</span>
                         </>
                       ) : (
                         <span>Direct Chat</span>
@@ -1276,7 +1277,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                {/* Shady & Circular Action Buttons in Header matching Image 1 */}
+                {/* Shady & Circular Action Buttons in Header matching Perplexity dark style */}
                 <WarmTooltipGroup delay={200} warmWindow={300} travel={220}>
                   <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
                     <WarmTooltip content="Search in conversation" shortcut="⌘F" side="bottom">
@@ -1285,8 +1286,8 @@ export default function DashboardPage() {
                         onClick={() => toggleInChatSearch()}
                         className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition shadow-xs cursor-pointer ${
                           inChatSearchOpen
-                            ? 'bg-[#2F3140] text-[#8B95F6]'
-                            : 'bg-[#242630] hover:bg-[#2F3140] text-zinc-300'
+                            ? 'bg-[#1D2B29] text-[#20B2AA] border border-[#25423E]'
+                            : 'bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED]'
                         }`}
                         aria-label="Search in conversation"
                       >
@@ -1294,39 +1295,39 @@ export default function DashboardPage() {
                       </button>
                     </WarmTooltip>
 
-                    {/* Circular Voice Call Button matching Image 1 */}
+                    {/* Circular Voice Call Button */}
                     <WarmTooltip content="Voice Call" side="bottom">
                       <button
                         type="button"
                         onClick={handleVoiceCall}
-                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#242630] hover:bg-[#2F3140] text-[#E2F952] flex items-center justify-center transition shadow-xs cursor-pointer"
+                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#20B2AA] hover:text-[#1CA099] flex items-center justify-center transition shadow-xs cursor-pointer"
                         aria-label="Voice Call"
                       >
                         <Phone className="w-4 h-4" />
                       </button>
                     </WarmTooltip>
 
-                    {/* Circular Video Call Button matching Image 1 */}
+                    {/* Circular Video Call Button */}
                     <WarmTooltip content="Video Call" side="bottom">
                       <button
                         type="button"
                         onClick={handleVideoCall}
-                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#242630] hover:bg-[#2F3140] text-zinc-200 hover:text-white flex items-center justify-center transition shadow-xs cursor-pointer"
+                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#EDEDED] hover:text-[#20B2AA] flex items-center justify-center transition shadow-xs cursor-pointer"
                         aria-label="Video Call"
                       >
                         <Video className="w-4 h-4" />
                       </button>
                     </WarmTooltip>
 
-                    {/* Circular Pin Chat Button matching Image 1 */}
+                    {/* Circular Pin Chat Button */}
                     <WarmTooltip content={isChatPinned(activeChat.id) ? 'Unpin chat' : 'Pin chat'} side="bottom">
                       <button
                         type="button"
                         onClick={() => togglePinChat(activeChat.id)}
                         className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition shadow-xs cursor-pointer ${
                           isChatPinned(activeChat.id)
-                            ? 'bg-[#2E313D] text-[#E2F952]'
-                            : 'bg-[#242630] hover:bg-[#2F3140] text-zinc-400 hover:text-zinc-200'
+                            ? 'bg-[#1D2B29] text-[#20B2AA] border border-[#25423E]'
+                            : 'bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED]'
                         }`}
                         aria-label="Pin Chat"
                       >
@@ -1334,7 +1335,7 @@ export default function DashboardPage() {
                       </button>
                     </WarmTooltip>
 
-                    {/* Circular Members & Details Button matching Image 1 */}
+                    {/* Circular Members & Details Button */}
                     <WarmTooltip content="Members & Info" side="bottom">
                       <button
                         type="button"
@@ -1347,8 +1348,8 @@ export default function DashboardPage() {
                         }}
                         className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition shadow-xs cursor-pointer ${
                           showGroupDrawer
-                            ? 'bg-[#2E313D] text-[#8B95F6]'
-                            : 'bg-[#242630] hover:bg-[#2F3140] text-zinc-300 hover:text-white'
+                            ? 'bg-[#1D2B29] text-[#20B2AA] border border-[#25423E]'
+                            : 'bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED]'
                         }`}
                         aria-label="Members & Details"
                       >
@@ -1366,10 +1367,10 @@ export default function DashboardPage() {
                               activeChat.otherUser!.displayName || activeChat.otherUser!.username,
                             )
                           }
-                          className="hidden sm:inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-full bg-[#20222C] border border-[#2D2F3C] text-blue-300 text-xs font-semibold hover:bg-[#292B38] transition cursor-pointer"
+                          className="hidden sm:inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-full bg-[#1D2B29] border border-[#25423E] text-[#20B2AA] text-xs font-semibold hover:bg-[#253B37] transition cursor-pointer"
                           aria-label="End-to-End Encrypted (Click to verify safety number)"
                         >
-                          <Lock className="w-3.5 h-3.5 text-[#8B95F6]" />
+                          <Lock className="w-3.5 h-3.5 text-[#20B2AA]" />
                           <span>E2EE</span>
                         </button>
                       </WarmTooltip>
@@ -1736,8 +1737,8 @@ export default function DashboardPage() {
                                       }
                                       className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-xs transition border cursor-pointer ${
                                         rx.hasReacted
-                                          ? 'bg-blue-50 dark:bg-blue-950/70 border-blue-400 dark:border-blue-600 text-blue-700 dark:text-blue-300 font-semibold shadow-2xs'
-                                          : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800'
+                                          ? 'bg-[#1D2B29] border-[#25423E] text-[#20B2AA] font-semibold shadow-2xs'
+                                          : 'bg-[#202222] border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED] hover:bg-[#262828]'
                                       }`}
                                     >
                                       <span>{rx.emoji}</span>
@@ -1758,18 +1759,18 @@ export default function DashboardPage() {
                   <Message align="start" className="mt-2 animate-in fade-in slide-in-from-bottom-2 duration-150">
                     <MessageAvatar>
                       <Avatar size="sm">
-                        <AvatarFallback className="text-[10px]">
+                        <AvatarFallback className="text-[10px] bg-[#202222] text-[#20B2AA]">
                           {activeTyping[0].charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                     </MessageAvatar>
                     <MessageContent>
-                      <Bubble variant="muted" className="py-2 px-3.5">
+                      <Bubble variant="muted" className="py-2 px-3.5 bg-[#202222] border-[#2D3030]">
                         <div className="flex items-center space-x-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-zinc-400 animate-bounce [animation-delay:-0.3s]" />
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-zinc-400 animate-bounce [animation-delay:-0.15s]" />
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-zinc-400 animate-bounce" />
-                          <span className="ml-1 text-[11px] text-slate-500 dark:text-zinc-400">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#20B2AA] animate-bounce [animation-delay:-0.3s]" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#20B2AA] animate-bounce [animation-delay:-0.15s]" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#20B2AA] animate-bounce" />
+                          <span className="ml-1 text-[11px] text-[#9EA3A3]">
                             {activeTyping.length === 1
                               ? `${activeTyping[0]} is typing...`
                               : `${activeTyping.slice(0, 2).join(', ')} are typing...`}
@@ -1783,17 +1784,17 @@ export default function DashboardPage() {
               </div>
 
               {/* Message Composer Footer */}
-              <div className="p-3 sm:p-4 border-t border-slate-200/80 dark:border-[#1E1E2A] bg-white/95 dark:bg-[#0D0D14]/95 backdrop-blur-md shrink-0 relative">
+              <div className="p-3 sm:p-4 border-t border-[#2C2E2E] bg-[#141515] shrink-0 relative">
                 {/* Replying banner */}
                 {replyingTo && (
-                  <div className="flex items-center justify-between px-3 py-1.5 mb-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-xs animate-in fade-in slide-in-from-bottom-2 duration-150">
+                  <div className="flex items-center justify-between px-3 py-1.5 mb-2 rounded-xl bg-[#1D2B29] border border-[#25423E] text-xs animate-in fade-in slide-in-from-bottom-2 duration-150">
                     <div className="flex items-center space-x-2 truncate">
-                      <Reply className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                      <Reply className="w-4 h-4 text-[#20B2AA] shrink-0" />
                       <div className="truncate">
-                        <span className="font-semibold text-blue-700 dark:text-blue-300">
+                        <span className="font-semibold text-[#20B2AA]">
                           Replying to {replyingTo.sender.displayName}:
                         </span>{' '}
-                        <span className="text-slate-600 dark:text-slate-300 truncate">
+                        <span className="text-[#EDEDED] truncate">
                           {replyingTo.content || '[Attachment]'}
                         </span>
                       </div>
@@ -1801,7 +1802,7 @@ export default function DashboardPage() {
                     <button
                       type="button"
                       onClick={() => setReplyingTo(null)}
-                      className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full transition"
+                      className="p-1 text-[#9EA3A3] hover:text-[#EDEDED] rounded-full transition"
                     >
                       <CloseIcon className="w-4 h-4" />
                     </button>
@@ -1810,14 +1811,14 @@ export default function DashboardPage() {
 
                 {/* Editing banner */}
                 {editingMessage && (
-                  <div className="flex items-center justify-between px-3 py-1.5 mb-2 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-xs animate-in fade-in slide-in-from-bottom-2 duration-150">
+                  <div className="flex items-center justify-between px-3 py-1.5 mb-2 rounded-xl bg-[#262217] border border-[#3E3520] text-xs animate-in fade-in slide-in-from-bottom-2 duration-150">
                     <div className="flex items-center space-x-2 truncate">
-                      <Pencil className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                      <Pencil className="w-4 h-4 text-amber-400 shrink-0" />
                       <div className="truncate">
-                        <span className="font-semibold text-amber-700 dark:text-amber-300">
+                        <span className="font-semibold text-amber-300">
                           Editing message:
                         </span>{' '}
-                        <span className="text-slate-600 dark:text-slate-300 truncate">
+                        <span className="text-[#EDEDED] truncate">
                           {editingMessage.content}
                         </span>
                       </div>
@@ -1828,7 +1829,7 @@ export default function DashboardPage() {
                         setEditingMessage(null);
                         setMessageInput('');
                       }}
-                      className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full transition"
+                      className="p-1 text-[#9EA3A3] hover:text-[#EDEDED] rounded-full transition"
                     >
                       <CloseIcon className="w-4 h-4" />
                     </button>
@@ -1839,9 +1840,9 @@ export default function DashboardPage() {
                 {showEmojiPicker && (
                   <div
                     ref={emojiPickerRef}
-                    className="absolute bottom-18 left-2 sm:left-4 z-30 w-[calc(100vw-1.5rem)] max-w-xs sm:w-80 bg-white/95 dark:bg-[#12121A]/95 border border-slate-200 dark:border-[#222232] rounded-2xl shadow-xl p-3 animate-in fade-in zoom-in-95 duration-150 backdrop-blur-xl"
+                    className="absolute bottom-20 left-2 sm:left-4 z-30 w-[calc(100vw-1.5rem)] max-w-xs sm:w-80 bg-[#202222] border border-[#2D3030] rounded-2xl shadow-2xl p-3 animate-in fade-in zoom-in-95 duration-150 backdrop-blur-xl"
                   >
-                    <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 dark:border-[#222232]">
+                    <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#2D3030]">
                       <div className="flex space-x-1">
                         {(['smileys', 'gestures', 'hearts', 'objects'] as const).map((cat) => (
                           <button
@@ -1850,8 +1851,8 @@ export default function DashboardPage() {
                             onClick={() => setEmojiCategory(cat)}
                             className={`px-2 py-1 text-xs rounded-lg font-medium transition cursor-pointer ${
                               emojiCategory === cat
-                                ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-semibold'
-                                : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-[#1E1E2C]'
+                                ? 'bg-[#1D2B29] text-[#20B2AA] font-semibold'
+                                : 'text-[#9EA3A3] hover:bg-[#262828] hover:text-[#EDEDED]'
                             }`}
                           >
                             {cat === 'smileys'
@@ -1867,7 +1868,7 @@ export default function DashboardPage() {
                       <button
                         type="button"
                         onClick={() => setShowEmojiPicker(false)}
-                        className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
+                        className="p-1 rounded-lg text-[#9EA3A3] hover:text-[#EDEDED] transition"
                       >
                         <CloseIcon className="w-3.5 h-3.5" />
                       </button>
@@ -1879,7 +1880,7 @@ export default function DashboardPage() {
                           key={emoji}
                           type="button"
                           onClick={() => handleInsertEmoji(emoji)}
-                          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-[#1E1E2C] hover:scale-120 transition cursor-pointer"
+                          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#262828] hover:scale-120 transition cursor-pointer"
                         >
                           {emoji}
                         </button>
@@ -1890,26 +1891,26 @@ export default function DashboardPage() {
 
                 {/* Staged Attachment Preview */}
                 {stagedFile && (
-                  <div className="mb-2 p-2 px-3 rounded-2xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 flex items-center justify-between animate-in fade-in duration-150">
+                  <div className="mb-2 p-2 px-3 rounded-2xl bg-[#1D2B29] border border-[#25423E] flex items-center justify-between animate-in fade-in duration-150">
                     <div className="flex items-center space-x-2.5 min-w-0">
                       {stagedPreviewUrl ? (
                         <img
                           src={stagedPreviewUrl}
                           alt="preview"
-                          className="w-9 h-9 rounded-lg object-cover border border-blue-300"
+                          className="w-9 h-9 rounded-lg object-cover border border-[#20B2AA]/40"
                         />
                       ) : stagedFile.type.startsWith('video/') ? (
-                        <Film className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
+                        <Film className="w-5 h-5 text-[#20B2AA] shrink-0" />
                       ) : stagedFile.type.startsWith('audio/') ? (
-                        <Music className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
+                        <Music className="w-5 h-5 text-[#20B2AA] shrink-0" />
                       ) : (
-                        <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
+                        <FileText className="w-5 h-5 text-[#20B2AA] shrink-0" />
                       )}
                       <div className="min-w-0">
-                        <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">
+                        <p className="text-xs font-semibold text-[#EDEDED] truncate">
                           {stagedFile.name}
                         </p>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                        <p className="text-[10px] text-[#9EA3A3]">
                           {formatFileSize(stagedFile.size)}
                         </p>
                       </div>
@@ -1917,14 +1918,18 @@ export default function DashboardPage() {
                     <button
                       type="button"
                       onClick={clearStagedFile}
-                      className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-white/40 cursor-pointer"
+                      className="p-1 rounded-lg text-[#9EA3A3] hover:text-[#EDEDED] hover:bg-white/10 cursor-pointer"
                     >
                       <CloseIcon className="w-4 h-4" />
                     </button>
                   </div>
                 )}
 
-                <form onSubmit={handleSendMessage} className="flex items-end space-x-1.5 sm:space-x-2">
+                {/* Perplexity Styled Floating Prompt Bar */}
+                <form
+                  onSubmit={handleSendMessage}
+                  className="bg-[#202222] border border-[#2D3030] focus-within:border-[#20B2AA] focus-within:ring-1 focus-within:ring-[#20B2AA]/30 rounded-2xl p-2 sm:p-2.5 flex items-end space-x-1.5 sm:space-x-2 transition-all shadow-md"
+                >
                   {/* Hidden file input */}
                   <input
                     type="file"
@@ -1940,28 +1945,28 @@ export default function DashboardPage() {
                       type="button"
                       onClick={() => setShowMobileActionsMenu(!showMobileActionsMenu)}
                       disabled={isSending || isUploadingMedia}
-                      className={`p-2.5 rounded-xl transition touch-target-44 flex items-center justify-center shrink-0 cursor-pointer ${
+                      className={`p-2 rounded-xl transition touch-target-44 flex items-center justify-center shrink-0 cursor-pointer ${
                         showMobileActionsMenu
-                          ? 'bg-[#0066FF] text-white rotate-45'
-                          : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-[#1E1E2C]'
+                          ? 'bg-[#20B2AA] text-black rotate-45'
+                          : 'text-[#9EA3A3] hover:text-[#20B2AA] hover:bg-[#262828]'
                       }`}
                       title="More actions"
                       aria-label="Add attachment or emoji"
                     >
-                      <Plus className="w-5 h-5 transition-transform" />
+                      <Plus className="w-4 h-4 transition-transform" />
                     </button>
 
                     {showMobileActionsMenu && (
-                      <div className="absolute bottom-12 left-0 z-30 bg-white dark:bg-[#12121A] border border-slate-200 dark:border-[#222232] rounded-2xl shadow-xl p-1.5 flex flex-col space-y-1 min-w-[170px] animate-in fade-in slide-in-from-bottom-2 duration-150">
+                      <div className="absolute bottom-12 left-0 z-30 bg-[#202222] border border-[#2D3030] rounded-2xl shadow-xl p-1.5 flex flex-col space-y-1 min-w-[170px] animate-in fade-in slide-in-from-bottom-2 duration-150">
                         <button
                           type="button"
                           onClick={() => {
                             setShowMobileActionsMenu(false);
                             fileInputRef.current?.click();
                           }}
-                          className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#1E1E2C] transition cursor-pointer"
+                          className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#EDEDED] hover:bg-[#262828] transition cursor-pointer"
                         >
-                          <Paperclip className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                          <Paperclip className="w-4 h-4 text-[#20B2AA] shrink-0" />
                           <span>Attach Media / File</span>
                         </button>
                         <button
@@ -1970,9 +1975,9 @@ export default function DashboardPage() {
                             setShowMobileActionsMenu(false);
                             setShowEmojiPicker(true);
                           }}
-                          className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#1E1E2C] transition cursor-pointer"
+                          className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#EDEDED] hover:bg-[#262828] transition cursor-pointer"
                         >
-                          <Smile className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                          <Smile className="w-4 h-4 text-[#20B2AA] shrink-0" />
                           <span>Insert Emoji</span>
                         </button>
                       </div>
@@ -1980,13 +1985,13 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Desktop & Tablet attachment/emoji buttons (sm:flex) */}
-                  <div className="hidden sm:flex items-center space-x-1 shrink-0">
+                  <div className="hidden sm:flex items-center space-x-0.5 shrink-0 mb-0.5">
                     <WarmTooltip content="Attach File or Media" side="top">
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
                         disabled={isSending || isUploadingMedia}
-                        className="p-2.5 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition shrink-0 cursor-pointer"
+                        className="p-2 rounded-xl text-[#9EA3A3] hover:text-[#20B2AA] hover:bg-[#262828] transition shrink-0 cursor-pointer"
                         aria-label="Attach file or photo"
                       >
                         <Paperclip className="w-4 h-4" />
@@ -1997,10 +2002,10 @@ export default function DashboardPage() {
                         type="button"
                         onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                         disabled={isSending || isUploadingMedia}
-                        className={`p-2.5 rounded-xl transition shrink-0 cursor-pointer ${
+                        className={`p-2 rounded-xl transition shrink-0 cursor-pointer ${
                           showEmojiPicker
-                            ? 'bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400'
-                            : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40'
+                            ? 'bg-[#1D2B29] text-[#20B2AA]'
+                            : 'text-[#9EA3A3] hover:text-[#20B2AA] hover:bg-[#262828]'
                         }`}
                         aria-label="Insert emoji"
                       >
@@ -2037,24 +2042,24 @@ export default function DashboardPage() {
                       editingMessage
                         ? 'Editing message... (Enter to save, Esc to cancel)'
                         : activeChat.type === 'channel'
-                        ? `Write a message in #${activeChat.name}...`
-                        : 'Write a message...'
+                        ? `Message in #${activeChat.name}...`
+                        : 'Ask anything or write a message...'
                     }
-                    className="flex-1 px-3 sm:px-4 py-2.5 bg-slate-100 dark:bg-[#14151B] border border-slate-200 dark:border-[#262833] rounded-2xl text-base sm:text-sm text-slate-900 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#8B95F6] transition resize-none max-h-32 overflow-y-auto leading-relaxed"
-                    style={{ minHeight: '44px' }}
+                    className="flex-1 px-2.5 py-1.5 bg-transparent border-none text-base sm:text-sm text-[#EDEDED] placeholder-[#737878] focus:outline-none focus:ring-0 transition resize-none max-h-32 overflow-y-auto leading-relaxed"
+                    style={{ minHeight: '38px' }}
                   />
 
                   <WarmTooltip content="Send Message" shortcut="↵" side="top">
                     <button
                       type="submit"
                       disabled={(!messageInput.trim() && !stagedFile) || isSending || isUploadingMedia}
-                      className="p-2.5 rounded-full bg-[#0066FF] hover:bg-blue-600 dark:bg-[#E2F952] dark:hover:bg-[#d6ee3c] disabled:opacity-40 text-white dark:text-black shadow-md shadow-blue-500/25 transition touch-target-44 flex items-center justify-center shrink-0 self-end cursor-pointer"
+                      className="w-9 h-9 rounded-full bg-[#20B2AA] hover:bg-[#1CA099] disabled:opacity-30 text-black shadow-md shadow-[#20B2AA]/20 transition touch-target-44 flex items-center justify-center shrink-0 self-end font-bold cursor-pointer active:scale-95 mb-0.5"
                       aria-label="Send Message"
                     >
                       {isUploadingMedia ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-white dark:text-black" />
+                        <Loader2 className="w-4 h-4 animate-spin text-black" />
                       ) : (
-                        <Send className="w-4 h-4 text-white dark:text-black" />
+                        <ArrowUp className="w-4 h-4 stroke-[2.5] text-black" />
                       )}
                     </button>
                   </WarmTooltip>
@@ -2062,20 +2067,123 @@ export default function DashboardPage() {
               </div>
             </>
           ) : (
-            /* Minimal Calm Empty State */
-            <div className="hidden md:flex flex-1 flex-col items-center justify-center p-8 text-center select-none bg-[#121316]">
-              <div className="w-16 h-16 rounded-3xl bg-[#18191E] border border-[#242630] flex items-center justify-center text-[#8B95F6] mb-4 shadow-sm">
-                <MessageSquare className="w-8 h-8" />
-              </div>
-              <h3 className="text-base font-semibold text-zinc-100 mb-1.5">
-                Whhispr Messenger
-              </h3>
-              <p className="text-xs text-zinc-500 max-w-xs mb-6 leading-relaxed">
-                Select a conversation from the sidebar to start chatting, or connect with contacts.
-              </p>
-              <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#18191E] border border-[#242630] text-[11px] text-zinc-400">
-                <Lock className="w-3.5 h-3.5 text-[#8B95F6]" />
-                <span>End-to-end encrypted messaging</span>
+            /* Iconic Perplexity AI Home Interface */
+            <div className="hidden md:flex flex-1 flex-col items-center justify-center p-6 lg:p-12 text-center select-none bg-[#141515] overflow-y-auto">
+              <div className="max-w-2xl w-full flex flex-col items-center">
+                {/* Sparkle badge */}
+                <div className="w-12 h-12 rounded-2xl bg-[#202222] border border-[#2D3030] flex items-center justify-center text-[#20B2AA] mb-4 shadow-sm">
+                  <Sparkles className="w-6 h-6" />
+                </div>
+
+                {/* Title */}
+                <h1 className="text-3xl lg:text-4xl font-normal tracking-tight text-[#EDEDED] mb-2 font-serif sm:font-sans">
+                  Where conversation begins
+                </h1>
+                <p className="text-xs sm:text-sm text-[#9EA3A3] mb-8 max-w-md">
+                  Start a new thread, search messages, or start a peer-to-peer encrypted call.
+                </p>
+
+                {/* Floating Perplexity Prompt / Starter Box */}
+                <div className="w-full bg-[#202222] border border-[#2D3030] hover:border-[#383B3B] focus-within:border-[#20B2AA] rounded-2xl shadow-xl p-4 sm:p-5 text-left mb-6 transition-all">
+                  <div className="flex items-start space-x-3 mb-4">
+                    <MessageSquare className="w-5 h-5 text-[#20B2AA] shrink-0 mt-0.5" />
+                    <input
+                      type="text"
+                      readOnly
+                      onClick={() => setShowCreateGroupModal(true)}
+                      placeholder="Message anyone, start a group, or join a channel..."
+                      className="w-full bg-transparent text-sm text-[#EDEDED] placeholder-[#737878] focus:outline-none cursor-pointer"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-[#2A2C2C]">
+                    <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar">
+                      <button
+                        type="button"
+                        onClick={() => setShowCreateGroupModal(true)}
+                        className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-[#2A2C2C] hover:bg-[#333636] border border-[#333636] text-[#EDEDED] text-xs font-medium transition cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5 text-[#20B2AA]" />
+                        <span>New Thread</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => navigate('/contacts')}
+                        className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-[#2A2C2C] hover:bg-[#333636] border border-[#333636] text-[#EDEDED] text-xs font-medium transition cursor-pointer"
+                      >
+                        <Users className="w-3.5 h-3.5 text-[#20B2AA]" />
+                        <span>Contacts</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowChannelBrowserModal(true)}
+                        className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-[#2A2C2C] hover:bg-[#333636] border border-[#333636] text-[#EDEDED] text-xs font-medium transition cursor-pointer"
+                      >
+                        <Compass className="w-3.5 h-3.5 text-[#20B2AA]" />
+                        <span>Channels</span>
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowCreateGroupModal(true)}
+                      className="w-8 h-8 rounded-full bg-[#20B2AA] hover:bg-[#1CA099] text-black flex items-center justify-center font-bold shadow-sm transition shrink-0 ml-2 cursor-pointer active:scale-95"
+                      aria-label="Start Conversation"
+                    >
+                      <ArrowUp className="w-4 h-4 stroke-[2.5]" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Quick starter cards grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full text-left">
+                  <button
+                    type="button"
+                    onClick={() => setShowCreateGroupModal(true)}
+                    className="p-3.5 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] hover:border-[#383B3B] transition text-left cursor-pointer group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-[#2A2C2C] flex items-center justify-center text-[#20B2AA] mb-2.5 group-hover:scale-105 transition">
+                      <MessageSquare className="w-4 h-4" />
+                    </div>
+                    <h4 className="text-xs font-semibold text-[#EDEDED] mb-1">Direct Messages</h4>
+                    <p className="text-[11px] text-[#9EA3A3] leading-relaxed">
+                      Encrypted peer-to-peer chats with verified keys and typing status.
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowCallHistoryModal(true)}
+                    className="p-3.5 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] hover:border-[#383B3B] transition text-left cursor-pointer group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-[#2A2C2C] flex items-center justify-center text-[#20B2AA] mb-2.5 group-hover:scale-105 transition">
+                      <PhoneCall className="w-4 h-4" />
+                    </div>
+                    <h4 className="text-xs font-semibold text-[#EDEDED] mb-1">Audio & Video</h4>
+                    <p className="text-[11px] text-[#9EA3A3] leading-relaxed">
+                      Instant crystal-clear WebRTC calls with screen sharing.
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowChannelBrowserModal(true)}
+                    className="p-3.5 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] hover:border-[#383B3B] transition text-left cursor-pointer group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-[#2A2C2C] flex items-center justify-center text-[#20B2AA] mb-2.5 group-hover:scale-105 transition">
+                      <Compass className="w-4 h-4" />
+                    </div>
+                    <h4 className="text-xs font-semibold text-[#EDEDED] mb-1">Public Channels</h4>
+                    <p className="text-[11px] text-[#9EA3A3] leading-relaxed">
+                      Discover community discussions and collaborate in team channels.
+                    </p>
+                  </button>
+                </div>
+
+                {/* Security footnote */}
+                <div className="mt-8 inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#202222] border border-[#2D3030] text-[11px] text-[#9EA3A3]">
+                  <Lock className="w-3.5 h-3.5 text-[#20B2AA]" />
+                  <span>Signal Protocol E2EE • Zero telemetry • Real-time WebRTC</span>
+                </div>
               </div>
             </div>
           )}
@@ -2096,11 +2204,11 @@ export default function DashboardPage() {
         <button
           type="button"
           onClick={() => setShowCreateGroupModal(true)}
-          className="md:hidden fixed right-4 bottom-6 z-20 w-13 h-13 rounded-full bg-[#0066FF] hover:bg-blue-600 text-white shadow-xl shadow-blue-600/30 flex items-center justify-center touch-target-44 hover:scale-105 active:scale-95 transition"
+          className="md:hidden fixed right-4 bottom-6 z-20 w-13 h-13 rounded-full bg-[#20B2AA] hover:bg-[#1CA099] text-black shadow-xl shadow-[#20B2AA]/30 flex items-center justify-center touch-target-44 hover:scale-105 active:scale-95 transition"
           aria-label="New Conversation or Group"
           title="New Conversation or Group"
         >
-          <Plus className="w-6 h-6" />
+          <Plus className="w-6 h-6 stroke-[2.5]" />
         </button>
       )}
 
