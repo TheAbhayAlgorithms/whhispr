@@ -109,22 +109,23 @@ export function GroupDetailsDrawer({ isOpen, onClose }: GroupDetailsDrawerProps)
         aria-hidden="true"
       />
 
-      <aside className="fixed inset-y-0 right-0 z-50 w-80 max-w-[85vw] sm:max-w-none sm:relative sm:inset-auto sm:z-auto sm:w-80 md:w-88 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0 overflow-hidden shadow-2xl transition-all">
+      <aside className="fixed inset-y-0 right-0 z-50 w-full max-w-xs sm:max-w-none sm:relative sm:inset-auto sm:z-auto sm:w-80 md:w-88 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0 overflow-hidden shadow-2xl transition-all">
         {/* Header */}
-        <div className="h-16 px-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
+        <div className="h-16 px-4 sm:px-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
           <h3 className="font-bold text-sm text-slate-900 dark:text-white">
             {activeGroupDetails.type === 'channel' ? 'Channel Info' : 'Group Details'}
           </h3>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+            aria-label="Close details"
+            className="min-w-[44px] min-h-[44px] p-2.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5 sm:w-4 sm:h-4" />
           </button>
         </div>
 
       {/* Body Container */}
-      <div className="flex-1 overflow-y-auto p-5 space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-6 pb-safe">
         {/* Profile Card */}
         <div className="text-center">
           <div className="w-16 h-16 rounded-2xl mx-auto mb-3 bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-xl shadow-md">

@@ -259,7 +259,7 @@ export function CallModal() {
         </div>
 
         {/* Bottom Floating Control Dock */}
-        <div className="px-3 sm:px-6 py-3 sm:py-5 bg-slate-900/90 border-t border-slate-800/80 flex items-center justify-center space-x-3 sm:space-x-4">
+        <div className="px-3 sm:px-6 py-3 sm:py-5 bg-slate-900/90 border-t border-slate-800/80 flex items-center justify-center space-x-3 sm:space-x-4 pb-safe">
           {session.status === 'incoming' ? (
             <div className="flex items-center space-x-4 sm:space-x-6">
               <button

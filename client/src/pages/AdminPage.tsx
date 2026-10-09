@@ -214,26 +214,27 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
       {/* Top Navbar */}
-      <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-8 py-3.5 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
+      <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-8 py-3 flex items-center justify-between pt-safe">
+        <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
           <Link
             to="/"
-            className="p-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition"
+            className="min-w-[44px] min-h-[44px] p-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition flex items-center justify-center shrink-0"
             title="Back to Chat"
+            aria-label="Back to Chat"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <div className="flex items-center space-x-2.5">
-            <div className="p-2 bg-indigo-600 text-white rounded-xl shadow-md shadow-indigo-600/20">
+          <div className="flex items-center space-x-2 sm:space-x-2.5 min-w-0">
+            <div className="p-2 bg-indigo-600 text-white rounded-xl shadow-md shadow-indigo-600/20 shrink-0">
               <Shield className="w-5 h-5" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center space-x-2">
-                <h1 className="text-base font-bold tracking-tight text-slate-900 dark:text-white">
-                  Whhispr Admin Portal
+                <h1 className="text-sm sm:text-base font-bold tracking-tight text-slate-900 dark:text-white truncate">
+                  Admin Portal
                 </h1>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 rounded-full">
-                  Superadmin
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 rounded-full shrink-0">
+                  Admin
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">
@@ -243,16 +244,17 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 shrink-0">
           <button
             onClick={() => void loadData()}
             disabled={isLoading}
-            className="p-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition disabled:opacity-50"
+            className="min-w-[44px] min-h-[44px] p-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition disabled:opacity-50 flex items-center justify-center"
             title="Refresh Data"
+            aria-label="Refresh Data"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           </button>
-          <ThemeToggle />
+          <ThemeToggle hideLabelBelow="sm" />
         </div>
       </header>
 

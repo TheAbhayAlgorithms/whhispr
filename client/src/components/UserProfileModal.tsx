@@ -10,23 +10,24 @@ export function UserProfileModal({ profile, onClose }: UserProfileModalProps) {
   if (!profile) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative animate-scale-up">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
+      <div className="bg-slate-900 border-t sm:border border-slate-800 rounded-t-3xl sm:rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative animate-scale-up max-h-[92dvh] sm:max-h-auto overflow-y-auto">
         {/* Banner */}
-        <div className="h-28 bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-600 relative">
+        <div className="h-24 sm:h-28 bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-600 relative shrink-0">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-950/40 hover:bg-slate-950/70 text-slate-200 flex items-center justify-center transition"
+            aria-label="Close profile"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 min-w-[44px] min-h-[44px] w-11 h-11 sm:w-8 sm:h-8 rounded-full bg-slate-950/50 hover:bg-slate-950/80 text-slate-200 flex items-center justify-center transition active:scale-95"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5 sm:w-4 sm:h-4" />
           </button>
         </div>
 
         {/* Profile Details */}
-        <div className="px-6 pb-6 pt-0 relative">
+        <div className="px-5 sm:px-6 pb-6 pt-0 relative pb-safe">
           {/* Avatar */}
           <div className="-mt-12 mb-4 flex justify-between items-end">
-            <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-800 border-4 border-slate-900 flex items-center justify-center text-3xl font-bold text-indigo-300 shadow-xl">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-slate-800 border-4 border-slate-900 flex items-center justify-center text-2xl sm:text-3xl font-bold text-indigo-300 shadow-xl shrink-0">
               {profile.avatarUrl ? (
                 <img
                   src={profile.avatarUrl}
@@ -85,7 +86,7 @@ export function UserProfileModal({ profile, onClose }: UserProfileModalProps) {
           <div className="mt-6">
             <button
               onClick={onClose}
-              className="w-full flex items-center justify-center space-x-2 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white transition"
+              className="w-full flex items-center justify-center space-x-2 min-h-[44px] py-3 sm:py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white transition active:scale-[0.98]"
             >
               <span>Close Profile</span>
             </button>

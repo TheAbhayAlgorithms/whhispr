@@ -67,13 +67,13 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
     unifiedResults.chats.length;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-4 sm:pt-20 p-2 sm:p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
       <div
-        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh] sm:max-h-[80vh] animate-in zoom-in-95 duration-150"
+        className="bg-white dark:bg-slate-900 border-b sm:border border-slate-200 dark:border-slate-800 rounded-none sm:rounded-3xl w-full sm:max-w-2xl shadow-2xl overflow-hidden flex flex-col h-full sm:h-auto sm:max-h-[80vh] pt-safe pb-safe animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Header Bar */}
-        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center space-x-3 bg-slate-50/50 dark:bg-slate-950/40">
+        <div className="p-3.5 sm:p-4 border-b border-slate-200 dark:border-slate-800 flex items-center space-x-3 bg-slate-50/50 dark:bg-slate-950/40 shrink-0">
           <Search className="w-5 h-5 text-indigo-500 shrink-0" />
           <input
             ref={inputRef}
@@ -84,7 +84,7 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
               if (e.key === 'Escape') onClose();
             }}
             placeholder="Search messages, people, or channels..."
-            className="flex-1 bg-transparent border-none text-base text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none"
+            className="flex-1 bg-transparent border-none text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none"
           />
           {isSearching ? (
             <Loader2 className="w-5 h-5 animate-spin text-slate-400 shrink-0" />
@@ -92,7 +92,8 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
             <button
               type="button"
               onClick={() => handleQueryChange('')}
-              className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full transition"
+              className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full transition touch-target-44 flex items-center justify-center"
+              aria-label="Clear query"
             >
               <X className="w-4 h-4" />
             </button>
@@ -104,7 +105,8 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition"
+            className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition touch-target-44 flex items-center justify-center shrink-0"
+            aria-label="Close search"
           >
             <X className="w-5 h-5" />
           </button>

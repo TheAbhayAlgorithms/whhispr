@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import { useChatStore } from '../store/useChatStore';
 import { useContactStore } from '../store/useContactStore';
@@ -114,6 +114,7 @@ const QUICK_REACTIONS = ['❤️', '👍', '😂', '😮', '😢', '🙏', '🔥
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user, logout } = useAuthStore();
   const {
     chats,
@@ -150,6 +151,46 @@ export default function DashboardPage() {
   const [showChannelBrowserModal, setShowChannelBrowserModal] = useState(false);
   const [showGroupDrawer, setShowGroupDrawer] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showMobileActionsMenu, setShowMobileActionsMenu] = useState(false);
+
+  // Synchronize URL search param `?chat=id` with activeChatId for back navigation
+  const urlChatId = searchParams.get('chat');
+  useEffect(() => {
+    if (urlChatId && urlChatId !== activeChatId) {
+      void selectChat(urlChatId);
+    } else if (!urlChatId && activeChatId && typeof window !== 'undefined' && window.innerWidth < 768) {
+      void selectChat(null);
+    }
+  }, [urlChatId, activeChatId, selectChat]);
+
+  const handleSelectChat = (chatId: string | null) => {
+    if (chatId) {
+      setSearchParams({ chat: chatId });
+    } else {
+      setSearchParams({});
+    }
+    void selectChat(chatId);
+  };
+
+  // Viewport resize handling for on-screen keyboards
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.visualViewport) return;
+    const handleViewport = () => {
+      if (window.visualViewport) {
+        document.documentElement.style.setProperty(
+          '--app-dvh',
+          `${window.visualViewport.height}px`
+        );
+      }
+    };
+    window.visualViewport.addEventListener('resize', handleViewport);
+    window.visualViewport.addEventListener('scroll', handleViewport);
+    handleViewport();
+    return () => {
+      window.visualViewport?.removeEventListener('resize', handleViewport);
+      window.visualViewport?.removeEventListener('scroll', handleViewport);
+    };
+  }, []);
 
   // Emoji Picker State
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -215,7 +256,7 @@ export default function DashboardPage() {
   }, [activeChatId, fetchMessages, fetchChats]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const messageInputRef = useRef<HTMLInputElement>(null);
+  const messageInputRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -363,7 +404,7 @@ export default function DashboardPage() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const val = e.target.value;
     setMessageInput(val);
     if (activeChatId) {
@@ -484,49 +525,61 @@ export default function DashboardPage() {
   });
 
   return (
-    <div className="h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col overflow-hidden transition-colors duration-200">
+    <div className="h-screen h-dvh bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col overflow-hidden transition-colors duration-200">
       {/* Real-time offline and reconnect status bar */}
       <OfflineBanner />
 
       {/* Top Navbar */}
-      <header className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between shrink-0 z-20">
-        <div className="flex items-center space-x-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <MessageSquare className="w-5 h-5 text-white" />
+      <header className="h-14 sm:h-16 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between shrink-0 z-20 sticky top-0">
+        <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 shrink-0">
+            <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
           </div>
-          <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-slate-900 via-slate-700 to-indigo-600 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent">
+          <span className="text-lg sm:text-xl font-bold tracking-tight bg-gradient-to-r from-slate-900 via-slate-700 to-indigo-600 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent truncate">
             Whhispr
           </span>
 
           {/* Real-time Socket Connection Badge */}
           {socketStatus === 'connected' ? (
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-medium flex items-center">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse" />
-              Live
+            <span
+              title="Socket Connected (Live)"
+              className="text-xs px-2 sm:px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-medium flex items-center shrink-0"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-0 sm:mr-1.5 animate-pulse shrink-0" />
+              <span className="hidden sm:inline">Live</span>
             </span>
           ) : socketStatus === 'connecting' ? (
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-medium flex items-center">
-              <Radio className="w-3 h-3 mr-1 animate-spin text-amber-500" />
-              Connecting...
+            <span
+              title="Socket Connecting..."
+              className="text-xs px-2 sm:px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-medium flex items-center shrink-0"
+            >
+              <Radio className="w-3 h-3 mr-0 sm:mr-1 animate-spin text-amber-500 shrink-0" />
+              <span className="hidden sm:inline">Connecting...</span>
             </span>
           ) : (
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-500/10 text-slate-500 dark:text-slate-400 border border-slate-500/20 font-medium flex items-center">
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5" />
-              Offline
+            <span
+              title="Socket Disconnected (Offline)"
+              className="text-xs px-2 sm:px-2.5 py-0.5 rounded-full bg-slate-500/10 text-slate-500 dark:text-slate-400 border border-slate-500/20 font-medium flex items-center shrink-0"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-400 mr-0 sm:mr-1.5 shrink-0" />
+              <span className="hidden sm:inline">Offline</span>
             </span>
           )}
         </div>
 
-        <div className="flex items-center space-x-1.5 sm:space-x-2.5">
-          {/* Daylight / Dark Theme Toggle Button */}
-          <ThemeToggle />
+        <div className="flex items-center space-x-1.5 sm:space-x-2">
+          {/* Daylight / Dark Theme Toggle Button (Tablet & Desktop only; Mobile accesses via drawer menu) */}
+          <div className="hidden md:flex items-center">
+            <ThemeToggle hideLabelBelow="lg" />
+          </div>
 
-          {/* In-App Notifications Bell */}
+          {/* In-App Notifications Bell (Visible on all screen sizes) */}
           <button
             type="button"
             onClick={() => toggleNotificationCenter()}
-            className="relative p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition cursor-pointer"
+            className="relative p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition cursor-pointer touch-target-44 flex items-center justify-center shrink-0"
             title="Notifications"
+            aria-label="Notifications"
           >
             <Bell className="w-4 h-4 text-indigo-500" />
             {unreadNotificationsCount > 0 && (
@@ -536,13 +589,15 @@ export default function DashboardPage() {
             )}
           </button>
 
-          {/* Contacts - visible on all screen sizes */}
+          {/* Contacts - visible on tablet & desktop (hidden on mobile < md) */}
           <Link
             to="/contacts"
-            className="flex items-center space-x-1 sm:space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 transition relative"
+            className="hidden md:flex items-center space-x-1 sm:space-x-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 transition relative"
+            title="Contacts"
+            aria-label="Contacts"
           >
-            <Users className="w-3.5 h-3.5 text-indigo-500" />
-            <span className="hidden sm:inline">Contacts</span>
+            <Users className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+            <span className="hidden lg:inline">Contacts</span>
             {incomingRequests.length > 0 && (
               <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">
                 {incomingRequests.length}
@@ -550,47 +605,52 @@ export default function DashboardPage() {
             )}
           </Link>
 
-          {/* Desktop Navigation Items */}
-          <div className="hidden md:flex items-center space-x-2">
+          {/* Tablet & Desktop Navigation Items */}
+          <div className="hidden md:flex items-center space-x-1.5 lg:space-x-2">
             <button
               onClick={() => setShowChannelBrowserModal(true)}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800 text-xs font-semibold text-indigo-600 dark:text-indigo-400 transition"
+              className="flex items-center space-x-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800 text-xs font-semibold text-indigo-600 dark:text-indigo-400 transition"
               title="Discover Public Channels"
+              aria-label="Explore Channels"
             >
-              <Compass className="w-3.5 h-3.5" />
-              <span>Explore Channels</span>
+              <Compass className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden lg:inline">Explore Channels</span>
             </button>
 
             <Link
               to="/profile"
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-600/20 hover:bg-indigo-100 dark:hover:bg-indigo-600/30 border border-indigo-200 dark:border-indigo-500/30 text-xs font-semibold text-indigo-600 dark:text-indigo-300 transition"
+              className="flex items-center space-x-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-600/20 hover:bg-indigo-100 dark:hover:bg-indigo-600/30 border border-indigo-200 dark:border-indigo-500/30 text-xs font-semibold text-indigo-600 dark:text-indigo-300 transition"
+              title="Profile"
+              aria-label="Profile"
             >
-              <UserIcon className="w-3.5 h-3.5" />
-              <span>Profile</span>
+              <UserIcon className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden lg:inline">Profile</span>
             </Link>
 
             <Link
               to="/settings"
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 transition"
+              className="flex items-center space-x-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 transition"
               title="Settings & Preferences"
+              aria-label="Settings"
             >
-              <SettingsIcon className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-              <span>Settings</span>
+              <SettingsIcon className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 shrink-0" />
+              <span className="hidden lg:inline">Settings</span>
             </Link>
 
             {user?.role === 'admin' && (
               <Link
                 to="/admin"
-                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/50 border border-purple-200 dark:border-purple-500/40 text-xs font-semibold text-purple-600 dark:text-purple-300 transition"
+                className="flex items-center space-x-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/50 border border-purple-200 dark:border-purple-500/40 text-xs font-semibold text-purple-600 dark:text-purple-300 transition"
                 title="Admin Portal"
+                aria-label="Admin Portal"
               >
-                <Shield className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                <span>Admin</span>
+                <Shield className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
+                <span className="hidden lg:inline">Admin</span>
               </Link>
             )}
 
             <div className="flex items-center space-x-2 pl-2 border-l border-slate-200 dark:border-slate-800 text-right">
-              <div>
+              <div className="hidden lg:block text-right">
                 <p className="text-xs font-semibold text-slate-900 dark:text-white leading-none">
                   {user?.displayName}
                 </p>
@@ -598,7 +658,10 @@ export default function DashboardPage() {
                   @{user?.username}
                 </p>
               </div>
-              <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800 border border-indigo-500/40 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-300 shrink-0">
+              <div
+                className="w-8 h-8 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800 border border-indigo-500/40 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-300 shrink-0"
+                title={`${user?.displayName} (@${user?.username})`}
+              >
                 {user?.avatarUrl ? (
                   <img
                     src={user.avatarUrl}
@@ -614,109 +677,151 @@ export default function DashboardPage() {
             <button
               onClick={handleLogout}
               disabled={loggingOut}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 dark:bg-slate-800 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 dark:hover:border-rose-500/30 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300 transition"
+              className="flex items-center space-x-1.5 px-2.5 lg:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 dark:bg-slate-800 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 dark:hover:border-rose-500/30 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300 transition"
+              title="Sign Out"
+              aria-label="Sign Out"
             >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>{loggingOut ? 'Signing out...' : 'Sign Out'}</span>
+              <LogOut className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden lg:inline">{loggingOut ? 'Signing out...' : 'Sign Out'}</span>
             </button>
           </div>
 
           {/* Mobile Menu Button for screens < md */}
           <button
             type="button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition"
-            aria-label="Toggle navigation menu"
+            onClick={() => setMobileMenuOpen(true)}
+            className="md:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition touch-target-44 flex items-center justify-center shrink-0"
+            aria-label="Open navigation menu"
           >
-            {mobileMenuOpen ? <CloseIcon className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            <Menu className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Mobile Dropdown Menu Sheet */}
+        {/* Mobile Slide-in Drawer Menu (< md) */}
         {mobileMenuOpen && (
           <>
             <div
-              className="fixed inset-0 z-30 bg-black/40 backdrop-blur-2xs md:hidden"
+              className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs md:hidden animate-in fade-in duration-200"
               onClick={() => setMobileMenuOpen(false)}
+              aria-hidden="true"
             />
-            <div className="absolute top-16 right-3 left-3 sm:left-auto sm:w-72 z-40 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-3 space-y-2 md:hidden animate-in fade-in slide-in-from-top-2 duration-150">
-              {/* User Profile Card */}
-              <div className="flex items-center space-x-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
-                <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800 border border-indigo-500/40 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-300 shrink-0">
-                  {user?.avatarUrl ? (
-                    <img
-                      src={user.avatarUrl}
-                      alt={user.displayName}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span>{user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}</span>
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                    {user?.displayName}
-                  </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                    @{user?.username}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-1 pt-1">
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setShowChannelBrowserModal(true);
-                  }}
-                  className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-                >
-                  <Compass className="w-4 h-4 text-indigo-500" />
-                  <span>Explore Channels</span>
-                </button>
-
-                <Link
-                  to="/profile"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-                >
-                  <UserIcon className="w-4 h-4 text-indigo-500" />
-                  <span>Profile</span>
-                </Link>
-
-                <Link
-                  to="/settings"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-                >
-                  <SettingsIcon className="w-4 h-4 text-slate-400" />
-                  <span>Settings</span>
-                </Link>
-
-                {user?.role === 'admin' && (
-                  <Link
-                    to="/admin"
+            <div className="fixed top-0 right-0 bottom-0 z-50 w-72 max-w-[85vw] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl p-4 flex flex-col justify-between overflow-y-auto md:hidden animate-in slide-in-from-right duration-200 pb-safe">
+              <div>
+                {/* Header row with title & close button */}
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Navigation</span>
+                  <button
+                    type="button"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 transition"
+                    className="p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 touch-target-44 flex items-center justify-center"
+                    aria-label="Close menu"
                   >
-                    <Shield className="w-4 h-4" />
-                    <span>Admin Portal</span>
-                  </Link>
-                )}
+                    <CloseIcon className="w-5 h-5" />
+                  </button>
+                </div>
 
-                <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
+                {/* User Profile Card */}
+                <div className="flex items-center space-x-3 p-3 mt-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800 border-2 border-indigo-500/40 flex items-center justify-center text-sm font-bold text-indigo-600 dark:text-indigo-300 shrink-0">
+                    {user?.avatarUrl ? (
+                      <img
+                        src={user.avatarUrl}
+                        alt={user.displayName}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span>{user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}</span>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                      {user?.displayName}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                      @{user?.username}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Daylight Toggle Row */}
+                <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Theme</span>
+                  <ThemeToggle showLabel={true} />
+                </div>
+
+                {/* Menu Links */}
+                <div className="space-y-1.5 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                  <Link
+                    to="/contacts"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Users className="w-4 h-4 text-indigo-500 shrink-0" />
+                      <span>Contacts</span>
+                    </div>
+                    {incomingRequests.length > 0 && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">
+                        {incomingRequests.length}
+                      </span>
+                    )}
+                  </Link>
+
                   <button
                     onClick={() => {
                       setMobileMenuOpen(false);
-                      void handleLogout();
+                      setShowChannelBrowserModal(true);
                     }}
-                    disabled={loggingOut}
-                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition"
+                    className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition text-left"
                   >
-                    <LogOut className="w-4 h-4" />
-                    <span>{loggingOut ? 'Signing out...' : 'Sign Out'}</span>
+                    <Compass className="w-4 h-4 text-indigo-500 shrink-0" />
+                    <span>Explore Channels</span>
                   </button>
+
+                  <Link
+                    to="/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                  >
+                    <UserIcon className="w-4 h-4 text-indigo-500 shrink-0" />
+                    <span>Profile</span>
+                  </Link>
+
+                  <Link
+                    to="/settings"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                  >
+                    <SettingsIcon className="w-4 h-4 text-slate-400 shrink-0" />
+                    <span>Settings</span>
+                  </Link>
+
+                  {user?.role === 'admin' && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 transition"
+                    >
+                      <Shield className="w-4 h-4 text-purple-500 shrink-0" />
+                      <span>Admin Portal</span>
+                    </Link>
+                  )}
                 </div>
+              </div>
+
+              {/* Sign Out Button */}
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    void handleLogout();
+                  }}
+                  disabled={loggingOut}
+                  className="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition"
+                >
+                  <LogOut className="w-4 h-4 shrink-0" />
+                  <span>{loggingOut ? 'Signing out...' : 'Sign Out'}</span>
+                </button>
               </div>
             </div>
           </>
@@ -729,8 +834,8 @@ export default function DashboardPage() {
         <aside
           role="region"
           aria-label="Conversations list"
-          className={`w-full sm:w-80 md:w-96 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 flex flex-col shrink-0 ${
-            activeChat ? 'hidden sm:flex' : 'flex'
+          className={`w-full md:w-80 lg:w-96 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 flex flex-col shrink-0 ${
+            activeChat ? 'hidden md:flex' : 'flex'
           }`}
         >
           {/* Sidebar Top Actions & Search */}
@@ -767,14 +872,14 @@ export default function DashboardPage() {
                 onChange={(e) => setChatSearch(e.target.value)}
                 placeholder="Search conversations..."
                 aria-label="Search conversations"
-                className="w-full pl-9 pr-14 py-2 bg-slate-100 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-xl text-base sm:text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                className="w-full pl-9 pr-10 sm:pr-14 py-2 bg-slate-100 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-xl text-base sm:text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
               />
               <button
                 type="button"
                 onClick={() => setShowGlobalSearch(true)}
                 title="Global Search (⌘K)"
                 aria-label="Global Search"
-                className="absolute right-2 px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-mono font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition"
+                className="hidden sm:inline-flex absolute right-2 px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-mono font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition"
               >
                 ⌘K
               </button>
@@ -819,31 +924,31 @@ export default function DashboardPage() {
                 return (
                   <button
                     key={chat.id}
-                    onClick={() => void selectChat(chat.id)}
-                    className={`w-full text-left p-3.5 flex items-start space-x-3 transition-colors ${
+                    onClick={() => void handleSelectChat(chat.id)}
+                    className={`w-full text-left p-3 sm:p-3.5 flex items-start space-x-3 transition-colors ${
                       isSelected
                         ? 'bg-indigo-50/80 dark:bg-indigo-950/40 border-l-4 border-indigo-600'
                         : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'
                     }`}
                   >
-                    {/* Avatar Icon */}
+                    {/* Avatar Icon (48px on mobile, 44px on sm+) */}
                     <div className="relative shrink-0">
                       {chat.type === 'channel' ? (
-                        <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-violet-500/20 to-purple-500/20 border border-violet-500/30 text-violet-600 dark:text-violet-400 flex items-center justify-center font-bold text-lg shadow-xs">
+                        <div className="w-12 h-12 sm:w-11 sm:h-11 rounded-2xl sm:rounded-xl bg-gradient-to-tr from-violet-500/20 to-purple-500/20 border border-violet-500/30 text-violet-600 dark:text-violet-400 flex items-center justify-center font-bold text-lg shadow-xs">
                           <Hash className="w-5 h-5" />
                         </div>
                       ) : chat.type === 'group' ? (
-                        <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-indigo-500/20 to-sky-500/20 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-base shadow-xs">
+                        <div className="w-12 h-12 sm:w-11 sm:h-11 rounded-2xl sm:rounded-xl bg-gradient-to-tr from-indigo-500/20 to-sky-500/20 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-base shadow-xs">
                           <Users className="w-5 h-5" />
                         </div>
                       ) : chat.avatarUrl ? (
                         <img
                           src={chat.avatarUrl}
                           alt={chat.name || 'Chat'}
-                          className="w-11 h-11 rounded-xl object-cover border border-slate-200 dark:border-slate-700"
+                          className="w-12 h-12 sm:w-11 sm:h-11 rounded-2xl sm:rounded-xl object-cover border border-slate-200 dark:border-slate-700"
                         />
                       ) : (
-                        <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-base shadow-xs">
+                        <div className="w-12 h-12 sm:w-11 sm:h-11 rounded-2xl sm:rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-base shadow-xs">
                           {chat.name ? chat.name.charAt(0).toUpperCase() : 'C'}
                         </div>
                       )}
@@ -906,19 +1011,19 @@ export default function DashboardPage() {
           role="region"
           aria-label="Active conversation"
           className={`flex-1 flex flex-col bg-slate-100/60 dark:bg-slate-950 overflow-hidden ${
-            activeChat ? 'flex' : 'hidden sm:flex'
+            activeChat ? 'flex' : 'hidden md:flex'
           }`}
         >
           {activeChat ? (
             <>
               {/* Active Chat Header */}
-              <div className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between shrink-0">
+              <div className="h-14 sm:h-16 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between shrink-0">
                 <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
                   {/* Mobile Back Button to conversation list */}
                   <button
                     type="button"
-                    onClick={() => void selectChat(null)}
-                    className="sm:hidden p-2 -ml-1 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                    onClick={() => void handleSelectChat(null)}
+                    className="md:hidden p-2 -ml-1 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition touch-target-44 flex items-center justify-center shrink-0"
                     aria-label="Back to conversations list"
                   >
                     <ArrowLeft className="w-5 h-5" />
@@ -1576,7 +1681,7 @@ export default function DashboardPage() {
                   </div>
                 )}
 
-                <form onSubmit={handleSendMessage} className="flex items-center space-x-2">
+                <form onSubmit={handleSendMessage} className="flex items-end space-x-1.5 sm:space-x-2">
                   {/* Hidden file input */}
                   <input
                     type="file"
@@ -1586,39 +1691,94 @@ export default function DashboardPage() {
                     accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt,.zip"
                   />
 
-                  {/* Attachment Button */}
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isSending || isUploadingMedia}
-                    className="p-2.5 rounded-xl text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition shrink-0"
-                    title="Attach file or photo"
-                  >
-                    <Paperclip className="w-4 h-4" />
-                  </button>
+                  {/* Mobile Collapsed Action Menu (< sm) */}
+                  <div className="relative sm:hidden shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setShowMobileActionsMenu(!showMobileActionsMenu)}
+                      disabled={isSending || isUploadingMedia}
+                      className={`p-2.5 rounded-xl transition touch-target-44 flex items-center justify-center shrink-0 ${
+                        showMobileActionsMenu
+                          ? 'bg-indigo-600 text-white rotate-45'
+                          : 'text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                      title="More actions"
+                      aria-label="Add attachment or emoji"
+                    >
+                      <Plus className="w-5 h-5 transition-transform" />
+                    </button>
 
-                  {/* Emoji Picker Button */}
-                  <button
-                    type="button"
-                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                    disabled={isSending || isUploadingMedia}
-                    className={`p-2.5 rounded-xl transition shrink-0 ${
-                      showEmojiPicker
-                        ? 'bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400'
-                        : 'text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
-                    title="Insert emoji"
-                  >
-                    <Smile className="w-4 h-4" />
-                  </button>
+                    {showMobileActionsMenu && (
+                      <div className="absolute bottom-12 left-0 z-30 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl p-1.5 flex flex-col space-y-1 min-w-[170px] animate-in fade-in slide-in-from-bottom-2 duration-150">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowMobileActionsMenu(false);
+                            fileInputRef.current?.click();
+                          }}
+                          className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                        >
+                          <Paperclip className="w-4 h-4 text-indigo-500 shrink-0" />
+                          <span>Attach Media / File</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowMobileActionsMenu(false);
+                            setShowEmojiPicker(true);
+                          }}
+                          className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                        >
+                          <Smile className="w-4 h-4 text-amber-500 shrink-0" />
+                          <span>Insert Emoji</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
 
-                  <input
+                  {/* Desktop & Tablet attachment/emoji buttons (sm:flex) */}
+                  <div className="hidden sm:flex items-center space-x-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isSending || isUploadingMedia}
+                      className="p-2.5 rounded-xl text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition shrink-0"
+                      title="Attach file or photo"
+                      aria-label="Attach file or photo"
+                    >
+                      <Paperclip className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                      disabled={isSending || isUploadingMedia}
+                      className={`p-2.5 rounded-xl transition shrink-0 ${
+                        showEmojiPicker
+                          ? 'bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400'
+                          : 'text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                      title="Insert emoji"
+                      aria-label="Insert emoji"
+                    >
+                      <Smile className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Auto-growing message textarea */}
+                  <textarea
                     ref={messageInputRef}
-                    type="text"
+                    rows={1}
                     value={messageInput}
-                    onChange={handleInputChange}
+                    onChange={(e) => {
+                      handleInputChange(e);
+                      e.target.style.height = 'auto';
+                      e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+                    }}
                     onKeyDown={(e) => {
-                      if (e.key === 'Escape') {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        void handleSendMessage(e);
+                      } else if (e.key === 'Escape') {
                         if (editingMessage) {
                           setEditingMessage(null);
                           setMessageInput('');
@@ -1630,20 +1790,23 @@ export default function DashboardPage() {
                     }}
                     placeholder={
                       editingMessage
-                        ? 'Editing message... (Press Enter to save, Esc to cancel)'
+                        ? 'Editing message... (Enter to save, Esc to cancel)'
                         : activeChat.type === 'channel'
                         ? `Message #${activeChat.name}...`
                         : activeChat.type === 'group'
                         ? `Message ${activeChat.name}...`
                         : 'Type a message... (Press Enter to send)'
                     }
-                    className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                    className="flex-1 px-3 sm:px-4 py-2.5 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-base sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition resize-none max-h-32 overflow-y-auto leading-relaxed"
+                    style={{ minHeight: '44px' }}
                   />
+
                   <button
                     type="submit"
                     disabled={(!messageInput.trim() && !stagedFile) || isSending || isUploadingMedia}
-                    className="p-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:hover:bg-indigo-600 text-white shadow-md shadow-indigo-600/20 transition shrink-0"
+                    className="p-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:hover:bg-indigo-600 text-white shadow-md shadow-indigo-600/20 transition touch-target-44 flex items-center justify-center shrink-0 self-end"
                     title="Send Message"
+                    aria-label="Send Message"
                   >
                     {isUploadingMedia ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -1655,8 +1818,8 @@ export default function DashboardPage() {
               </div>
             </>
           ) : (
-            /* Empty State when no chat is selected */
-            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+            /* Empty State when no chat is selected (Tablet & Desktop only; hidden on mobile) */
+            <div className="hidden md:flex flex-1 flex-col items-center justify-center p-8 text-center">
               <div className="w-16 h-16 rounded-3xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-4 shadow-lg shadow-indigo-500/10">
                 <MessageSquare className="w-8 h-8" />
               </div>
@@ -1696,6 +1859,79 @@ export default function DashboardPage() {
           onClose={() => setShowGroupDrawer(false)}
         />
       </div>
+
+      {/* Mobile Floating Action Button (New Chat/Group) */}
+      {!activeChat && (
+        <button
+          type="button"
+          onClick={() => setShowCreateGroupModal(true)}
+          className="md:hidden fixed right-4 bottom-20 z-20 w-13 h-13 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white shadow-xl shadow-indigo-600/30 flex items-center justify-center touch-target-44 hover:scale-105 active:scale-95 transition"
+          aria-label="New Conversation or Group"
+          title="New Conversation or Group"
+        >
+          <Plus className="w-6 h-6" />
+        </button>
+      )}
+
+      {/* Mobile Bottom Tab Bar (shown when conversations list is visible) */}
+      {!activeChat && (
+        <nav
+          className="md:hidden border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md pb-safe shrink-0 z-20"
+          aria-label="Mobile Navigation"
+        >
+          <div className="grid grid-cols-5 h-14">
+            <button
+              type="button"
+              className="flex flex-col items-center justify-center text-indigo-600 dark:text-indigo-400 touch-target-44"
+              aria-label="Chats"
+            >
+              <MessageSquare className="w-5 h-5" />
+              <span className="text-[10px] font-semibold mt-0.5">Chats</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowCallHistoryModal(true)}
+              className="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 touch-target-44"
+              aria-label="Calls"
+            >
+              <PhoneCall className="w-5 h-5" />
+              <span className="text-[10px] font-semibold mt-0.5">Calls</span>
+            </button>
+            <Link
+              to="/contacts"
+              className="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 relative touch-target-44"
+              aria-label="Contacts"
+            >
+              <div className="relative">
+                <Users className="w-5 h-5" />
+                {incomingRequests.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-amber-500 text-white rounded-full text-[9px] font-bold flex items-center justify-center animate-pulse">
+                    {incomingRequests.length}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] font-semibold mt-0.5">Contacts</span>
+            </Link>
+            <button
+              type="button"
+              onClick={() => setShowChannelBrowserModal(true)}
+              className="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 touch-target-44"
+              aria-label="Explore Channels"
+            >
+              <Compass className="w-5 h-5" />
+              <span className="text-[10px] font-semibold mt-0.5">Explore</span>
+            </button>
+            <Link
+              to="/profile"
+              className="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 touch-target-44"
+              aria-label="Profile"
+            >
+              <UserIcon className="w-5 h-5" />
+              <span className="text-[10px] font-semibold mt-0.5">Profile</span>
+            </Link>
+          </div>
+        </nav>
+      )}
 
       {/* Lightbox Image Preview Modal */}
       {lightboxImageUrl && (
