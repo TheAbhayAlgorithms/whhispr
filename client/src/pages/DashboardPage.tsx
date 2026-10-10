@@ -6,8 +6,8 @@ import { useContactStore } from '../store/useContactStore';
 import { useSocketStore } from '../store/useSocketStore';
 import { useProfileStore } from '../store/useProfileStore';
 import { UserProfileModal } from '../components/UserProfileModal';
-import { ThemeToggle } from '../components/ThemeToggle';
 import { CreateGroupModal } from '../components/CreateGroupModal';
+import { ComeOverLogo } from '../components/ComeOverLogo';
 import { GroupDetailsDrawer } from '../components/GroupDetailsDrawer';
 import { UserSearchModal } from '../components/UserSearchModal';
 import { ContactRequestsModal } from '../components/ContactRequestsModal';
@@ -44,8 +44,6 @@ import {
 import WarmTooltip, { WarmTooltipGroup } from '@/components/ui/WarmTooltip';
 import {
   MessageSquare,
-  LogOut,
-  User as UserIcon,
   Users,
   Bell,
   Search,
@@ -75,7 +73,6 @@ import {
   Clock,
   AlertTriangle,
   MessageSquarePlus,
-  Menu,
   Pin,
   Sparkles,
   ArrowUp,
@@ -131,7 +128,7 @@ const QUICK_REACTIONS = ['❤️', '👍', '😂', '😮', '😢', '🙏', '🔥
 export default function DashboardPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const {
     chats,
     activeChatId,
@@ -172,10 +169,8 @@ export default function DashboardPage() {
   const [messageInput, setMessageInput] = useState('');
   const [bannerNotice, setBannerNotice] = useState<string | null>(null);
   const [chatSearch, setChatSearch] = useState('');
-  const [loggingOut, setLoggingOut] = useState(false);
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
   const [showGroupDrawer, setShowGroupDrawer] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showMobileActionsMenu, setShowMobileActionsMenu] = useState(false);
 
   // Synchronize URL search param `?chat=id` with activeChatId for back navigation
@@ -429,11 +424,6 @@ export default function DashboardPage() {
     toggleNotificationCenter,
   ]);
 
-  const handleLogout = async () => {
-    setLoggingOut(true);
-    await logout();
-  };
-
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setStagedFile(e.target.files[0]);
@@ -642,106 +632,73 @@ export default function DashboardPage() {
 
   return (
     <div className="h-screen h-dvh bg-[#191A1A] text-[#EDEDED] flex flex-col overflow-hidden transition-colors duration-200">
-      {/* Top Navbar Only */}
-      <WarmTooltipGroup delay={200} warmWindow={300} travel={220} lean={0}>
-        <header className="h-14 sm:h-16 w-full border-b border-[#2C2E2E] bg-[#141515] px-3 sm:px-5 lg:px-6 flex items-center justify-between shrink-0 z-30 select-none shadow-xs">
-          {/* Left: Brand */}
-          <div className="flex items-center space-x-3 shrink-0 min-w-0">
-            <button
-              type="button"
-              onClick={() => void handleSelectChat(null)}
-              className="flex items-center space-x-2.5 group cursor-pointer focus:outline-none"
-              aria-label="Whhispr Home"
-            >
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#20B2AA] flex items-center justify-center text-black shadow-md shadow-[#20B2AA]/20 group-hover:scale-105 active:scale-95 transition shrink-0 font-bold">
-                <MessageSquare className="w-5 h-5 fill-current text-black" />
-              </div>
-              <div className="flex flex-col text-left">
-                <span className="text-base font-bold tracking-tight text-[#EDEDED] leading-tight">
-                  Whhispr
-                </span>
-                <span className="text-[10px] font-medium text-[#9EA3A3] hidden sm:inline">
-                  Secure Messaging
-                </span>
-              </div>
-            </button>
-          </div>
-
-          {/* Right: Tools, Theme Toggle, Profile, Sign Out */}
-          <div className="flex items-center space-x-1.5 sm:space-x-2.5">
-            {/* User Search Trigger (Directly and only searches users by username) */}
-            <WarmTooltip content="Search users by @username" shortcut="⌘K" side="bottom">
+      {/* Top Navbar with Smooth Curved Island Separation */}
+      <div className="pt-2.5 sm:pt-3 px-2.5 sm:px-3 shrink-0">
+        <WarmTooltipGroup delay={200} warmWindow={300} travel={220} lean={0}>
+          <header className="h-14 sm:h-16 w-full rounded-2xl border border-[#2C2E2E] bg-[#141515] px-3 sm:px-5 lg:px-6 flex items-center justify-between shrink-0 z-30 select-none shadow-sm">
+            {/* Left: Brand */}
+            <div className="flex items-center space-x-3 shrink-0 min-w-0">
               <button
                 type="button"
-                onClick={() => setShowUserSearchModal(true)}
-                className="w-9 h-9 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED] flex items-center justify-center transition cursor-pointer active:scale-95"
-                aria-label="Search users by username"
+                onClick={() => void handleSelectChat(null)}
+                className="flex items-center space-x-2.5 group cursor-pointer focus:outline-none"
+                aria-label="ComeOver Home"
               >
-                <Search className="w-4 h-4" />
+                <ComeOverLogo className="w-9 h-9 sm:w-10 sm:h-10 group-hover:scale-105 active:scale-95 transition shrink-0" />
+                <div className="flex flex-col text-left">
+                  <span className="text-base font-bold tracking-tight text-[#EDEDED] leading-tight">
+                    ComeOver
+                  </span>
+                  <span className="text-[10px] font-medium text-[#9EA3A3] hidden sm:inline">
+                    Secure Messaging
+                  </span>
+                </div>
               </button>
-            </WarmTooltip>
-
-            {/* Direct Contacts Button with Drop box */}
-            <div className="relative">
-              <WarmTooltip content="Contacts" shortcut="⌘2" side="bottom">
-                <button
-                  type="button"
-                  onClick={() => setShowContactsDropdown((prev) => !prev)}
-                  className={`relative w-9 h-9 rounded-xl border transition cursor-pointer active:scale-95 flex items-center justify-center ${
-                    showContactsDropdown
-                      ? 'bg-[#20B2AA]/20 border-[#20B2AA] text-[#20B2AA]'
-                      : 'bg-[#202222] hover:bg-[#262828] border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED]'
-                  }`}
-                  aria-label="Contacts"
-                >
-                  <Users className="w-4 h-4 text-[#20B2AA]" />
-                </button>
-              </WarmTooltip>
-
-              {/* Contacts Dropbox Panel */}
-              <ContactsDropdown
-                isOpen={showContactsDropdown}
-                onClose={() => setShowContactsDropdown(false)}
-                onOpenSearchModal={() => setShowUserSearchModal(true)}
-              />
             </div>
 
-            {/* Requests Option: Beside contacts, shown ONLY when there is a request, otherwise not displayed */}
-            {incomingRequests.length > 0 && (
-              <WarmTooltip content={`New Requests (${incomingRequests.length})`} side="bottom">
+            {/* Right: Exactly Search, Contacts, Settings, Notifications, and Profile Logo */}
+            <div className="flex items-center space-x-1.5 sm:space-x-2.5">
+              {/* 1. Search Users */}
+              <WarmTooltip content="Search users by @username" shortcut="⌘K" side="bottom">
                 <button
                   type="button"
-                  onClick={() => setShowContactRequestsModal(true)}
-                  className="relative h-9 px-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-500 flex items-center space-x-1.5 transition cursor-pointer active:scale-95 animate-pulse"
-                  aria-label="New Contact Requests"
+                  onClick={() => setShowUserSearchModal(true)}
+                  className="w-9 h-9 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED] flex items-center justify-center transition cursor-pointer active:scale-95"
+                  aria-label="Search users by username"
                 >
-                  <Clock className="w-4 h-4 text-amber-500" />
-                  <span className="text-xs font-bold text-amber-500">
-                    {incomingRequests.length}
-                  </span>
+                  <Search className="w-4 h-4" />
                 </button>
               </WarmTooltip>
-            )}
 
-            {/* Notifications Bell */}
-            <WarmTooltip content="Notifications" shortcut="⌘4" side="bottom">
-              <button
-                type="button"
-                onClick={() => toggleNotificationCenter()}
-                className="relative w-9 h-9 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED] flex items-center justify-center transition cursor-pointer active:scale-95"
-                aria-label="Notifications"
-              >
-                <Bell className="w-4 h-4" />
-                {unreadNotificationsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[#20B2AA] text-black rounded-full text-[10px] font-bold flex items-center justify-center animate-pulse shadow-xs">
-                    {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
-                  </span>
-                )}
-              </button>
-            </WarmTooltip>
+              {/* 2. Direct Contacts Button with Drop box */}
+              <div className="relative">
+                <WarmTooltip content="Contacts" shortcut="⌘2" side="bottom">
+                  <button
+                    type="button"
+                    onClick={() => setShowContactsDropdown((prev) => !prev)}
+                    className={`relative w-9 h-9 rounded-xl border transition cursor-pointer active:scale-95 flex items-center justify-center ${
+                      showContactsDropdown
+                        ? 'bg-[#20B2AA]/20 border-[#20B2AA] text-[#20B2AA]'
+                        : 'bg-[#202222] hover:bg-[#262828] border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED]'
+                    }`}
+                    aria-label="Contacts"
+                  >
+                    <Users className="w-4 h-4 text-[#20B2AA]" />
+                    {incomingRequests.length > 0 && (
+                      <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400 ring-2 ring-[#141515] animate-pulse" />
+                    )}
+                  </button>
+                </WarmTooltip>
 
-            {/* Settings Link (Desktop) */}
-            <div className="hidden sm:block">
+                {/* Contacts Dropbox Panel */}
+                <ContactsDropdown
+                  isOpen={showContactsDropdown}
+                  onClose={() => setShowContactsDropdown(false)}
+                  onOpenSearchModal={() => setShowUserSearchModal(true)}
+                />
+              </div>
+
+              {/* 3. Settings Link */}
               <WarmTooltip content="Settings" shortcut="⌘," side="bottom">
                 <Link
                   to="/settings"
@@ -751,218 +708,45 @@ export default function DashboardPage() {
                   <SettingsIcon className="w-4 h-4" />
                 </Link>
               </WarmTooltip>
-            </div>
 
-            {/* Admin Portal (if admin) */}
-            {user?.role === 'admin' && (
-              <div className="hidden sm:block">
-                <WarmTooltip content="Admin Portal" shortcut="⌘A" side="bottom">
-                  <Link
-                    to="/admin"
-                    className="w-9 h-9 rounded-xl bg-[#1D2B29] hover:bg-[#253B37] border border-[#25423E] text-[#20B2AA] flex items-center justify-center transition active:scale-95"
-                    aria-label="Admin Portal"
-                  >
-                    <Shield className="w-4 h-4" />
-                  </Link>
-                </WarmTooltip>
-              </div>
-            )}
-
-            {/* Daylight / Dark Theme Toggle Button */}
-            <WarmTooltip content="Toggle Theme" side="bottom">
-              <div>
-                <ThemeToggle size="sm" />
-              </div>
-            </WarmTooltip>
-
-            {/* User Profile Avatar with socket live indicator */}
-            <WarmTooltip content={user?.displayName || 'Your Profile'} shortcut="⌘P" side="bottom">
-              <button
-                type="button"
-                onClick={() => user && fetchUserProfile(user.id)}
-                className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-[#20B2AA]/40 hover:border-[#20B2AA] shadow-sm transition active:scale-95 cursor-pointer shrink-0"
-                aria-label={`${user?.displayName} (@${user?.username})`}
-              >
-                {user?.avatarUrl ? (
-                  <img src={user.avatarUrl} alt={user.displayName} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-[#20B2AA] text-black font-bold flex items-center justify-center text-xs">
-                    {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
-                  </div>
-                )}
-              </button>
-            </WarmTooltip>
-
-            {/* Sign Out (Desktop) */}
-            <div className="hidden sm:block">
-              <WarmTooltip content="Sign Out" shortcut="⌥Q" side="bottom">
+              {/* 4. Notifications Bell */}
+              <WarmTooltip content="Notifications" shortcut="⌘4" side="bottom">
                 <button
                   type="button"
-                  onClick={handleLogout}
-                  disabled={loggingOut}
-                  className="w-9 h-9 rounded-xl bg-[#202222] hover:bg-rose-950/30 border border-[#2D3030] hover:border-rose-900/40 text-[#9EA3A3] hover:text-rose-400 flex items-center justify-center transition active:scale-95 cursor-pointer"
-                  aria-label="Sign Out"
+                  onClick={() => toggleNotificationCenter()}
+                  className="relative w-9 h-9 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED] flex items-center justify-center transition cursor-pointer active:scale-95"
+                  aria-label="Notifications"
                 >
-                  <LogOut className="w-4 h-4" />
+                  <Bell className="w-4 h-4" />
+                  {unreadNotificationsCount > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[#20B2AA] text-black rounded-full text-[10px] font-bold flex items-center justify-center animate-pulse shadow-xs">
+                      {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                    </span>
+                  )}
+                </button>
+              </WarmTooltip>
+
+              {/* 5. User Profile Logo / Avatar */}
+              <WarmTooltip content={user?.displayName || 'Your Profile'} shortcut="⌘P" side="bottom">
+                <button
+                  type="button"
+                  onClick={() => user && fetchUserProfile(user.id)}
+                  className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-[#20B2AA]/40 hover:border-[#20B2AA] shadow-sm transition active:scale-95 cursor-pointer shrink-0"
+                  aria-label={`${user?.displayName} (@${user?.username})`}
+                >
+                  {user?.avatarUrl ? (
+                    <img src={user.avatarUrl} alt={user.displayName} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-[#20B2AA] text-black font-bold flex items-center justify-center text-xs">
+                      {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                  )}
                 </button>
               </WarmTooltip>
             </div>
-
-            {/* Mobile Menu Dropdown Toggle (< md) */}
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen((prev) => !prev)}
-              className="md:hidden w-9 h-9 rounded-xl bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED] transition flex items-center justify-center shrink-0 active:scale-95"
-              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-              aria-expanded={mobileMenuOpen}
-            >
-              {mobileMenuOpen ? (
-                <CloseIcon className="w-4 h-4" />
-              ) : (
-                <Menu className="w-4 h-4" />
-              )}
-            </button>
-          </div>
-
-          {/* Mobile Dropdown Menu (< md) */}
-          {mobileMenuOpen && (
-            <>
-              <div
-                className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs md:hidden animate-in fade-in duration-150"
-                onClick={() => setMobileMenuOpen(false)}
-                aria-hidden="true"
-              />
-              <div className="fixed top-16 right-3 z-50 w-72 max-w-[calc(100vw-24px)] bg-[#141515] border border-[#2C2E2E] rounded-2xl shadow-2xl p-2.5 flex flex-col md:hidden animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-150 origin-top-right max-h-[calc(100dvh-4.5rem)] overflow-y-auto">
-                {/* User Profile Card */}
-                <div className="flex items-center space-x-2.5 p-2 rounded-xl bg-[#202222] border border-[#2D3030]">
-                  <div className="w-9 h-9 rounded-full overflow-hidden bg-[#262828] border-2 border-[#20B2AA]/40 flex items-center justify-center text-xs font-bold text-[#20B2AA] shrink-0">
-                    {user?.avatarUrl ? (
-                      <img
-                        src={user.avatarUrl}
-                        alt={user.displayName}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span>{user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}</span>
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-bold text-[#EDEDED] truncate">
-                      {user?.displayName}
-                    </p>
-                    <p className="text-[11px] text-[#9EA3A3] truncate">
-                      @{user?.username}
-                    </p>
-                  </div>
-                  {user?.role === 'admin' && (
-                    <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 bg-[#20B2AA]/15 text-[#20B2AA] border border-[#20B2AA]/30 rounded-md shrink-0">
-                      Admin
-                    </span>
-                  )}
-                </div>
-
-                {/* Theme Toggle Row */}
-                <div className="mt-2 px-2.5 py-2 rounded-xl bg-[#202222] border border-[#2D3030] flex items-center justify-between">
-                  <span className="text-xs font-medium text-[#EDEDED]">Theme</span>
-                  <ThemeToggle showLabel={true} />
-                </div>
-
-                {/* Menu Links */}
-                <div className="mt-2 pt-1.5 border-t border-[#2C2E2E] space-y-0.5">
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setShowCallHistoryModal(true);
-                    }}
-                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#EDEDED] hover:bg-[#202222] transition text-left active:scale-[0.99]"
-                  >
-                    <PhoneCall className="w-4 h-4 text-[#20B2AA] shrink-0" />
-                    <span>Calls</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setShowContactsDropdown(true);
-                    }}
-                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-[#EDEDED] hover:bg-[#202222] transition active:scale-[0.99] text-left cursor-pointer"
-                  >
-                    <div className="flex items-center space-x-2.5">
-                      <Users className="w-4 h-4 text-[#20B2AA] shrink-0" />
-                      <span>Contacts</span>
-                    </div>
-                  </button>
-
-                  {incomingRequests.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        setShowContactRequestsModal(true);
-                      }}
-                      className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 transition active:scale-[0.99]"
-                    >
-                      <div className="flex items-center space-x-2.5">
-                        <Clock className="w-4 h-4 text-amber-400 shrink-0" />
-                        <span>Requests</span>
-                      </div>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-black">
-                        {incomingRequests.length}
-                      </span>
-                    </button>
-                  )}
-
-
-                  <Link
-                    to="/profile"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#EDEDED] hover:bg-[#202222] transition active:scale-[0.99]"
-                  >
-                    <UserIcon className="w-4 h-4 text-[#20B2AA] shrink-0" />
-                    <span>Profile</span>
-                  </Link>
-
-                  <Link
-                    to="/settings"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#EDEDED] hover:bg-[#202222] transition active:scale-[0.99]"
-                  >
-                    <SettingsIcon className="w-4 h-4 text-[#9EA3A3] shrink-0" />
-                    <span>Settings</span>
-                  </Link>
-
-                  {user?.role === 'admin' && (
-                    <Link
-                      to="/admin"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#20B2AA] hover:bg-[#1D2B29] transition active:scale-[0.99]"
-                    >
-                      <Shield className="w-4 h-4 text-[#20B2AA] shrink-0" />
-                      <span>Admin Portal</span>
-                    </Link>
-                  )}
-                </div>
-
-                {/* Sign Out Button */}
-                <div className="mt-1.5 pt-1.5 border-t border-[#2C2E2E]">
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      void handleLogout();
-                    }}
-                    disabled={loggingOut}
-                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-950/30 transition active:scale-[0.99]"
-                  >
-                    <LogOut className="w-4 h-4 shrink-0" />
-                    <span>{loggingOut ? 'Signing out...' : 'Sign Out'}</span>
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
-        </header>
-      </WarmTooltipGroup>
+          </header>
+        </WarmTooltipGroup>
+      </div>
 
       {/* Real-time offline and reconnect status bar */}
       <OfflineBanner />
@@ -977,32 +761,8 @@ export default function DashboardPage() {
               activeChat ? 'hidden md:flex' : 'flex'
             }`}
           >
-            {/* Sidebar Header & Search */}
-            <div className="p-3 sm:p-3.5 border-b border-[#2C2E2E] space-y-3">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xs font-semibold tracking-wider text-[#9EA3A3] uppercase">
-                  Threads
-                </h2>
-                <div className="flex items-center space-x-1.5">
-                  <button
-                    onClick={() => setShowCallHistoryModal(true)}
-                    className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#EDEDED] text-xs font-medium shadow-2xs transition cursor-pointer"
-                    title="View Call History"
-                  >
-                    <PhoneCall className="w-3.5 h-3.5 text-[#20B2AA]" />
-                    <span>Calls</span>
-                  </button>
-                  <button
-                    onClick={() => setShowCreateGroupModal(true)}
-                    className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-[#20B2AA] hover:bg-[#1CA099] text-black text-xs font-semibold shadow-xs transition cursor-pointer active:scale-95"
-                    title="Create Group or Channel"
-                  >
-                    <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                    <span>New</span>
-                  </button>
-                </div>
-              </div>
-
+            {/* Sidebar Search Bar */}
+            <div className="p-3 sm:p-3.5 border-b border-[#2C2E2E]">
               {/* Search Bar */}
               <div className="relative flex items-center">
                 <Search className="w-4 h-4 text-[#737878] absolute left-3.5 top-2.5 pointer-events-none" />
@@ -1049,7 +809,7 @@ export default function DashboardPage() {
                     <EmptyState
                       icon={<MessageSquarePlus className="w-7 h-7" />}
                       title="No active chats yet"
-                      description="Connect with contacts or explore public channels to begin chatting securely on Whhispr!"
+                      description="Connect with contacts or explore public channels to begin chatting securely on ComeOver!"
                       actionText="Find Contacts"
                       actionIcon={<Users className="w-4 h-4" />}
                       onAction={() => navigate('/contacts')}

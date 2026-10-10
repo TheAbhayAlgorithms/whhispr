@@ -59,7 +59,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               Something went wrong
             </h1>
             <p className="text-sm text-[#9EA3A3] mb-6 max-w-sm">
-              An unexpected render error occurred in Whhispr. Your messages and account remain safe and intact.
+              An unexpected render error occurred in ComeOver. Your messages and account remain safe and intact.
             </p>
 
             {/* Action Buttons */}
@@ -70,7 +70,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                 className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-[#20B2AA] hover:bg-[#1CA099] text-black font-semibold text-xs transition flex items-center justify-center space-x-2 shadow-xs cursor-pointer"
               >
                 <RefreshCw className="w-4 h-4" />
-                <span>Reload Whhispr</span>
+                <span>Reload ComeOver</span>
               </button>
 
               <button

@@ -272,23 +272,26 @@ export function UserProfileModal({
         className="bg-white dark:bg-[#141515] border border-[#E5E5E3] dark:border-[#2C2E2E] rounded-3xl sm:rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative animate-scale-up max-h-[90vh] sm:max-h-[85vh] flex flex-col my-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Banner with subtle Perplexity gradient */}
-        <div className="h-24 sm:h-28 bg-gradient-to-r from-[#F3F3F2] via-[#E6F7F6] to-[#F3F3F2] dark:from-[#191A1A] dark:via-[#1D2B29] dark:to-[#191A1A] border-b border-[#E5E5E3] dark:border-[#2C2E2E] relative shrink-0">
+        {/* Sleek Top Header Bar */}
+        <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 border-b border-[#E5E5E3] dark:border-[#2C2E2E] bg-[#FAFAF9] dark:bg-[#191A1A] shrink-0">
+          <span className="text-xs font-semibold tracking-wider uppercase text-[#737878] dark:text-[#9EA3A3]">
+            {isSelf ? 'My Profile' : 'User Profile'}
+          </span>
           <button
             onClick={onClose}
             aria-label="Close profile"
-            className="absolute top-3 right-3 sm:top-4 sm:right-4 min-w-[36px] min-h-[36px] w-9 h-9 sm:w-8 sm:h-8 rounded-full bg-white/80 dark:bg-[#141515]/70 hover:bg-white dark:hover:bg-[#141515] border border-[#E5E5E3] dark:border-[#2C2E2E] text-[#737878] dark:text-[#9EA3A3] hover:text-[#191A1A] dark:hover:text-[#EDEDED] flex items-center justify-center transition active:scale-95 cursor-pointer shadow-xs"
+            className="w-8 h-8 rounded-full bg-white dark:bg-[#202222] hover:bg-[#F3F3F2] dark:hover:bg-[#262828] border border-[#E5E5E3] dark:border-[#2C2E2E] text-[#737878] dark:text-[#9EA3A3] hover:text-[#191A1A] dark:hover:text-[#EDEDED] flex items-center justify-center transition active:scale-95 cursor-pointer shadow-2xs"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Profile Details Container - generous bottom padding, no pb-safe clipping */}
-        <div className="px-5 sm:px-6 pt-0 pb-8 sm:pb-8 overflow-y-auto flex-1 bg-white dark:bg-[#141515]">
+        {/* Profile Details Container - clear and structured */}
+        <div className="px-5 sm:px-6 pt-5 pb-6 overflow-y-auto flex-1 bg-white dark:bg-[#141515]">
           {/* Avatar and Badges / Pencil Button */}
-          <div className="-mt-12 mb-4 flex justify-between items-end">
+          <div className="mb-4 flex justify-between items-end">
             <div className="relative group">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-[#F3F3F2] dark:bg-[#202222] border-4 border-white dark:border-[#141515] flex items-center justify-center text-2xl sm:text-3xl font-bold text-[#20B2AA] shadow-xl shrink-0">
+              <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-full overflow-hidden bg-[#F3F3F2] dark:bg-[#202222] border-2 border-[#20B2AA]/50 flex items-center justify-center text-2xl font-bold text-[#20B2AA] shadow-md shrink-0">
                 {profile.avatarUrl ? (
                   <img
                     src={profile.avatarUrl}

@@ -200,7 +200,7 @@ export default function AdminPage() {
           </div>
           <h2 className="text-xl font-bold text-[#191A1A] dark:text-[#EDEDED] mb-2">Access Denied</h2>
           <p className="text-sm text-[#737878] dark:text-[#9EA3A3] mb-6">
-            You do not have Administrator permissions to access the Whhispr Admin Portal.
+            You do not have Administrator permissions to access the ComeOver Admin Portal.
           </p>
           <button
             onClick={() => navigate('/')}

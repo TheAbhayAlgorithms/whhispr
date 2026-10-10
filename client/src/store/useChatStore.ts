@@ -107,7 +107,7 @@ interface ChatStoreState {
 const getInitialPinnedChats = (): string[] => {
   if (typeof window === 'undefined') return [];
   try {
-    const raw = localStorage.getItem('whhispr_pinned_chats');
+    const raw = localStorage.getItem('comeover_pinned_chats') || localStorage.getItem('whhispr_pinned_chats');
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -139,7 +139,7 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
       ? current.filter((id) => id !== chatId)
       : [chatId, ...current];
     try {
-      localStorage.setItem('whhispr_pinned_chats', JSON.stringify(next));
+      localStorage.setItem('comeover_pinned_chats', JSON.stringify(next));
     } catch {}
     set({ pinnedChatIds: next });
   },

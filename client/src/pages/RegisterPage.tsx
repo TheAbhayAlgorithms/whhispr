@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import {
-  MessageSquare,
   Lock,
   Mail,
   User,
@@ -11,6 +10,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { ThemeToggle } from '../components/ThemeToggle';
+import { ComeOverLogo } from '../components/ComeOverLogo';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -73,9 +73,7 @@ export default function RegisterPage() {
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <div className="flex justify-center">
-          <div className="w-12 h-12 rounded-2xl bg-[#20B2AA] flex items-center justify-center shadow-lg shadow-[#20B2AA]/20 font-bold text-black">
-            <MessageSquare className="w-6 h-6 text-black" />
-          </div>
+          <ComeOverLogo className="w-14 h-14" />
         </div>
         <h2 className="mt-4 text-center text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191A1A] dark:text-[#EDEDED]">
           Create your account

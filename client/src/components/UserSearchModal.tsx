@@ -248,7 +248,7 @@ export function UserSearchModal({ isOpen, onClose }: UserSearchModalProps) {
                 Search Users by Username
               </h4>
               <p className="text-xs text-[#737878] dark:text-[#9EA3A3] mt-1 max-w-xs mx-auto">
-                Type a username to discover and add contacts on Whhispr.
+                Type a username to discover and add contacts on ComeOver.
               </p>
             </div>
           )}

@@ -189,7 +189,7 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                     </p>
                     <p className="text-[11px] text-[#9EA3A3]">
                       {isPublic
-                        ? 'Anyone in Whhispr can discover and join this channel'
+                        ? 'Anyone in ComeOver can discover and join this channel'
                         : 'Only invited members can view and join'}
                     </p>
                   </div>

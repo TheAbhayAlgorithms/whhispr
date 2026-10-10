@@ -18,6 +18,7 @@ import {
   Check,
   Eye,
   EyeOff,
+  LogOut,
 } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useThemeStore } from '../store/useThemeStore';
@@ -49,6 +50,19 @@ export default function SettingsPage() {
   } = useSettingsStore();
 
   const [activeTab, setActiveTab] = useState<SettingsTab>('appearance');
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      navigate('/login');
+    } catch (err) {
+      console.error('Logout failed:', err);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   // Change password form state
   const [currentPassword, setCurrentPassword] = useState('');
@@ -371,12 +385,32 @@ export default function SettingsPage() {
                         </span>
                       </div>
                       <div className="hidden md:block text-xs text-purple-600/70 dark:text-purple-300/70">
-                        Manage users & monitor messages
+                        Manage users & monitor platform
                       </div>
                     </div>
                   </Link>
                 </div>
               )}
+
+              {/* Dedicated Sign Out Option */}
+              <div className="md:pt-2 md:mt-2 md:border-t border-slate-200 dark:border-slate-800 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="w-full flex items-center space-x-2.5 md:space-x-3 px-3.5 py-2.5 md:px-4 md:py-3 rounded-xl md:rounded-2xl font-medium text-xs md:text-sm transition text-left text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-transparent hover:border-rose-200 dark:hover:border-rose-900/40 cursor-pointer disabled:opacity-50"
+                >
+                  <LogOut className="w-4 h-4 shrink-0" />
+                  <div className="flex-1">
+                    <div className="font-bold flex items-center space-x-1.5">
+                      <span>{isLoggingOut ? 'Signing out...' : 'Sign Out'}</span>
+                    </div>
+                    <div className="hidden md:block text-xs text-rose-500/70 dark:text-rose-400/70">
+                      Sign out of your account
+                    </div>
+                  </div>
+                </button>
+              </div>
             </nav>
           </aside>
 
@@ -388,7 +422,7 @@ export default function SettingsPage() {
                 <div>
                   <h2 className="text-xl font-bold text-slate-900 dark:text-white">Appearance</h2>
                   <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                    Customize how Whhispr looks and feels across your workspace.
+                    Customize how ComeOver looks and feels across your workspace.
                   </p>
                 </div>
 
@@ -459,7 +493,7 @@ export default function SettingsPage() {
                       Message Density
                     </h3>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Whhispr automatically formats bubbles for comfortable reading
+                      ComeOver automatically formats bubbles for comfortable reading
                     </p>
                   </div>
                   <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-semibold text-slate-600 dark:text-slate-300">
@@ -619,7 +653,7 @@ export default function SettingsPage() {
                         <span>Danger Zone</span>
                       </h3>
                       <p className="text-xs text-rose-600/80 dark:text-rose-400/80 mt-1 max-w-md">
-                        Permanently deactivate your Whhispr account, revoke all credentials, and
+                        Permanently deactivate your ComeOver account, revoke all credentials, and
                         remove your profile from directories.
                       </p>
                     </div>
@@ -644,7 +678,7 @@ export default function SettingsPage() {
                       Active Sessions
                     </h2>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                      Devices currently signed in to your Whhispr account.
+                      Devices currently signed in to your ComeOver account.
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -727,7 +761,7 @@ export default function SettingsPage() {
                     Notification Preferences
                   </h2>
                   <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                    Control how and when Whhispr alerts you about messages and calls.
+                    Control how and when ComeOver alerts you about messages and calls.
                   </p>
                 </div>
 
@@ -872,7 +906,7 @@ export default function SettingsPage() {
                     </div>
                     <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
                       All 1-on-1 private conversations and media attachments are cryptographically
-                      secured via ECDH key exchange and AES-256-GCM. Whhispr servers cannot inspect
+                      secured via ECDH key exchange and AES-256-GCM. ComeOver servers cannot inspect
                       your private message content.
                     </p>
                   </div>
@@ -913,7 +947,7 @@ export default function SettingsPage() {
                         Online Status
                       </h4>
                       <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Show a green indicator when you are actively using Whhispr
+                        Show a green indicator when you are actively using ComeOver
                       </p>
                     </div>
                     <button
