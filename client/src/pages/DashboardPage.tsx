@@ -1092,24 +1092,8 @@ export default function DashboardPage() {
                       </button>
                     </WarmTooltip>
 
-                    {/* Circular Pin Chat Button */}
-                    <WarmTooltip content={isChatPinned(activeChat.id) ? 'Unpin chat' : 'Pin chat'} side="bottom">
-                      <button
-                        type="button"
-                        onClick={() => togglePinChat(activeChat.id)}
-                        className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition shadow-xs cursor-pointer ${
-                          isChatPinned(activeChat.id)
-                            ? 'bg-[#1D2B29] text-[#20B2AA] border border-[#25423E]'
-                            : 'bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED]'
-                        }`}
-                        aria-label="Pin Chat"
-                      >
-                        <Pin className={`w-4 h-4 ${isChatPinned(activeChat.id) ? 'fill-current' : ''}`} />
-                      </button>
-                    </WarmTooltip>
-
-                    {/* Circular Members & Details Button */}
-                    <WarmTooltip content="Members & Info" side="bottom">
+                    {/* Circular Info & Details Button */}
+                    <WarmTooltip content={activeChat.type === 'direct' ? 'User Info' : 'Group Info'} side="bottom">
                       <button
                         type="button"
                         onClick={() => {
@@ -1124,9 +1108,9 @@ export default function DashboardPage() {
                             ? 'bg-[#1D2B29] text-[#20B2AA] border border-[#25423E]'
                             : 'bg-[#202222] hover:bg-[#262828] border border-[#2D3030] text-[#9EA3A3] hover:text-[#EDEDED]'
                         }`}
-                        aria-label="Members & Details"
+                        aria-label="Conversation Info"
                       >
-                        <Users className="w-4 h-4" />
+                        <Info className="w-4 h-4" />
                       </button>
                     </WarmTooltip>
 
