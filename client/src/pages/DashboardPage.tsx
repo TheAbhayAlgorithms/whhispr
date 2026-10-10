@@ -645,14 +645,9 @@ export default function DashboardPage() {
                 aria-label="ComeOver Home"
               >
                 <ComeOverLogo className="w-9 h-9 sm:w-10 sm:h-10 group-hover:scale-105 active:scale-95 transition shrink-0" />
-                <div className="flex flex-col text-left">
-                  <span className="text-base font-bold tracking-tight text-[#EDEDED] leading-tight">
-                    ComeOver
-                  </span>
-                  <span className="text-[10px] font-medium text-[#9EA3A3] hidden sm:inline">
-                    Secure Messaging
-                  </span>
-                </div>
+                <span className="text-base sm:text-lg font-bold tracking-tight text-[#EDEDED] leading-none">
+                  ComeOver
+                </span>
               </button>
             </div>
 
