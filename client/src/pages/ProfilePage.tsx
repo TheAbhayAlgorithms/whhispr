@@ -14,6 +14,7 @@ import {
   Eye,
 } from 'lucide-react';
 import { ThemeToggle } from '../components/ThemeToggle';
+import { DevicesLoading } from '../components/DevicesLoading';
 
 export default function ProfilePage() {
   const { user } = useAuthStore();
@@ -166,14 +167,20 @@ export default function ProfilePage() {
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 w-full">
-        {error && (
-          <div className="mb-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-start space-x-3 text-rose-600 dark:text-rose-400 text-sm">
-            <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-500 mt-0.5" />
-            <span>{error}</span>
+        {isLoading && !profile ? (
+          <div className="py-24 flex flex-col items-center justify-center">
+            <DevicesLoading size="lg" label="Loading profile across devices..." />
           </div>
-        )}
+        ) : (
+          <>
+            {error && (
+              <div className="mb-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-start space-x-3 text-rose-600 dark:text-rose-400 text-sm">
+                <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-500 mt-0.5" />
+                <span>{error}</span>
+              </div>
+            )}
 
-        <form onSubmit={handleSave} className="space-y-6 sm:space-y-8">
+            <form onSubmit={handleSave} className="space-y-6 sm:space-y-8">
           {/* Avatar Section */}
           <div className="p-4 sm:p-6 rounded-3xl bg-white dark:bg-[#141515] border border-[#E5E5E3] dark:border-[#2C2E2E] shadow-xs">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-[#737878] dark:text-[#9EA3A3] mb-4 sm:mb-6 flex items-center space-x-2">
@@ -401,6 +408,8 @@ export default function ProfilePage() {
             </button>
           </div>
         </form>
+          </>
+        )}
       </main>
     </div>
   );

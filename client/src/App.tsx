@@ -17,15 +17,10 @@ const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
 const VerifyEmailPage = lazy(() => import('./pages/VerifyEmailPage'));
 
+import { DevicesLoading } from './components/DevicesLoading';
+
 function PageLoadingFallback() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F9F9F8] dark:bg-[#191A1A] transition-colors">
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-10 h-10 border-4 border-[#20B2AA] border-t-transparent rounded-full animate-spin" />
-        <span className="text-sm font-medium text-[#737878] dark:text-[#9EA3A3]">Loading ComeOver...</span>
-      </div>
-    </div>
-  );
+  return <DevicesLoading size="fullscreen" label="Loading ComeOver..." />;
 }
 
 export default function App() {

@@ -11,6 +11,8 @@ import {
   Users,
 } from 'lucide-react';
 
+import { DevicesLoading } from './DevicesLoading';
+
 interface UserSearchModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -135,7 +137,11 @@ export function UserSearchModal({ isOpen, onClose }: UserSearchModalProps) {
 
         {/* Search Results Area */}
         <div className="p-3 sm:p-4 overflow-y-auto flex-1 space-y-2">
-          {searchResults.length > 0 ? (
+          {isSearching ? (
+            <div className="py-12 px-4 flex flex-col items-center justify-center">
+              <DevicesLoading size="sm" label="Searching users across devices..." />
+            </div>
+          ) : searchResults.length > 0 ? (
             <div className="space-y-1.5">
               <p className="text-[11px] font-semibold text-[#737878] dark:text-[#9EA3A3] uppercase tracking-wider px-2 py-1">
                 Users ({searchResults.length})

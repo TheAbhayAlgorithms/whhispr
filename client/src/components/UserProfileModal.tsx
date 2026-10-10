@@ -22,6 +22,7 @@ import {
   Info,
   Upload,
 } from 'lucide-react';
+import { DevicesLoading } from './DevicesLoading';
 
 interface UserProfileModalProps {
   profile: PublicProfile | null;
@@ -304,8 +305,8 @@ export function UserProfileModal({
 
                 {/* Upload Spinner overlay */}
                 {isUploadingDp && (
-                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center rounded-full">
-                    <Loader2 className="w-6 h-6 animate-spin text-[#20B2AA]" />
+                  <div className="absolute inset-0 bg-black/75 flex items-center justify-center rounded-full overflow-hidden">
+                    <DevicesLoading size="sm" />
                   </div>
                 )}
               </div>

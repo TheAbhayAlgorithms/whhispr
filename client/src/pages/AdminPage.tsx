@@ -19,6 +19,7 @@ import {
 import { useAuthStore } from '../store/useAuthStore';
 import { apiRequest } from '../lib/api';
 import { ThemeToggle } from '../components/ThemeToggle';
+import { DevicesLoading } from '../components/DevicesLoading';
 
 interface AdminStats {
   totalUsers: number;
@@ -209,6 +210,14 @@ export default function AdminPage() {
             Return to Dashboard
           </button>
         </div>
+      </div>
+    );
+  }
+
+  if (isLoading && !stats) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F9F9F8] dark:bg-[#191A1A]">
+        <DevicesLoading size="fullscreen" label="Loading ComeOver Admin Portal..." />
       </div>
     );
   }

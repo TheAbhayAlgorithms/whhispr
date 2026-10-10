@@ -13,6 +13,7 @@ import {
   UserPlus,
   Loader2,
 } from 'lucide-react';
+import { DevicesLoading } from './DevicesLoading';
 
 interface ContactsDropdownProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ export function ContactsDropdown({
   const {
     contacts,
     incomingRequests,
+    isLoading,
     fetchContacts,
     fetchRequests,
     removeContact,
@@ -300,6 +302,10 @@ export function ContactsDropdown({
                 </div>
               );
             })
+          ) : isLoading && contacts.length === 0 ? (
+            <div className="py-8 px-4 flex flex-col items-center justify-center">
+              <DevicesLoading size="sm" label="Syncing contacts..." />
+            </div>
           ) : contacts.length === 0 ? (
             <div className="py-8 px-4 text-center">
               <div className="w-10 h-10 mx-auto rounded-xl bg-[#E6F7F6] dark:bg-[#1D2B29] border border-[#B2E5E2] dark:border-[#25423E] flex items-center justify-center text-[#20B2AA] mb-2.5">

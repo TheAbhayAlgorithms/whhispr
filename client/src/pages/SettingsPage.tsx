@@ -24,6 +24,7 @@ import { useAuthStore } from '../store/useAuthStore';
 import { useThemeStore } from '../store/useThemeStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { ThemeToggle } from '../components/ThemeToggle';
+import { DevicesLoading } from '../components/DevicesLoading';
 
 type SettingsTab = 'appearance' | 'account' | 'sessions' | 'notifications' | 'privacy';
 
@@ -704,45 +705,51 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-3 pt-2">
-                  {sessions.map((session) => (
-                    <div
-                      key={session.id}
-                      className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition"
-                    >
-                      <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
-                        <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/40 flex items-center justify-center shrink-0">
-                          {getDeviceIcon(session.userAgent)}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                            <span className="text-sm font-semibold text-slate-900 dark:text-white truncate">
-                              {parseBrowser(session.userAgent)}
-                            </span>
-                            {session.isCurrent && (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 flex items-center space-x-1 shrink-0">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                <span>Current Device</span>
-                              </span>
-                            )}
-                          </div>
-                          <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                            <span>IP: {session.ipAddress || '127.0.0.1'}</span>
-                            <span>•</span>
-                            <span>Signed in {new Date(session.createdAt).toLocaleDateString()}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {!session.isCurrent && (
-                        <button
-                          onClick={() => revokeSession(session.id)}
-                          className="self-end sm:self-center px-3 py-1.5 rounded-xl text-xs font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition shrink-0"
-                        >
-                          Revoke
-                        </button>
-                      )}
+                  {isLoadingSessions && sessions.length === 0 ? (
+                    <div className="py-12 flex flex-col items-center justify-center">
+                      <DevicesLoading size="md" label="Loading connected devices..." />
                     </div>
-                  ))}
+                  ) : (
+                    sessions.map((session) => (
+                      <div
+                        key={session.id}
+                        className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition"
+                      >
+                        <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
+                          <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/40 flex items-center justify-center shrink-0">
+                            {getDeviceIcon(session.userAgent)}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                              <span className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                                {parseBrowser(session.userAgent)}
+                              </span>
+                              {session.isCurrent && (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 flex items-center space-x-1 shrink-0">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                  <span>Current Device</span>
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                              <span>IP: {session.ipAddress || '127.0.0.1'}</span>
+                              <span>•</span>
+                              <span>Signed in {new Date(session.createdAt).toLocaleDateString()}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {!session.isCurrent && (
+                          <button
+                            onClick={() => revokeSession(session.id)}
+                            className="self-end sm:self-center px-3 py-1.5 rounded-xl text-xs font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition shrink-0"
+                          >
+                            Revoke
+                          </button>
+                        )}
+                      </div>
+                    ))
+                  )}
 
                   {sessions.length === 0 && !isLoadingSessions && (
                     <div className="text-center py-8 text-slate-400 text-sm">
