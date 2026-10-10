@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { ComeOverLogo } from '../components/ComeOverLogo';
+import { DevicesLoading } from '../components/DevicesLoading';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -67,6 +68,11 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-[#F9F9F8] dark:bg-[#191A1A] text-[#191A1A] dark:text-[#EDEDED] flex flex-col justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200 relative">
+      {loading && (
+        <div className="fixed inset-0 z-50 bg-[#191A1A]/85 backdrop-blur-md flex items-center justify-center animate-in fade-in duration-200">
+          <DevicesLoading size="lg" label="Creating your ComeOver account..." />
+        </div>
+      )}
       <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
         <ThemeToggle />
       </div>

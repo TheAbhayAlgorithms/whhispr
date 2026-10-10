@@ -10,9 +10,9 @@ import {
   X,
   User,
   Clock,
-  Loader2,
 } from 'lucide-react';
 import { CallHistoryItem } from '../types/call';
+import { DevicesLoading } from './DevicesLoading';
 
 interface CallHistoryModalProps {
   isOpen: boolean;
@@ -85,9 +85,8 @@ export function CallHistoryModal({ isOpen, onClose, onStartCall }: CallHistoryMo
         {/* Call List */}
         <div className="flex-1 overflow-y-auto divide-y divide-[#242626] p-2 bg-[#141515]">
           {isLoadingHistory ? (
-            <div className="py-16 text-center text-[#737878]">
-              <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#20B2AA]" />
-              <p className="text-xs">Loading call history...</p>
+            <div className="py-16 flex flex-col items-center justify-center">
+              <DevicesLoading size="sm" label="Loading call history..." />
             </div>
           ) : callHistory.length === 0 ? (
             <div className="py-16 text-center text-[#737878]">

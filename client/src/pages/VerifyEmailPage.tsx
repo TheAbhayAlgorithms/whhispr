@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { apiRequest } from '../lib/api';
 import { MessageSquare, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
 import { ThemeToggle } from '../components/ThemeToggle';
+import { DevicesLoading } from '../components/DevicesLoading';
 
 export default function VerifyEmailPage() {
   const [searchParams] = useSearchParams();
@@ -59,9 +60,8 @@ export default function VerifyEmailPage() {
       <div className="mt-6 sm:mt-8 sm:mx-auto sm:w-full sm:max-w-md w-full">
         <div className="bg-white dark:bg-[#141515] py-6 px-4 sm:py-8 sm:px-10 shadow-xl rounded-3xl border border-[#E5E5E3] dark:border-[#2C2E2E] text-center">
           {loading ? (
-            <div className="py-8">
-              <div className="mx-auto w-10 h-10 rounded-full border-3 border-[#20B2AA] border-t-transparent animate-spin mb-4" />
-              <p className="text-sm text-[#737878] dark:text-[#9EA3A3]">Verifying your email address...</p>
+            <div className="py-6 flex flex-col items-center justify-center">
+              <DevicesLoading size="md" label="Verifying your email address..." />
             </div>
           ) : success ? (
             <div>

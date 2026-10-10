@@ -12,11 +12,11 @@ import {
   PhoneMissed,
   Users,
   Smile,
-  Loader2,
   Clock,
   BellRing,
 } from 'lucide-react';
 import { NotificationItem, NotificationType } from '../types/notification';
+import { DevicesLoading } from './DevicesLoading';
 
 interface NotificationCenterModalProps {
   isOpen: boolean;
@@ -155,9 +155,8 @@ export function NotificationCenterModal({ isOpen, onClose }: NotificationCenterM
         {/* Notification List */}
         <div className="flex-1 overflow-y-auto divide-y divide-[#2C2E2E] p-2 bg-[#141515]">
           {isLoading && notifications.length === 0 ? (
-            <div className="py-20 text-center text-[#9EA3A3]">
-              <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#20B2AA]" />
-              <p className="text-xs">Loading alerts...</p>
+            <div className="py-16 flex flex-col items-center justify-center">
+              <DevicesLoading size="sm" label="Loading alerts..." />
             </div>
           ) : notifications.length === 0 ? (
             <div className="py-20 text-center text-[#9EA3A3]">
