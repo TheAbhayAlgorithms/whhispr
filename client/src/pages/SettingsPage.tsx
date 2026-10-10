@@ -19,11 +19,13 @@ import {
   Eye,
   EyeOff,
   LogOut,
+  Sparkles,
 } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useThemeStore } from '../store/useThemeStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { DevicesLoading } from '../components/DevicesLoading';
+import JellyRadio from '../components/JellyRadio';
 
 type SettingsTab = 'appearance' | 'account' | 'sessions' | 'notifications' | 'privacy';
 
@@ -31,6 +33,9 @@ export default function SettingsPage() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const { theme, setTheme } = useThemeStore();
+  const [messageDensity, setMessageDensity] = useState<'Compact' | 'Comfortable' | 'Spacious'>('Comfortable');
+  const [jellyPhysics, setJellyPhysics] = useState<string>('Medium');
+  const [alertChimeLevel, setAlertChimeLevel] = useState<string>('Medium');
   const {
     sessions,
     isLoadingSessions,
@@ -384,9 +389,26 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="pt-4 border-t border-[#E5E5E3] dark:border-[#2D3030]">
-                  <label className="text-sm font-semibold text-[#191A1A] dark:text-[#EDEDED] block mb-3">
-                    Color Mode
-                  </label>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+                    <label className="text-sm font-semibold text-[#191A1A] dark:text-[#EDEDED] block">
+                      Color Mode
+                    </label>
+                    <JellyRadio
+                      items={[
+                        { value: 'light', label: 'Light', icon: <Sun className="w-3.5 h-3.5" /> },
+                        { value: 'dark', label: 'Dark', icon: <Moon className="w-3.5 h-3.5" /> }
+                      ]}
+                      value={theme}
+                      onChange={(val) => setTheme(val as 'light' | 'dark')}
+                      chipColor={theme === 'dark' ? '#202222' : '#F3F3F2'}
+                      activeColor="#20B2AA"
+                      textColor={theme === 'dark' ? '#9EA3A3' : '#737878'}
+                      activeTextColor="#000000"
+                      size="sm"
+                      gap={6}
+                      radius={16}
+                    />
+                  </div>
                   <div className="grid grid-cols-2 gap-4">
                     <button
                       type="button"
@@ -444,18 +466,67 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-[#E5E5E3] dark:border-[#2D3030] flex items-center justify-between">
+                {/* Message Density with JellyRadio */}
+                <div className="pt-6 border-t border-[#E5E5E3] dark:border-[#2D3030] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div>
                     <h3 className="text-sm font-semibold text-[#191A1A] dark:text-[#EDEDED]">
                       Message Density
                     </h3>
                     <p className="text-xs text-[#737878] dark:text-[#9EA3A3] mt-0.5">
-                      ComeOver automatically formats bubbles for comfortable reading
+                      Adjust conversation row spacing and message bubble padding
                     </p>
                   </div>
-                  <span className="px-3 py-1 bg-[#F3F3F2] dark:bg-[#202222] border border-[#E5E5E3] dark:border-[#2D3030] rounded-full text-xs font-semibold text-[#191A1A] dark:text-[#EDEDED]">
-                    Comfortable
-                  </span>
+                  <JellyRadio
+                    items={['Compact', 'Comfortable', 'Spacious']}
+                    value={messageDensity}
+                    onChange={(val) => setMessageDensity(val as 'Compact' | 'Comfortable' | 'Spacious')}
+                    chipColor={theme === 'dark' ? '#202222' : '#F3F3F2'}
+                    activeColor="#20B2AA"
+                    textColor={theme === 'dark' ? '#9EA3A3' : '#737878'}
+                    activeTextColor="#000000"
+                    size="md"
+                    radius={18}
+                    swell={0.18}
+                    barge={5}
+                    bounce={0.25}
+                  />
+                </div>
+
+                {/* Micro-Animation Spring Physics with JellyRadio */}
+                <div className="pt-6 border-t border-[#E5E5E3] dark:border-[#2D3030] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <Sparkles className="w-4 h-4 text-[#20B2AA]" />
+                      <h3 className="text-sm font-semibold text-[#191A1A] dark:text-[#EDEDED]">
+                        Micro-Animation Physics
+                      </h3>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#20B2AA]/15 text-[#20B2AA] border border-[#20B2AA]/25">
+                        JELLY SPRING
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#737878] dark:text-[#9EA3A3] mt-0.5">
+                      Tune spring stiffness, jelly recoil, and tactile feedback
+                    </p>
+                  </div>
+                  <JellyRadio
+                    items={['Off', 'Low', 'Medium', 'High', 'Max']}
+                    value={jellyPhysics}
+                    onChange={(val) => setJellyPhysics(val)}
+                    chipColor={theme === 'dark' ? '#202222' : '#F3F3F2'}
+                    activeColor="#20B2AA"
+                    textColor={theme === 'dark' ? '#9EA3A3' : '#737878'}
+                    activeTextColor="#000000"
+                    size="md"
+                    gap={8}
+                    radius={18}
+                    swell={0.2}
+                    barge={6}
+                    shrink={0.05}
+                    jelly={1}
+                    bounce={0.25}
+                    stagger={22}
+                    stiffness={580}
+                  />
                 </div>
               </div>
             )}
@@ -836,6 +907,32 @@ export default function SettingsPage() {
                         }`}
                       />
                     </button>
+                  </div>
+
+                  {/* Notification Chime Level with JellyRadio */}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 rounded-2xl border border-[#E5E5E3] dark:border-[#2D3030] bg-[#F9F9F8] dark:bg-[#191A1A] gap-3">
+                    <div>
+                      <h4 className="text-sm font-semibold text-[#191A1A] dark:text-[#EDEDED]">
+                        Notification Chime Intensity
+                      </h4>
+                      <p className="text-xs text-[#737878] dark:text-[#9EA3A3]">
+                        Adjust audio volume level and alert haptic resonance
+                      </p>
+                    </div>
+                    <JellyRadio
+                      items={['Off', 'Low', 'Medium', 'High', 'Max']}
+                      value={alertChimeLevel}
+                      onChange={(val) => setAlertChimeLevel(val)}
+                      chipColor={theme === 'dark' ? '#202222' : '#F3F3F2'}
+                      activeColor="#20B2AA"
+                      textColor={theme === 'dark' ? '#9EA3A3' : '#737878'}
+                      activeTextColor="#000000"
+                      size="sm"
+                      gap={6}
+                      radius={14}
+                      swell={0.16}
+                      barge={4}
+                    />
                   </div>
                 </div>
               </div>
